@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="./~d3theme"/>
+    <script type="text/javascript" src="./~d3main"></script>
+</head>
+<body>
+
+<div id="D3MainContainer" class="D3MainContainer">
+    <div class="slider hidden" style="width:400px;position:absolute;right:0;top:55px;z-index: 100;">
+    </div>
+</div>
+<script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function(){
+            if(D3BROWSER === false) {
+                document.getElementById('D3_NOT_SUPPORTED').style.display = 'block';
+            } else {
+                D3Api.MULTI_REQUEST = {"MAX_THREAD":"","MAX_REQUEST":""};
+                D3Api.cache_enabled = 0;
+                D3Api.startInit();
+                D3Api.init();
+                D3Api.MainDom = document.getElementById('D3MainContainer');
+                D3Api.D3MainContainer = D3Api.MainDom;
+                var dev_info_panel = D3Api.getOption('dev_info_panel', 'false');
+                if (dev_info_panel && dev_info_panel.show == 'true') {
+                    var info_panel = document.createElement('div');
+                    if (dev_info_panel.text) {
+                        info_panel.innerHTML = dev_info_panel.text;
+                    }
+                    if (dev_info_panel.color) {
+                        info_panel.style.borderColor = dev_info_panel.color;
+                    }
+                    D3Api.addClass(info_panel, 'dev_info_panel');
+                    D3Api.insertBeforeDom(D3Api.D3MainContainer, info_panel);
+                }
+                D3Api.showForm('main', undefined, {history: false});
+            }
+        },true);
+
+
+</script>
+</body>
+</html>

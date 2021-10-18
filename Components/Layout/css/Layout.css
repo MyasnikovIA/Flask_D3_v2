@@ -1,0 +1,59 @@
+
+   /*
+     Если в родителе нет класса WinContent у родителя, тогда нкжно добавить position: fixed;
+
+   */
+
+	table.WinLayout{
+        display: table;
+	}
+    table.WinLayout td.WinVerticalSpliter {
+       width:10px;
+	   background:url("Components/Layout/images/ModWin_l.png") left top repeat-y;
+    }
+
+
+    table.WinLayout td.WinLayout div.formBackground
+	{
+            -moz-border-radius: 0 0 5px 5px;
+            -webkit-border-radius: 0 0 5px 5px;
+            -o-border-radius: 0 0 5px 5px;
+            border-radius: 0 0 5px 5px;
+        }
+
+	table.WinLayout td.WinLayoutTop
+	{
+		height:10px;
+		background:url("Components/Layout/images/ModWin_t.png") left top repeat-x;
+	}
+
+	table.WinLayout td.WinLayoutLeft
+	{
+		width:10px;
+		background:url("Components/Layout/images/ModWin_l.png") left top repeat-y;
+	}
+
+	table.WinLayout td.WinLayout
+	{
+		background:url("Components/Window/images/ModWin_bg.png") left top;
+	}
+
+	table.WinLayout td.WinLayoutRight
+	{
+		width:10px;
+		background:url("Components/Layout/images/ModWin_l.png") left top repeat-y;
+                -moz-user-select: none;
+                user-select: none;
+                -webkit-user-select: none;
+	}
+
+	table.WinLayout td.WinLayoutBottom
+	{
+		height:10px;
+		background:url("Components/Layout/images/ModWin_t.png") left top repeat-x;
+                cursor:s-resize;
+                -moz-user-select: none;
+                user-select: none;
+                -webkit-user-select: none;
+	}
+

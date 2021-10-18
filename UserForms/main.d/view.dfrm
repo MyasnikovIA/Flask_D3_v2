@@ -1,0 +1,10 @@
+<attr target="Button1" name="onclick" value="base().showPrg(true);" pos="replace"/>
+<node target="MainScript"  pos="replace">
+    <cmpScript >
+      Form.onCreate = function() {
+          setVar("form_params22","12345");
+          setVar("paramArrDS",{"testparam1":123,"testParam2":345});
+          console.log("1111111111");
+      }
+    </cmpScript>
+</node>

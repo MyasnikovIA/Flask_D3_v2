@@ -1,0 +1,40 @@
+.formSized{
+    position: relative;
+    height: auto;
+    width: auto;
+    margin: 0 auto;
+}
+.formSizedContainer{
+    background-color: rgba(0,0,0,0.0) !important;
+    overflow: auto !important;
+}
+.formFrame{
+    background:url('~CmpForm/framebg') repeat transparent;
+    padding: 30px 10px 10px;
+    position: absolute;
+}
+.formFrame .frameCaption{
+    margin-top: -30px;
+    line-height: 30px;
+    margin-right: 40px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: default;
+    color: #FFFFFF;
+    user-select: none;
+}
+.formFrame .frameClose {
+    position: absolute;
+    display: block;
+    width: 40px;
+    height: 20px;
+    background-color: #DC322F;
+    color: #FFFFFF;
+    text-align: center;
+    line-height: 20px;
+    cursor: pointer;
+    top: 5px;
+    right: 10px;
+    user-select: none;
+}
