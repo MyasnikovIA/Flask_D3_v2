@@ -4,7 +4,7 @@ from Components.Base.BaseCtrl import *
 class LayoutContainer(Base):
     def __init__(self, attrs):
         super().__init__(attrs)
-        self.CmpType = 'Layout';
+        self.CmpType = 'LayoutContainer';
         self.tag = 'td';
         if "style" in self.attrs:
             self.style = f""" style="vertical-align: top; background-size: 100% 100%; {self.attrs.get("style")}" """
@@ -15,7 +15,7 @@ class LayoutContainer(Base):
     def show(self):
         eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
-        self.print(f"""<td class="WinLayout" {self.style} {atr} {eventsStr} >""")
+        self.print(f"""<td class="WinLayout" cmptype="{self.CmpType}" name="{self.name}"    {self.style} {atr} {eventsStr} >""")
 
 
 """

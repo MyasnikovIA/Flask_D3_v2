@@ -4,27 +4,41 @@ class LayoutSplit(Base):
 
     def __init__(self, attrs):
         super().__init__(attrs)
-        self.CmpType = 'Layout';
+        self.CmpType = 'Layoutsplit';
 
         if "orientation" in self.attrs:
             self.orientation = self.attrs.get("orientation" )
+            del self.attrs["orientation"]
         else:
             self.orientation = 'vertical';
 
+
         if self.orientation == "vertical":
             self.tag = 'td';
+
         if self.orientation == "horizon":
             self.tag = 'tr';
+
+        # Установка направление в котором будет изменятся блок
+        if "direction" in self.attrs:
+            self.direction = self.attrs.get("direction" )
+            del self.attrs["direction"]
+        else:
+            if self.orientation == "vertical":
+                self.direction = 'left';
+            else:
+                self.direction = 'top';
+
 
     def show(self):
 
         if self.orientation == "horizon":
-               self.print(""" <tr style="display: table-row;  border-color: inherit; cursor:s-resize;">
-                                <td class="WinLayoutTop" name="s_top" colspan="25" onmousedown="D3Api.LayoutSplitCtrl.mouseDownVert(event)"/>
+               self.print(f""" <tr  cmptype="{self.CmpType}" name="{self.name}"   style="display: table-row;  border-color: inherit; cursor:s-resize;">
+                                <td class="WinLayoutTop" name="s_top" colspan="25" onmousedown="D3Api.LayoutSplitCtrl.moveSplit(event,'{self.direction}')"/>
                               </tr>
                 """)
         if self.orientation == "vertical":
-            self.print(""" <td class="WinLayoutLeft" name="e_middle" style="cursor:e-resize;"  onmousedown="D3Api.LayoutSplitCtrl.mouseDownHor(event)"/> """)
+            self.print(f""" <td class="WinLayoutLeft" cmptype="{self.CmpType}" name="{self.name}"  style="cursor:e-resize;"  onmousedown="D3Api.LayoutSplitCtrl.moveSplit(event,'{self.direction}')"/> """)
 
 
 """

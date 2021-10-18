@@ -50,8 +50,8 @@ def show():
     res.append(readfile('Components/Window/win_sys.js'))
     res.append(readfile('Components/Window/window.js'))
 
-    res.append(readfile('Components/Layout/js/Layout.js'))
 
+    res.append(readfile('Components/Layout/js/Layout.js'))
     res.append(readfile('Components/LayoutSplit/js/LayoutSplit.js'))
 
 

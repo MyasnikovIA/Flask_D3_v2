@@ -31,7 +31,7 @@ function getWindowXml(_otladka){
                         <tr style="display: table-row; vertical-align: inherit; border-color: inherit;">
                             <td class="WinContentLeft" name="w_middle"></td>
                             <td class="WinContent" style="vertical-align: top;  background: url(Components/Window/images/Background.png); background-size: 100% 100%;">
-                                <div name="win_content" style="-webkit-box-sizing: border-box;background-color: RGB(210, 210, 210);"></div>
+                                <div class="WinContentBody" name="win_content" style="-webkit-box-sizing: border-box;background-color: RGB(210, 210, 210);"></div>
                             </td>
                             <td class="WinContentRight" name="e_middle" style="cursor:e-resize;">
                             </td>
@@ -151,8 +151,8 @@ function DWindow(_otladka){
 	    	captureX=evt.pageX||evt.x;captureY=evt.pageY||evt.y;
 	    	var _windowObject=this;
 	    	this._removeDocEvent();
-                    addClass(document.body,'noselect');
-                    addClass(modal_win,'noselect');
+            addClass(document.body,'noselect');
+            addClass(modal_win,'noselect');
 	    	addEvent(document,'mousemove',docMoveEvent=function (e){_windowObject._onMove(e||window.event);});
 	    	addEvent(document,'mouseup',docUpEvent=function (e){_windowObject._onMouseUp(e||window.event);});
 	    }

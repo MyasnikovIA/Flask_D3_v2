@@ -34,12 +34,19 @@
                 openD3Form('main',true,{width: '100%', height: "100%", vars: { AGENT_ID: 123 }, onclose: function(mod) { console.log('mod',mod); }} );
             }
 
+            Form.getLay = function(){
+               console.log( getControl("MyLayout"));
+            };
+
+
+
        ]]>
     </cmpScript>
 
     <cmpButton caption="Form.openD3Form" onclick="Form.openD3Form();"/>
+    <cmpButton caption="Form.MyLayout" onclick="Form.getLay();"/>
 
-    <cmpLayout name="test" >
+    <cmpLayout name="MyLayout"  style="height:90%">
         <cmpLayoutContainer  colspan="22"  style="height:25px">
             верх444
               <cmpLabel caption="Лево"/>
@@ -71,8 +78,8 @@
                 <cmpLabel caption="право"/>
                 4444
             </cmpLayoutContainer>
-        <cmpLayoutSplit orientation="horizon"/>
-        <cmpLayoutContainer  colspan="25">
+        <cmpLayoutSplit orientation="horizon" direction="bottom"/>
+        <cmpLayoutContainer  colspan="25" >
             Низ
         </cmpLayoutContainer>
     </cmpLayout>
