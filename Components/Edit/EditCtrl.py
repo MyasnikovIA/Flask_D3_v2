@@ -45,8 +45,9 @@ class Edit(Base):
             classCSSStr = f""" class='{' '.join(self.classCSS)}'"""
         else:
             classCSSStr = ""
-        self.SetSysInfo.append("<scriptfile>Components/Edit/js/Edit.js</scriptfile>")
-        self.SetSysInfo.append("<cssfile>Components/Edit/css/Edit.css</cssfile>")
         self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}"  {classCSSStr} {self.style} {self.placeholder}  {atr}  disabled onchange="D3Api.stopEvent();">  
                      <input cmpparse="Edit"  {self.type} {self.value} {self.maxlength} {self.readonly} {eventsStr}  onchange="D3Api.stopEvent(); " {self.placeholder} {self.disabled} />""")
+        # Добавляется при инициализации  d3main.js d3theme.css
+        #self.SetSysInfo.append("<scriptfile>Components/Edit/js/Edit.js</scriptfile>")
+        #self.SetSysInfo.append("<cssfile>Components/Edit/css/Edit.css</cssfile>")
 

@@ -108,18 +108,19 @@ D3Api.LayoutSplitCtrl = new function ()
               /* Вычисляем новые координаты блока */
               if ((direction == "left")||(direction == "right")) {
                  new_x = delta_x + x;
-                 blockEdit.style.width = new_x + "px";
+                 obj_event.target.style.width = new_x + "px";
+                 // blockEdit.style.width = new_x + "px";
               }
               if (direction == "top") {
                  new_y = delta_y + 1;
+                 //obj_event.target.style.height = new_y + "px";
                  blockEdit.style.height = new_y + "px";
               }
               if (direction == "bottom") {
                  new_y = delta_y + y;
+                 //obj_event.target.style.height = new_y + "px";
                  blockEdit.style.height = new_y + "px";
               }
-
-
            }
            return false;
         }

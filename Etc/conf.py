@@ -116,10 +116,47 @@ ConfigOptions = {
 def getParam(name, defoultValue=''):
     return request.args.get(name, default=defoultValue)
 
+
 def get_option(name, defoultValue=""):
     if name in ConfigOptions:
         return ConfigOptions[name]
     return defoultValue
 
+
 def is_design_mode():
     return get_option('design_mode');
+
+
+###-----------------------------------------------------------------------------------------------
+###------ Механизм буфиризации контента, для ускорения продуктового сервета ----------------------
+###-----------------------------------------------------------------------------------------------
+global TMP_PAGE_CAHE
+TMP_PAGE_CAHE = {}
+
+
+def getTempPage(name, defoultValue=''):
+    global TMP_PAGE_CAHE
+    if TMP_PAGE_CAHE.get(name) == None:
+        return defoultValue, 'application/plain'
+    res = TMP_PAGE_CAHE.get(name)
+    return res.get("txt"), res.get("mime")
+
+
+def setTempPage(name, html='', mime='application/plain'):
+    global TMP_PAGE_CAHE
+    if TMP_PAGE_CAHE == None:
+        TMP_PAGE_CAHE = {}
+    TMP_PAGE_CAHE[name] = {"txt": html, "mime": mime}
+
+
+def existTempPage(name):
+    global TMP_PAGE_CAHE
+    if TMP_PAGE_CAHE == None:
+        TMP_PAGE_CAHE = {}
+        return False
+    if name in TMP_PAGE_CAHE:
+        return True
+    return False
+###-----------------------------------------------------------------------------------------------
+###-----------------------------------------------------------------------------------------------
+###-----------------------------------------------------------------------------------------------

@@ -47,41 +47,43 @@
     <cmpButton caption="Form.MyLayout" onclick="Form.getLay();"/>
 
     <cmpLayout name="MyLayout"  style="height:90%">
-        <cmpLayoutContainer  colspan="22"  style="height:25px">
-            верх444
-              <cmpLabel caption="Лево"/>
-            555
+
+        <cmpLayoutContainer  colspan="22"  style="height:125px">
+              <cmpLabel caption="Верхняя панель"/>
         </cmpLayoutContainer>
-        <cmpLayoutSplit orientation="horizon"/>
-            <cmpLayoutContainer>
-                1111
-                <cmpLabel caption="Лево"/>
-                4444
+
+        <!-- Разделительны элемент (горизонтальный) -->
+        <cmpLayoutSplit orientation="horizon" direction="top" />
+
+             <!-- контейнер -->
+             <cmpLayoutContainer>
+                <cmpLabel caption="Левая панель "/>
             </cmpLayoutContainer>
+
+            <!-- Разделительны элемент (вертикальный) -->
             <cmpLayoutSplit orientation="vertical"/>
+
+
             <cmpLayoutContainer>
-                2222
-                <cmpLabel caption="Центр"/>
-                4444
+                <cmpLabel caption="Центральная панель"/>
                 <cmpEdit name="test3"/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
-                <br/>
                 <cmpEdit name="test3"/>
             </cmpLayoutContainer>
+
+            <!-- Разделительны элемент (вертикальный) -->
             <cmpLayoutSplit orientation="vertical"/>
+
             <cmpLayoutContainer>
-                3333
-                <cmpLabel caption="право"/>
-                4444
+                <cmpLabel caption="Правая панель"/>
             </cmpLayoutContainer>
+
+        <!-- Разделительны элемент (горизонтальный) -->
         <cmpLayoutSplit orientation="horizon" direction="bottom"/>
+
         <cmpLayoutContainer  colspan="25" >
-            Низ
+            Нижняя панель
         </cmpLayoutContainer>
+
     </cmpLayout>
 
 </cmpForm>

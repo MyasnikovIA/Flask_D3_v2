@@ -1,9 +1,10 @@
 from flask import session, request, jsonify
 import os
 import codecs
-from Etc.conf import ROOT_DIR
+from Etc.conf import get_option, ROOT_DIR, getTempPage, setTempPage, existTempPage
 import hashlib
 
+compList = ['Base','Edit','Button','Form','Label','LayoutSplit']
 
 def readfile(name):
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{name}'
@@ -26,9 +27,31 @@ def genCacheUid():
     hesh = random + hashlib.md5(f'{getIdClient()}'.encode('utf-8')).hexdigest()
     return hesh
 
+def getTemp(agent_info):
+    cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir","temp/")}'
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_d3main.js"
+    if not os.path.exists(cmpDirSrc):
+        os.makedirs(cmpDirSrc)
+    txt = ""
+    if existTempPage(cmpFiletmp):
+        txt,mime  = getTempPage(cmpFiletmp,'')
+    if not txt == "":
+        return txt
+
+    if not os.path.exists(cmpFiletmp):
+        with open(cmpFiletmp,"wb") as d3_js:
+            txt = getSrc(agent_info)
+            d3_js.write(txt.encode())
+            setTempPage(cmpFiletmp, txt)
+            return txt
+    else:
+        with open(cmpFiletmp, "rb") as infile:
+            txt = infile.read()
+            setTempPage(cmpFiletmp, txt)
+            return txt
 
 
-def show():
+def getSrc(agent_info):
     random = "c"
     hesh = random + hashlib.md5(f'{getIdClient()}'.encode('utf-8')).hexdigest()
     res = []
@@ -49,10 +72,14 @@ def show():
     res.append(readfile('Components/Window/common.js'))
     res.append(readfile('Components/Window/win_sys.js'))
     res.append(readfile('Components/Window/window.js'))
+    #res.append(readfile('Components/Layout/js/Layout.js'))
+    #res.append(readfile('Components/LayoutSplit/js/LayoutSplit.js'))
+    for cmp in compList:
+        cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}.js'
+        res.append(readfile(cmpDirSrc))
+        cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}_{agent_info.get("platform")}.js'
+        res.append(readfile(cmpDirSrc))
 
-
-    res.append(readfile('Components/Layout/js/Layout.js'))
-    res.append(readfile('Components/LayoutSplit/js/LayoutSplit.js'))
 
 
     #
@@ -110,4 +137,11 @@ def show():
     res.append('D3Api.SYS_CONFIG = {"formCache":false,"showDependence":false};')
     res.append('D3Api.SYS_CONFIG.debug = 1;')
     res.append('D3Api.startInit = function (){};')
-    return "\r".join(res)
+    return "".join(res)
+
+
+def show(agent_info):
+    if get_option("TempDir") and (+get_option("debug"))<1:
+        return getTemp(agent_info)
+    else:
+        return getSrc(agent_info)

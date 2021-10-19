@@ -209,6 +209,7 @@ D3Api.returnGET = function(notlower)
 }
 D3Api.getControlPropertyByDom = function(controlDom,nameProperty,noGetEvent)
 {
+    debugger;
     var ct = D3Api.getProperty(controlDom,'cmptype');
     if (!ct)
     {

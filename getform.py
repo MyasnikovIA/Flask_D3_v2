@@ -213,11 +213,9 @@ def handle_property(root):
             htmlContent.append(obj.tail)
     return sysinfoBlock, "".join(htmlContent)
 
-def getParsedForm(formName, cache, dataSetName=""):
-    """
-      Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
-      !!!  необходимо переписать, и добавить логику DFRM (частичног опереопределения XML формы)
-      """
+
+
+def getSrc(formName, cache, dataSetName="",agent_info={}):
     rootForm = getXMLObject(formName)
     sysinfoBlock, text = handle_property(rootForm)  # парсим форму
     resTxt = [text]
@@ -226,6 +224,38 @@ def getParsedForm(formName, cache, dataSetName=""):
         resTxt.append(line)
     resTxt.append('</div>')
     return "".join(resTxt)
+
+def getTemp(formName, cache, dataSetName,agent_info):
+    cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir","temp/")}'
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_{formName.replace(os.sep,'_')}.frm"
+    if not os.path.exists(cmpDirSrc):
+        os.makedirs(cmpDirSrc)
+    txt = ""
+    if existTempPage(cmpFiletmp):
+        txt,mime  = getTempPage(cmpFiletmp,'')
+    if not txt == "":
+        return txt
+    if not os.path.exists(cmpFiletmp):
+        with open(cmpFiletmp,"wb") as d3_css:
+            txt = getSrc(formName, cache, dataSetName,agent_info)
+            d3_css.write(txt.encode())
+            setTempPage(cmpFiletmp, txt)
+            return txt
+    else:
+        with open(cmpFiletmp, "rb") as infile:
+            txt = infile.read()
+            setTempPage(cmpFiletmp, txt)
+            return txt
+
+def getParsedForm(formName, cache, dataSetName="",agent_info={}):
+    """
+      Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
+      !!!  необходимо переписать, и добавить логику DFRM (частичног опереопределения XML формы)
+    """
+    if get_option("TempDir") and (+get_option("debug"))<1:
+        return getTemp(formName, cache, dataSetName,agent_info)
+    else:
+        return getSrc(formName, cache, dataSetName,agent_info)
 
 
 def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
@@ -355,7 +385,7 @@ def getXMLObject(formName):
         return joinDfrm(rootForm,rootDfrmForm)
     return rootForm
 
-def dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj):
+def dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj,agent_info):
     """
     Функция обработки запросов DataSet и Action с клиентских форм
     """

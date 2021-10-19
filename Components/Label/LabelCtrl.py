@@ -53,6 +53,8 @@ class Label(Base):
             classCSSStr = ""
         self.print(f"""
                 <span  cmptype="{self.CmpType}" name="{self.name}" {classCSSStr}  {self.style} {eventsStr} {self.data}> {self.before_caption}{self.caption}{self.after_caption}{self.note} {atr}""")
-        self.SetSysInfo.append("<scriptfile>Components/Label/js/Label.js</scriptfile>")
-        self.SetSysInfo.append("<cssfile>Components/Label/css/Label.css</cssfile>")
+
+        # Добавляется при инициализации  d3main.js d3theme.css
+        #self.SetSysInfo.append("<scriptfile>Components/Label/js/Label.js</scriptfile>")
+        #self.SetSysInfo.append("<cssfile>Components/Label/css/Label.css</cssfile>")
 

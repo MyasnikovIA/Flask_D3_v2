@@ -16,8 +16,9 @@ class Layout(Base):
         atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
         eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
         self.print(f""" <table class=" WinLayout"  cmptype="{self.CmpType}" name="{self.name}"  {self.style} {eventsStr} {atr}> """)
-        self.SetSysInfo.append("<scriptfile>Components/Layout/js/Layout.js</scriptfile>")
-        self.SetSysInfo.append("<cssfile>Components/Layout/css/Layout.css</cssfile>")
+        # Добавляется при инициализации  d3main.js d3theme.css
+        #self.SetSysInfo.append("<scriptfile>Components/Layout/js/Layout.js</scriptfile>")
+        #self.SetSysInfo.append("<cssfile>Components/Layout/css/Layout.css</cssfile>")
 
 """
 

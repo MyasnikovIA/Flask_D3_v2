@@ -1,6 +1,6 @@
 import os
 import codecs
-from Etc.conf import get_option, ROOT_DIR
+from Etc.conf import get_option, ROOT_DIR, getTempPage, setTempPage, existTempPage
 import hashlib
 
 theme = get_option('Theme');
@@ -24,31 +24,45 @@ def readfile(name):
     return ""
 
 
-def getSrc():
+def getSrc(agent_info):
     res = []
     for cmp in compList:
-        res.append(readCmpCss(cmp, ''))
-        res.append(readfile('Components/Window/css/win.css'))
-        res.append(readfile('Components/Layout/css/Layout.css'))
-    return "\r".join(res)
+        cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}css{os.sep}{cmp}.css'
+        res.append(readfile(cmpDirSrc))
+        cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}css{os.sep}{cmp}_{agent_info.get("platform")}.css'
+        res.append(readfile(cmpDirSrc))
+    # Обязательные стили
+    res.append(readfile('Components/Window/css/win.css'))
+    res.append(readfile(f'Components/Window/css/win_{agent_info.get("platform")}.css'))
+    res.append(readfile('Components/Layout/css/Layout.css'))
+    res.append(readfile(f'Components/Window/css/win_{agent_info.get("platform")}.css'))
+    return "".join(res)
 
-
-def getTemp():
+def getTemp(agent_info):
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir","temp/")}'
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_d3theme.css"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
-    if not os.path.exists(f"{cmpDirSrc}d3theme.css"):
-        d3_js = open(f"{cmpDirSrc}d3theme.css", 'w')
-        txt = getSrc()
-        d3_js.write(txt)
-        d3_js.close()
+    txt = ""
+    if existTempPage(cmpFiletmp):
+       txt,mime = getTempPage(cmpFiletmp,'')
+    if txt == "":
+        if not os.path.exists(cmpFiletmp):
+            with open(cmpFiletmp,"wb") as d3_css:
+                txt = getSrc(agent_info)
+                d3_css.write(txt.encode())
+                setTempPage(cmpFiletmp,txt)
+                return txt
+        else:
+            with open(cmpFiletmp, "rb") as infile:
+                txt = infile.read()
+                setTempPage(cmpFiletmp, txt)
+                return txt
+    else:
         return txt
-    else:
-        with open(f"{cmpDirSrc}d3theme.css", "rb") as infile:
-            return infile.read()
 
-def show():
+def show(agent_info):
     if get_option("TempDir") and (+get_option("debug"))<1:
-        return getTemp()
+        return getTemp(agent_info)
     else:
-        return getSrc()
+        return getSrc(agent_info)

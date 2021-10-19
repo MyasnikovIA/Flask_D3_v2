@@ -62,8 +62,9 @@ class BaseCtrl(Base):
         eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
         self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {atr}  {eventsStr}>""")
-        self.SetSysInfo.append("<scriptfile>Components/Base/js/Base.js</scriptfile>")
-        self.SetSysInfo.append("<cssfile>Components/Edit/css/Base.css</cssfile>")
+        # Добавляется при инициализации  d3main.js d3theme.css
+        #self.SetSysInfo.append("<scriptfile>Components/Base/js/Base.js</scriptfile>")
+        #self.SetSysInfo.append("<cssfile>Components/Base/css/Base.css</cssfile>")
 
 
 def getDomAttr(name, value='', attrs=None):

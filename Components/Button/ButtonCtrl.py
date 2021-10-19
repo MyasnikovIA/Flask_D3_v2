@@ -73,7 +73,8 @@ class Button(Base):
             popupmenuCss = ' style="display: inline-block;" '
             popupmenuTag = """<i class="fas fa-angle-down" style="padding-left: 5px;float: right;padding-top: 4px"></i>"""
         self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {eventsStr} tabindex="0" {classCSSStr} style="{" ".join(self.style)}" {self.data} >{self.icon}<div class="btn_caption btn_center {minwidth}" {popupmenuCss}>{self.caption}{self.text}</div>{popupmenuTag}""")
-        self.SetSysInfo.append("<scriptfile>Components/Button/js/Button.js</scriptfile>")
-        self.SetSysInfo.append("<cssfile>Components/Button/css/Button.css</cssfile>")
+        # Добавляется при инициализации  d3main.js d3theme.css
+        #self.SetSysInfo.append("<scriptfile>Components/Button/js/Button.js</scriptfile>")
+        #self.SetSysInfo.append("<cssfile>Components/Button/css/Button.css</cssfile>")
 
 

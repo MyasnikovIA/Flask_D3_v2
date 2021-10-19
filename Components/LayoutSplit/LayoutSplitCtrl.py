@@ -31,14 +31,21 @@ class LayoutSplit(Base):
 
 
     def show(self):
-
         if self.orientation == "horizon":
-               self.print(f""" <tr  cmptype="{self.CmpType}" name="{self.name}"   style="display: table-row;  border-color: inherit; cursor:s-resize;">
+               self.print(f""" <tr name="{self.name}"   style="display: table-row;  border-color: inherit; cursor:s-resize;">
                                 <td class="WinLayoutTop" name="s_top" colspan="25" onmousedown="D3Api.LayoutSplitCtrl.moveSplit(event,'{self.direction}')"/>
                               </tr>
                 """)
         if self.orientation == "vertical":
-            self.print(f""" <td class="WinLayoutLeft" cmptype="{self.CmpType}" name="{self.name}"  style="cursor:e-resize;"  onmousedown="D3Api.LayoutSplitCtrl.moveSplit(event,'{self.direction}')"/> """)
+            self.print(f""" <td class="WinLayoutLeft" name="{self.name}"  style="cursor:e-resize;"  onmousedown="D3Api.LayoutSplitCtrl.moveSplit(event,'{self.direction}')"/> """)
+
+        #if self.orientation == "horizon":
+        #       self.print(f""" <tr  cmptype="{self.CmpType}" name="{self.name}"   style="display: table-row;  border-color: inherit; cursor:s-resize;">
+        #                        <td class="WinLayoutTop" name="s_top" colspan="25" onmousedown="D3Api.LayoutSplitCtrl.moveSplit(event,'{self.direction}')"/>
+        #                      </tr>
+        #        """)
+        #if self.orientation == "vertical":
+        #    self.print(f""" <td class="WinLayoutLeft" cmptype="{self.CmpType}" name="{self.name}"  style="cursor:e-resize;"  onmousedown="D3Api.LayoutSplitCtrl.moveSplit(event,'{self.direction}')"/> """)
 
 
 """
