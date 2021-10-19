@@ -9,7 +9,7 @@ import json
 import hashlib
 from inspect import getfullargspec
 
-from Etc.conf import get_option, ROOT_DIR
+from Etc.conf import get_option, ROOT_DIR,getAgetntInfo
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
 
@@ -131,33 +131,17 @@ def example():
     return app.send_static_file('index.html')
 
 
-def getAgetntInfo():
-    # Пределение платформы и версии браузера
-    browser = request.user_agent.browser
-    version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
-    platform = request.user_agent.platform
-    uas = request.user_agent.string
-    res = {'browser': browser, 'browser_version': version, 'platform': platform}
-    agent = request.headers.get('User-Agent')
-    res['agent'] = agent
-    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-        res['ip'] = request.environ['REMOTE_ADDR']
-    else:
-        res['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
-    return res
-
 @app.route('/~<name>', methods=['GET'])
 @cross_origin()
 def d3theme_files(name):
-    agent_info = getAgetntInfo()
     if "d3theme" in name:
         # return app.send_static_file('external/d3/d3theme.css')
-        return d3theme_css(agent_info), 200, {'content-type': 'text/css'}
+        return d3theme_css(getAgetntInfo()), 200, {'content-type': 'text/css'}
         # return app.send_static_file('external/d3/~d3theme'), 200, {'content-type': 'text/css'}
 
     if "d3main" in name:
         # return app.send_static_file('external/d3/d3api.js')
-        return d3main_js(agent_info), 200, {'content-type': 'application/json'}
+        return d3main_js(getAgetntInfo()), 200, {'content-type': 'application/json'}
         # return app.send_static_file('System/d3main.py'), 200, {'content-type': 'application/json'}
 
 

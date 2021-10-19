@@ -15,11 +15,10 @@ class LayoutContainer(Base):
     def show(self):
         eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
-        self.print(f"""<td class="WinLayout" cmptype="{self.CmpType}" name="{self.name}"    {self.style} {atr} {eventsStr} >""")
-
+        self.print(f"""<td class="WinLayout" cmptype="{self.CmpType}" name="{self.name}"  {self.style} {atr} {eventsStr} >""")
 
 """
-
+cmptype="{self.CmpType}" name="{self.name}"  
     <table class="window WinLayout" name="modal_win" style="height:80%; width:90% ; ext-indent: initial; border-spacing: 2px; background-color: rgb(210, 210, 210);">
         <tbody>
 

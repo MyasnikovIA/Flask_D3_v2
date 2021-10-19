@@ -4,8 +4,8 @@
  */
 D3Api.LayoutSplitCtrl = new function ()
 {
-    this.decimalSeparator = (1.1).toLocaleString().substring(1, 2);
-    this.thousandSeparator = (1000).toLocaleString().substring(1, 2);
+    //this.decimalSeparator = (1.1).toLocaleString().substring(1, 2);
+    //this.thousandSeparator = (1000).toLocaleString().substring(1, 2);
     /**
      *
      * @param _dom
@@ -13,11 +13,10 @@ D3Api.LayoutSplitCtrl = new function ()
     this.init = function(_dom) {
         var inp = D3Api.EditCtrl.getInput(_dom);
         this.init_focus(inp);
-        D3Api.addEvent(inp, 'change', function(event){ D3Api.stopEvent(event); }, true);
-        D3Api.BaseCtrl.initEvent(_dom,'onchange');
-        D3Api.BaseCtrl.initEvent(_dom,'onformat');
+        //D3Api.addEvent(inp, 'change', function(event){ D3Api.stopEvent(event); }, true);
+        //D3Api.BaseCtrl.initEvent(_dom,'onchange');
+        //D3Api.BaseCtrl.initEvent(_dom,'onformat');
     }
-
 
     ///**********************************************************************************
     var oldLeft=new Number(0);
@@ -28,12 +27,14 @@ D3Api.LayoutSplitCtrl = new function ()
     var docUpEvent=function(){};
     var modal_win;
 
-        this.moveSplit=function(evt,direction) {
+    var blockEdit =null;
+    var new_x = 0;
+    var new_y = 0;
+    this.moveSplit=function(evt,direction) {
            if ((typeof direction === 'undefined')||( direction == '')) {
               direction = "left";
            }
            if (direction == "top") {
-              blockEdit =evt.target.previousElementSibling;
               blockEdit = evt.target.parentElement.previousSibling.firstChild;
            }
            if (direction == "bottom") {
@@ -47,6 +48,10 @@ D3Api.LayoutSplitCtrl = new function ()
            }
            block = evt.target;
            rect = blockEdit.getBoundingClientRect()
+           blockEdit.style.width = rect.width + "px";
+           blockEdit.style.height = rect.height + "px";
+           blockEdit.style.left =  rect.left + "px";
+           blockEdit.style.top =  rect.top + "px";
            var ie = 0;
            var op = 0;
            var ff = 0;
@@ -62,7 +67,6 @@ D3Api.LayoutSplitCtrl = new function ()
            delta_y = 0;
            /* Ставим обработчики событий на нажатие и отпускание клавиши мыши */
            saveXY();
-
            // document.addEventListener('mouseup', clearXY, false);
            // document.addEventListener('mouseout', clearXY, false);
       	   addEvent(document,'mouseup',clearXY);
@@ -108,15 +112,10 @@ D3Api.LayoutSplitCtrl = new function ()
               /* Вычисляем новые координаты блока */
               if ((direction == "left")||(direction == "right")) {
                  new_x = delta_x + x;
-                 obj_event.target.style.width = new_x + "px";
-                 // blockEdit.style.width = new_x + "px";
+                 //obj_event.target.style.width = new_x + "px";
+                 blockEdit.style.width = new_x + "px";
               }
-              if (direction == "top") {
-                 new_y = delta_y + 1;
-                 //obj_event.target.style.height = new_y + "px";
-                 blockEdit.style.height = new_y + "px";
-              }
-              if (direction == "bottom") {
+              if ((direction == "top")|| (direction == "bottom") ) {
                  new_y = delta_y + y;
                  //obj_event.target.style.height = new_y + "px";
                  blockEdit.style.height = new_y + "px";
