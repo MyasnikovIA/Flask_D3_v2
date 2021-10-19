@@ -1,13 +1,18 @@
+import os
+
 from flask import Flask, session
 from flask_cors import CORS, cross_origin
 from flask import request, jsonify
 from getform import *
+import shutil
 import json
 import hashlib
 from inspect import getfullargspec
 
+from Etc.conf import get_option, ROOT_DIR
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
+
 # https://habr.com/ru/post/222983/
 # https://programtalk.com/python-examples/sys.__stdout__/
 # https://www.py4u.net/discuss/183138
@@ -16,6 +21,7 @@ app = Flask(__name__, static_folder='.')
 cors = CORS(app)
 app.secret_key = str(uuid.uuid1()).replace("-", "")
 app.config['CORS_HEADERS'] = 'Content-Type'
+TEMP_DIR_PATH = f'{ROOT_DIR}{os.sep}{get_option("TempDir", "temp/")}'
 
 
 # ====================================================================================================================
@@ -66,7 +72,6 @@ global SESSION
 SESSION = {}
 
 
-
 def getSession(name, defoult):
     global SESSION
     key = getIdClient()
@@ -77,12 +82,14 @@ def getSession(name, defoult):
         return defoult
     return SESSION[key][name]
 
+
 def setSession(name, value):
     global SESSION
     key = getIdClient()
     if not key in SESSION:
         SESSION[key] = {}
     SESSION[key][name] = value
+
 
 def getSessionObject():
     global SESSION
@@ -91,6 +98,7 @@ def getSessionObject():
         SESSION[key] = {}
     return SESSION[key]
 
+
 def getIdClient():
     agent = request.headers.get('User-Agent')
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
@@ -98,56 +106,71 @@ def getIdClient():
     else:
         return jsonify({'ip': request.environ['HTTP_X_FORWARDED_FOR'], "agent": agent})
 
+
 # ====================================================================================================================
 # ====================================================================================================================
 
 
 def sendCostumBin(pathFile):
-    if os.path.isfile(pathFile):
-        with open(pathFile, "rb") as f:
-            return f.read(), mimeType(pathFile)
+    txt = ""
+    if existTempPage(pathFile):
+        txt, mime = getTempPage(pathFile, '')
+    if txt == "":
+        if os.path.isfile(pathFile):
+            with open(pathFile, "rb") as f:
+                return f.read(), mimeType(pathFile)
+        else:
+            return f"File {pathFile} not found", mimeType(".txt")
     else:
-        return f"File {pathFile} not found", mimeType(".txt")
+        return txt, mime
+
 
 @app.route('/')
 @cross_origin()
 def example():
     return app.send_static_file('index.html')
 
-@app.route('/~<name>', methods=['GET'])
-@cross_origin()
-def d3theme_files(name):
+
+def getAgetntInfo():
     # Пределение платформы и версии браузера
     browser = request.user_agent.browser
     version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
     platform = request.user_agent.platform
     uas = request.user_agent.string
-    agetInfo = {'browser' :browser,'browser_version':version,'platform':platform}
+    res = {'browser': browser, 'browser_version': version, 'platform': platform}
+    agent = request.headers.get('User-Agent')
+    res['agent'] = agent
+    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+        res['ip'] = request.environ['REMOTE_ADDR']
+    else:
+        res['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
+    return res
 
+@app.route('/~<name>', methods=['GET'])
+@cross_origin()
+def d3theme_files(name):
+    agent_info = getAgetntInfo()
     if "d3theme" in name:
         # return app.send_static_file('external/d3/d3theme.css')
-        return d3theme_css(), 200, {'content-type': 'text/css'}
+        return d3theme_css(agent_info), 200, {'content-type': 'text/css'}
         # return app.send_static_file('external/d3/~d3theme'), 200, {'content-type': 'text/css'}
-
-    if "d3api" in name:
-        # return app.send_static_file('external/d3/d3api.js')
-        # return d3api_js(), 200, {'content-type': 'application/json'}
-        return app.send_static_file('external/d3/~d3api'), 200, {'content-type': 'application/json'}
 
     if "d3main" in name:
         # return app.send_static_file('external/d3/d3api.js')
-        return d3main_js(), 200, {'content-type': 'application/json'}
+        return d3main_js(agent_info), 200, {'content-type': 'application/json'}
         # return app.send_static_file('System/d3main.py'), 200, {'content-type': 'application/json'}
+
 
 @app.route('/<the_path>.php', methods=['GET', 'POST'])
 @cross_origin()
 def getform_php_files(the_path):
     sessionObj = getSessionObject()
+    agent_info = getAgetntInfo()
     if the_path == 'getform':
         formName = getParam('Form')
         cache = getParam('cache')
         dataSetName = getParam('DataSet', "")
-        frm = getParsedForm(formName, cache, dataSetName)
+        frm = getParsedForm(formName, cache, dataSetName, agent_info)
         return frm, 200, {'content-type': 'application/plain'}
 
     if the_path == "request":
@@ -159,17 +182,18 @@ def getform_php_files(the_path):
             for dataSetName in dataSet:
                 typeQuery = dataSet[dataSetName]["type"]
                 paramsQuery = dataSet[dataSetName]["params"]
-                resultTxt = dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj)
+                resultTxt = dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj, agent_info)
                 # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
-
     return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {
         'content-type': 'application/xml'}
+
 
 @app.route('/<name>.js')
 @cross_origin()
 def js_files(name):
     return app.send_static_file('js/' + name + '.js')
+
 
 @app.route('/<path:path>')
 @cross_origin()
@@ -202,5 +226,14 @@ def all_files(path):
 
 
 if __name__ == '__main__':
-    app.debug = True
+    if get_option("debug") > 0:
+        if os.path.exists(TEMP_DIR_PATH):
+            for root, dirs, files in os.walk(TEMP_DIR_PATH):
+                for f in files:
+                    os.unlink(os.path.join(root, f))
+                for d in dirs:
+                    shutil.rmtree(os.path.join(root, d))
+        else:
+            os.mkdir(TEMP_DIR_PATH)
+    app.debug = False
     app.run(host='0.0.0.0', port=9091)
