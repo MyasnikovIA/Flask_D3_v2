@@ -1,5 +1,15 @@
 /.idea
 __pycache__
+*/__pycache__
 /build
 /System/__pycache__
-*.pec
+/*.pec
+*.pyc
+*/*cpython-39.pyc
+/Etc/__pycache__
+/Components/Base/__pycache__
+/Components/DataSet/__pycache__
+/Components/Edit/__pycache__
+/Components/Form/__pycache__
+/Components/Label/__pycache__
+
