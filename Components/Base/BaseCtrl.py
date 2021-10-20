@@ -1,35 +1,68 @@
 import uuid
+import random
+from datetime import datetime
 from Etc.conf import get_option
+
 
 class Base:
     def __init__(self, attrs):
         self.isDebug = int(get_option("debug", 0))
+
+        # Имя формы на которой расположен элемент
         if "formName" in attrs:
             self.formName = attrs["formName"]
             del attrs["formName"]
         else:
             self.formName = ""
+
+        if "caption" in attrs:
+            self.caption = attrs["caption"]
+            del attrs["caption"]
+        else:
+            self.caption = ""
+
+        if "title" in attrs:
+            self.title = attrs["title"]
+            del attrs["title"]
+        else:
+            self.title = ""
+
+        if "value" in attrs:
+            self.value = attrs["value"]
+            del attrs["value"]
+        else:
+            self.value = ""
+
+        if "readonly" in attrs:
+            self.readonly = attrs["readonly"]
+            del attrs["readonly"]
+        else:
+            self.readonly = ""
+
+        if "placeholder" in attrs:
+            self.placeholder = attrs["placeholder"]
+            del attrs["readonly"]
+        else:
+            self.placeholder = ""
+
+        if "disabled" in attrs:
+            self.disabled = attrs["disabled"]
+            del attrs["disabled"]
+        else:
+            self.disabled = ""
+
         if "tag" in attrs:
             self.tag = attrs["tag"]
             del attrs["tag"]
         else:
             self.tag = ""
+
         if "tagName" in attrs:
             self.tagName = attrs["tagName"]
             del attrs["tagName"]
         else:
             self.tagName = "div"
 
-        if "text" in attrs:
-            self.text = attrs["text"]
-            del attrs["text"]
-        else:
-            self.text = ""
-        if "tail" in attrs:
-            self.tail = attrs["tail"]
-            del attrs["tail"]
-        else:
-            self.tail = ""
         if 'cmptype' in attrs:
             self.CmpType = attrs['cmptype']
             del attrs['cmptype']
@@ -41,10 +74,35 @@ class Base:
             del attrs['name']
         else:
             self.name = self.genName()
+
+        # Содержимое innerHTML (после тэга следующего элемента)
+        if "tail" in attrs:
+            self.tail = attrs["tail"]
+            del attrs["tail"]
+        else:
+            self.tail = ""
+
+        # Содержимое innerHTML (до тэга следующего элемента)
         if 'text' in attrs:
             self.innerHTML = attrs['text']
+            self.text = attrs['text']
         else:
             self.innerHTML = ""
+            self.text = ""
+
+        #  Родительский элемент XML
+        if 'parentElement' in attrs:
+            self.parentElement = attrs['parentElement']
+            del attrs['parentElement']
+        else:
+            self.parentElement = {}
+
+        # Последовательный номер элемента
+        if 'num_element' in attrs:
+            self.num_element = attrs['num_element']
+            del attrs['num_element']
+        else:
+            self.num_element = 0
         self.attrs = attrs
         self.SetSysInfo = []
         self.HTML_DST = []
@@ -56,6 +114,13 @@ class Base:
         self.HTML_DST.append(text)
         self.HTML_DST.append(end)
 
+    def genName(self):
+        """
+        генерируем случайное число на основании даты + случайное число + имени формы
+        """
+        return str(uuid.uuid5(uuid.NAMESPACE_DNS,f"{datetime.now().microsecond}{random.randint(0,9999999)}{self.formName}" )).replace("-", "")
+
+
 
 class BaseCtrl(Base):
 
@@ -64,15 +129,13 @@ class BaseCtrl(Base):
         self.SetSysInfo = []
         self.CmpType = 'Base';
         self.tag = '<sa>';
-        self.formInfo=""
-        if self.isDebug>0:
+        self.formInfo = ""
+        if self.isDebug > 0:
             self.formInfo = f""" formName="{self.formName}" """
-
 
     def show(self):
         eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
-
 
         self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {atr}  {eventsStr} {self.formInfo}>""")
         # Добавляется при инициализации  d3main.js d3theme.css

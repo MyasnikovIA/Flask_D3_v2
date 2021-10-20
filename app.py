@@ -219,5 +219,5 @@ if __name__ == '__main__':
                     shutil.rmtree(os.path.join(root, d))
         else:
             os.mkdir(TEMP_DIR_PATH)
-    app.debug = False
+    app.debug = True
     app.run(host='0.0.0.0', port=9091)

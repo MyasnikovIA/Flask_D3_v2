@@ -9,7 +9,6 @@ class Edit(Base):
                   </td>
               </tr>
          </table>
-
     """
     def __init__(self, attrs):
         super().__init__(attrs)

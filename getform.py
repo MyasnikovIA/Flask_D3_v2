@@ -5,6 +5,7 @@ import ast
 import json
 import sys
 import re
+
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
@@ -12,6 +13,7 @@ except ImportError:
 
 from app import getSession, setSession
 from Etc.conf import *
+
 global COMPONENT_PATH
 COMPONENT_PATH = os.path.join(os.path.dirname(__file__), 'Components')
 FORM_PATH = os.path.join(os.path.dirname(__file__), get_option('Forms', '/Forms/')[1:])
@@ -65,6 +67,7 @@ def exec_then_eval(vars, code, sessionObj):
     exec(compile(block, '<string>', mode='exec'), _globals, _locals)
     return eval(compile(last, '<string>', mode='eval'), _globals, _locals)
 
+
 def getObjctClass(module_class_string, **kwargs):
     """
      Получить экземпляр класса по его полному имени, и инициализироватьобъект с входящими переменными
@@ -84,7 +87,7 @@ def getObjctClass(module_class_string, **kwargs):
     return obj
 
 
-def handle_property(root,formName):
+def handle_property(root, formName, parentRoot={}, num_element=0):
     """
     Функция предназначена для рекурсивного обхода дерева XML (формы),
     и заены  элементов тэк который начинается с стмволов "cmp" (<cmpButton name="test">)
@@ -114,6 +117,8 @@ def handle_property(root,formName):
     attrib["tail"] = root.tail
     attrib["text"] = root.text
     attrib["formName"] = formName
+    attrib["parentElement"] = parentRoot
+    attrib["num_element"] = num_element
 
     # дописать проверку наличия компонента файла
     compFileName = os.path.join(COMPONENT_PATH, compName, f'{compName}Ctrl.py')
@@ -168,12 +173,14 @@ def handle_property(root,formName):
     # =========== Рекурсионый обход дерева ============================
     if hasattr(root, 'getchildren'):
         for elem in root.getchildren():
-            loc_SetSysInfo, text = handle_property(elem,formName)
+            loc_SetSysInfo, text = handle_property(elem, formName, root, 0)
             sysinfoBlock.extend(loc_SetSysInfo)
             htmlContent.append(text)
     elif len(root) > 0:
+        num_element = 0
         for elem in root:
-            loc_SetSysInfo, text = handle_property(elem,formName)
+            num_element += 1
+            loc_SetSysInfo, text = handle_property(elem, formName, root, num_element)
             sysinfoBlock.extend(loc_SetSysInfo)
             htmlContent.append(text)
     # =================================================================
@@ -215,10 +222,9 @@ def handle_property(root,formName):
     return sysinfoBlock, "".join(htmlContent)
 
 
-
-def getSrc(formName, cache, dataSetName="",agent_info={}):
+def getSrc(formName, cache, dataSetName="", agent_info={}):
     rootForm = getXMLObject(formName)
-    sysinfoBlock, text = handle_property(rootForm,formName)  # парсим форму
+    sysinfoBlock, text = handle_property(rootForm, formName)  # парсим форму
     resTxt = [text]
     resTxt.append('\n<div cmptype="sysinfo" style="display:none;">')
     for line in sysinfoBlock:
@@ -226,19 +232,20 @@ def getSrc(formName, cache, dataSetName="",agent_info={}):
     resTxt.append('</div>')
     return "".join(resTxt)
 
-def getTemp(formName, cache, dataSetName,agent_info):
-    cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir","temp/")}'
-    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_{formName.replace(os.sep,'_')}.frm"
+
+def getTemp(formName, cache, dataSetName, agent_info):
+    cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir", "temp/")}'
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_{formName.replace(os.sep, '_')}.frm"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
     if existTempPage(cmpFiletmp):
-        txt,mime  = getTempPage(cmpFiletmp,'')
+        txt, mime = getTempPage(cmpFiletmp, '')
     if not txt == "":
         return txt
     if not os.path.exists(cmpFiletmp):
-        with open(cmpFiletmp,"wb") as d3_css:
-            txt = getSrc(formName, cache, dataSetName,agent_info)
+        with open(cmpFiletmp, "wb") as d3_css:
+            txt = getSrc(formName, cache, dataSetName, agent_info)
             d3_css.write(txt.encode())
             setTempPage(cmpFiletmp, txt)
             return txt
@@ -248,15 +255,16 @@ def getTemp(formName, cache, dataSetName,agent_info):
             setTempPage(cmpFiletmp, txt)
             return txt
 
-def getParsedForm(formName, cache, dataSetName="",agent_info={}):
+
+def getParsedForm(formName, cache, dataSetName="", agent_info={}):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
       !!!  необходимо переписать, и добавить логику DFRM (частичног опереопределения XML формы)
     """
-    if get_option("TempDir") and (+get_option("debug"))<1:
-        return getTemp(formName, cache, dataSetName,agent_info)
+    if get_option("TempDir") and (+get_option("debug")) < 1:
+        return getTemp(formName, cache, dataSetName, agent_info)
     else:
-        return getSrc(formName, cache, dataSetName,agent_info)
+        return getSrc(formName, cache, dataSetName, agent_info)
 
 
 def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
@@ -311,7 +319,8 @@ def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
         argsQuery[key] = paramsQuery[key]
     return argsQuery, sessionVar
 
-def joinDfrm(rootForm,rootDfrmForm):
+
+def joinDfrm(rootForm, rootDfrmForm):
     """
     Обработать DFRM и FRM
     Необходимо дописать замену найденой ноды на ноду из DFRM
@@ -330,32 +339,31 @@ def joinDfrm(rootForm,rootDfrmForm):
             continue
         if pos == "replace":
             print("+")
-            #print(nodeXml.text)
-            #print(ET.tostring(nodeXml).decode())
+            # print(nodeXml.text)
+            # print(ET.tostring(nodeXml).decode())
             hodeArrText = ET.tostring(nodeXml).decode().split("\n")
-            hodeText = "\n".join([j for i, j in enumerate(hodeArrText) if i not in [0,len(hodeArrText)-1]])
+            hodeText = "\n".join([j for i, j in enumerate(hodeArrText) if i not in [0, len(hodeArrText) - 1]])
             print(hodeText)
             print(nodSrcForm.get("node"))
-            #print(ET.tostring(nodSrcForm).decode())
+            # print(ET.tostring(nodSrcForm).decode())
             print("+")
             # nodSrcForm.fromstring(ET.tostring(nodeXml).decode())
-        #print(nodeXml.tag, ET.tostring(nodeXml).decode())
-        #print(nodSrcForm.tag, ET.tostring(nodSrcForm).decode())
+        # print(nodeXml.tag, ET.tostring(nodeXml).decode())
+        # print(nodSrcForm.tag, ET.tostring(nodSrcForm).decode())
         # name = nodeXml.attrib.get("name")
         # value = nodeXml.attrib.get("value")
         # print(nodeXml.tag,ET.tostring(nodeXml).decode())
         # print(nodeXml.tag,ET.tostring(nodeXml).decode())
 
     for attrXml in rootDfrmForm.findall(f'attr'):
-        findName  = attrXml.attrib.get("target")
+        findName = attrXml.attrib.get("target")
         nodSrcForm = rootForm.find(f"./*[@name='{findName}']")
         if nodSrcForm == None:
             continue
         pos = attrXml.attrib.get("pos")
         name = attrXml.attrib.get("name")
         value = attrXml.attrib.get("value")
-        print(attrXml.tag,ET.tostring(attrXml).decode())
-
+        print(attrXml.tag, ET.tostring(attrXml).decode())
 
     return rootForm
 
@@ -366,6 +374,7 @@ def readFile(pathForm):
     with codecs.open(pathForm, 'r', encoding='utf8') as f:
         xmlContentSrc = f.read()
     return xmlContentSrc
+
 
 def getXMLObject(formName):
     global TEMP_XML_PAGE
@@ -378,15 +387,17 @@ def getXMLObject(formName):
         pathForm = pathUserForm
     rootForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?>\n{readFile(pathForm)}')
     if os.path.exists(pathUserFormDir):
-        filesArr = [os.path.join(pathUserFormDir, fileName) for fileName in os.listdir(pathUserFormDir) if fileName[-4:] == "dfrm"]
-        xmldfrmtext =[]
+        filesArr = [os.path.join(pathUserFormDir, fileName) for fileName in os.listdir(pathUserFormDir) if
+                    fileName[-4:] == "dfrm"]
+        xmldfrmtext = []
         for fileName in filesArr:
             xmldfrmtext.append(readFile(fileName))
         rootDfrmForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?><div>\n{"".join(xmldfrmtext)}</div>')
-        return joinDfrm(rootForm,rootDfrmForm)
+        return joinDfrm(rootForm, rootDfrmForm)
     return rootForm
 
-def dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj,agent_info):
+
+def dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj, agent_info):
     """
     Функция обработки запросов DataSet и Action с клиентских форм
     """
@@ -397,15 +408,14 @@ def dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj,agent
         uid = paramsQuery["_uid_"]
         del paramsQuery["_uid_"]
 
-
-    #pathForm = getXMLSRC(formName)
-    #pathForm = f"{FORM_PATH}{os.sep}{formName}.frm"
-    #with codecs.open(pathForm, 'r', encoding='utf8') as f:
+    # pathForm = getXMLSRC(formName)
+    # pathForm = f"{FORM_PATH}{os.sep}{formName}.frm"
+    # with codecs.open(pathForm, 'r', encoding='utf8') as f:
     #    xmlContentSrc = f.read()
-    #xmlContent = xmlContentSrc
-    #xmlContent = getXMLSRC(formName)
-    #xmlContent = f'<?xml version="1.0" encoding="UTF-8" ?>\n{xmlContent}'
-    #rootForm = ET.fromstring(xmlContent)
+    # xmlContent = xmlContentSrc
+    # xmlContent = getXMLSRC(formName)
+    # xmlContent = f'<?xml version="1.0" encoding="UTF-8" ?>\n{xmlContent}'
+    # rootForm = ET.fromstring(xmlContent)
 
     rootForm = getXMLObject(formName)
     for dataSetXml in rootForm.findall(f'cmp{typeQuery}'):
@@ -415,7 +425,7 @@ def dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj,agent
             continue
         # =============== Вставляем инициализированые переменные =======================
         argsQuery, sessionVar = parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj)
-        varsDebug={}
+        varsDebug = {}
         if get_option("debug") > 0:
             varsDebug = argsQuery.copy()
         # =============================================================================
@@ -443,8 +453,8 @@ def dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj,agent
                 resObject[dataSetName]["type"] = typeQuery
                 resObject[dataSetName]["uid"] = uid
                 if get_option("debug") > 0:
-                   resObject[dataSetName]["var"] = varsDebug
-                   resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
+                    resObject[dataSetName]["var"] = varsDebug
+                    resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
                 return json.dumps(resObject)
 
         if typeQuery == "DataSet":

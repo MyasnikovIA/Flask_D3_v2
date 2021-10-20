@@ -24,17 +24,6 @@
          data
         <cmpDataSetVar name="form_params"    src="form_params"   srctype="var"/>
     </cmpDataSet>
-
-        <cmpComboBox class="form-control" name="MySel">
-            <cmpComboItem caption="" value=""/>
-            <cmpComboItem caption="2" value="2"/>
-            <cmpComboItem caption="3" value="3"/>
-            <cmpComboItem caption="4" value="4"/>
-            <cmpComboItem dataset="DB_MyDataSet" repeat="0" data="value:id;caption:FULLNAME"/>
-        </cmpComboBox>
-
-
-
     <br/><br/><br/><br/>
 <!-- ===============================            -->
      <cmpScript >
@@ -54,6 +43,17 @@
          <cmpLabel data="caption:FULLNAME" name="PAT_AT"/>
  </div>
 
+<!-- ===============================            -->
+=================================================
+    <br/>
+
+         <cmpComboBox class="form-control" name="MySel" multiselect="true">
+            <cmpComboItem caption="" value=""/>
+            <cmpComboItem caption="2" value="2"/>
+            <cmpComboItem caption="3" value="3"/>
+            <cmpComboItem caption="4" value="4"/>
+        </cmpComboBox>
+=================================================
 
 </div>
 
