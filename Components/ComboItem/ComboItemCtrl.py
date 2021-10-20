@@ -5,7 +5,7 @@ class ComboItem(Base):
 
     def __init__(self, attrs):
         super().__init__(attrs)
-        self.CmpType = 'Label';
+        self.CmpType = 'ComboItem';
         self.tag = 'tr';
         self.parentName = ""
         if not self.parentElement.attrib.get("name") == None:
@@ -68,7 +68,6 @@ class ComboItem(Base):
                         <span class="btnOC" comboboxname="{self.parentName}"></span>
                         <span>{self.caption}</span>
                     </td>
-                </tr>
             """)
         else:
             self.print(f"""
