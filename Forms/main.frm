@@ -78,8 +78,7 @@
             </cmpLayoutContainer>
 
         <!-- Разделительны элемент (горизонтальный) -->
-        <cmpLayoutSplit orientation="horizon" direction="bottom"/>
-
+        <cmpLayoutSplit orientation="horizon" direction="top"/>
         <cmpLayoutContainer  colspan="25" >
             Нижняя панель
         </cmpLayoutContainer>

@@ -84,7 +84,7 @@ def getObjctClass(module_class_string, **kwargs):
     return obj
 
 
-def handle_property(root):
+def handle_property(root,formName):
     """
     Функция предназначена для рекурсивного обхода дерева XML (формы),
     и заены  элементов тэк который начинается с стмволов "cmp" (<cmpButton name="test">)
@@ -113,6 +113,7 @@ def handle_property(root):
     attrib["tag"] = root.tag
     attrib["tail"] = root.tail
     attrib["text"] = root.text
+    attrib["formName"] = formName
 
     # дописать проверку наличия компонента файла
     compFileName = os.path.join(COMPONENT_PATH, compName, f'{compName}Ctrl.py')
@@ -162,16 +163,17 @@ def handle_property(root):
                 htmlContent.append("".join(obj.HTML_DST))
             if hasattr(obj, 'SetSysInfo'):
                 sysinfoBlock.extend(obj.SetSysInfo)
-            htmlContent.append(root.text)
+            if hasattr(obj, 'text'):
+                htmlContent.append(obj.text)
     # =========== Рекурсионый обход дерева ============================
     if hasattr(root, 'getchildren'):
         for elem in root.getchildren():
-            loc_SetSysInfo, text = handle_property(elem)
+            loc_SetSysInfo, text = handle_property(elem,formName)
             sysinfoBlock.extend(loc_SetSysInfo)
             htmlContent.append(text)
     elif len(root) > 0:
         for elem in root:
-            loc_SetSysInfo, text = handle_property(elem)
+            loc_SetSysInfo, text = handle_property(elem,formName)
             sysinfoBlock.extend(loc_SetSysInfo)
             htmlContent.append(text)
     # =================================================================
@@ -204,7 +206,6 @@ def handle_property(root):
             else:
                 htmlContent.append(f"</{root.tag}>")
             htmlContent.append(root.tail)
-
         else:
             if len(obj.tag) > 0:
                 htmlContent.append(f"</{obj.tag}>")
@@ -217,7 +218,7 @@ def handle_property(root):
 
 def getSrc(formName, cache, dataSetName="",agent_info={}):
     rootForm = getXMLObject(formName)
-    sysinfoBlock, text = handle_property(rootForm)  # парсим форму
+    sysinfoBlock, text = handle_property(rootForm,formName)  # парсим форму
     resTxt = [text]
     resTxt.append('\n<div cmptype="sysinfo" style="display:none;">')
     for line in sysinfoBlock:

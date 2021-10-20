@@ -1,7 +1,14 @@
 import uuid
+from Etc.conf import get_option
 
 class Base:
     def __init__(self, attrs):
+        self.isDebug = int(get_option("debug", 0))
+        if "formName" in attrs:
+            self.formName = attrs["formName"]
+            del attrs["formName"]
+        else:
+            self.formName = ""
         if "tag" in attrs:
             self.tag = attrs["tag"]
             del attrs["tag"]
@@ -35,18 +42,17 @@ class Base:
         else:
             self.name = self.genName()
         if 'text' in attrs:
-            self.innerHTML  = attrs['text']
+            self.innerHTML = attrs['text']
         else:
             self.innerHTML = ""
         self.attrs = attrs
         self.SetSysInfo = []
         self.HTML_DST = []
 
-
     def show(self):
         pass
 
-    def print(self,text, end=""):
+    def print(self, text, end=""):
         self.HTML_DST.append(text)
         self.HTML_DST.append(end)
 
@@ -54,17 +60,24 @@ class Base:
 class BaseCtrl(Base):
 
     def __init__(self, attrs, parent):
+        super().__init__(attrs)
         self.SetSysInfo = []
         self.CmpType = 'Base';
         self.tag = '<sa>';
+        self.formInfo=""
+        if self.isDebug>0:
+            self.formInfo = f""" formName="{self.formName}" """
+
 
     def show(self):
         eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
-        self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {atr}  {eventsStr}>""")
+
+
+        self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {atr}  {eventsStr} {self.formInfo}>""")
         # Добавляется при инициализации  d3main.js d3theme.css
-        #self.SetSysInfo.append("<scriptfile>Components/Base/js/Base.js</scriptfile>")
-        #self.SetSysInfo.append("<cssfile>Components/Base/css/Base.css</cssfile>")
+        # self.SetSysInfo.append("<scriptfile>Components/Base/js/Base.js</scriptfile>")
+        # self.SetSysInfo.append("<cssfile>Components/Base/css/Base.css</cssfile>")
 
 
 def getDomAttr(name, value='', attrs=None):
@@ -125,5 +138,3 @@ def getBooleanAttr(name, attrs, default, remove=True):
 
 def RemoveArrKeyCondition(arr, condition='on'):
     return {k[v] for k, v in arr.items() if k[:2] == condition}
-
-

@@ -37,7 +37,6 @@
 
     <br/><br/><br/><br/>
 <!-- ===============================            -->
-
      <cmpScript >
         <![CDATA[
             Form.onPopupHelpKinds = function(arg) {
@@ -49,6 +48,11 @@
     <cmpPopupMenu name="pHelpKinds" onpopup="Form.onPopupHelpKinds(args[1]);">
         <cmpPopupItem caption="-"/>
     </cmpPopupMenu>
+<!-- ===============================            -->
+
+ <div cmptype="tmp" repeat="0" dataset="DB_MyDataSet" repeatername="rptDirLines">
+         <cmpLabel data="caption:FULLNAME" name="PAT_AT"/>
+ </div>
 
 
 </div>

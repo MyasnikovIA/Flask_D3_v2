@@ -115,8 +115,14 @@ D3Api.LayoutSplitCtrl = new function ()
                  //obj_event.target.style.width = new_x + "px";
                  blockEdit.style.width = new_x + "px";
               }
-              if ((direction == "top")|| (direction == "bottom") ) {
+              if (direction == "top") {
                  new_y = delta_y + y;
+                 //obj_event.target.style.height = new_y + "px";
+                 blockEdit.style.height = new_y + "px";
+              }
+              if (direction == "bottom") {
+                 // В контейнере окно необходимо инвертировать  перемещение  нижнего блока
+                 new_y =  delta_y + y;
                  //obj_event.target.style.height = new_y + "px";
                  blockEdit.style.height = new_y + "px";
               }
