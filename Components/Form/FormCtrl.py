@@ -4,8 +4,8 @@ class Form(Base):
     def __init__(self, attrs):
         super().__init__(attrs)
         self.SetSysInfo = []
-        self.CmpType = 'Base';
-        self.tag = 'div';
+        self.CmpType = 'Base'
+        self.tag = 'div'
         self.formInfo = ""
         if self.isDebug>0:
             self.formInfo = f""" formName="{self.formName}" """
