@@ -10,6 +10,11 @@ class ComboItem(Base):
         self.parentName = ""
         if not self.parentElement.attrib.get("name") == None:
             self.parentName = self.parentElement.attrib.get("name")
+        if "caption" in attrs:
+            self.caption = attrs["caption"]
+            del attrs["caption"]
+        else:
+            self.caption = ""
 
         if not "selected" in self.attrs:
             self.selected = ""

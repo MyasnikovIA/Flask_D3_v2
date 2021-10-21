@@ -15,12 +15,6 @@ class Base:
         else:
             self.formName = ""
 
-        if "caption" in attrs:
-            self.caption = attrs["caption"]
-            del attrs["caption"]
-        else:
-            self.caption = ""
-
         if "title" in attrs:
             self.title = attrs["title"]
             del attrs["title"]

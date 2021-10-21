@@ -114,8 +114,10 @@ def handle_property(root, formName, parentRoot={}, num_element=0):
             compName = compName[3:]
     attrib["tagName"] = compName
     attrib["tag"] = root.tag
-    attrib["tail"] = root.tail
-    attrib["text"] = root.text
+    if not root.tail == None:
+        attrib["tail"] = root.tail
+    if not root.text == None:
+        attrib["text"] = root.text
     attrib["formName"] = formName
     attrib["parentElement"] = parentRoot
     attrib["num_element"] = num_element
@@ -168,7 +170,7 @@ def handle_property(root, formName, parentRoot={}, num_element=0):
                 htmlContent.append("".join(obj.HTML_DST))
             if hasattr(obj, 'SetSysInfo'):
                 sysinfoBlock.extend(obj.SetSysInfo)
-            if hasattr(obj, 'text'):
+            if hasattr(obj, 'text') and not obj.text==None:
                 htmlContent.append(obj.text)
     # =========== Рекурсионый обход дерева ============================
     if hasattr(root, 'getchildren'):

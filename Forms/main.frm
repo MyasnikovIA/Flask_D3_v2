@@ -1,4 +1,4 @@
-<cmpForm class="Main ActiveDashBoard box-sizing-force"  oncreate="Form.onCreate()" name="MAINFORM" title="Тестовое окно" >
+<cmpForm class="Main ActiveDashBoard box-sizing-force"  oncreate="Form.onCreate()" name="MAINFORM" caption="Тестовое окно" >
     <cmpScript name="MainScript">
        <![CDATA[
             Form.onCreate = function() {

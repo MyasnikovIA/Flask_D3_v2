@@ -24,22 +24,19 @@ class Button(Base):
         # ====================================================
         self.nominwidth = RemoveArrKeyRtrn(self.attrs, 'nominwidth')
         self.popupmenu = RemoveArrKeyRtrn(self.attrs, 'popupmenu')
-        self.caption = RemoveArrKeyRtrn(self.attrs, 'caption')
         # ============== ICON Button =========================
         self.icon = RemoveArrKeyRtrn(attrs, 'icon')
         if len(self.icon) > 0:
             self.icon = f'''<div class="btn_icon"><img src="{self.icon}" class="btn_icon_img"/></div>'''
+        if "caption" in attrs:
+            self.caption = attrs["caption"]
+            del attrs["caption"]
+        else:
+            self.caption = ""
         # ====================================================
-        if ('onlyicon' in self.attrs) or (('caption' in self.attrs) and (len(attrs['caption'] == 0))):
+        if ('onlyicon' in self.attrs) or (('caption' in self.attrs) and (len(self.caption == 0))):
             self.classCSS.append('onlyicon')
         # ============== INIT Html Class =========================
-
-
-        if 'text' not in self.attrs:
-            self.text =""
-        else:
-            self.text = self.attrs.get("text")
-
         if 'class' not in self.attrs:
             self.classCSS = ['ctrl_button', 'box-sizing-force']
         else:
@@ -72,7 +69,7 @@ class Button(Base):
         if len(self.popupmenu) > 0:
             popupmenuCss = ' style="display: inline-block;" '
             popupmenuTag = """<i class="fas fa-angle-down" style="padding-left: 5px;float: right;padding-top: 4px"></i>"""
-        self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {eventsStr} tabindex="0" {classCSSStr} style="{" ".join(self.style)}" {self.data} >{self.icon}<div class="btn_caption btn_center {minwidth}" {popupmenuCss}>{self.caption}{self.text}</div>{popupmenuTag}""")
+        self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {eventsStr} tabindex="0" {classCSSStr} style="{" ".join(self.style)}" {self.data} >{self.icon}<div class="btn_caption btn_center {minwidth}" {popupmenuCss}>{self.caption}</div>{popupmenuTag}""")
         # Добавляется при инициализации  d3main.js d3theme.css
         #self.SetSysInfo.append("<scriptfile>Components/Button/js/Button.js</scriptfile>")
         #self.SetSysInfo.append("<cssfile>Components/Button/css/Button.css</cssfile>")
