@@ -4,7 +4,7 @@ from Etc.conf import get_option, ROOT_DIR, getTempPage, setTempPage, existTempPa
 import hashlib
 
 theme = get_option('Theme');
-compList = ['Label','Form','Edit','Button' ,'Base','Window','ComboBox','CheckBox']
+compList = ['Label','Form','Edit','Button' ,'Base','Window','ComboBox','CheckBox','Mask']
 
 def readCmpCss(name, ext=''):
     cmpDirSrc = f'{ROOT_DIR}Components{os.sep}{name}{os.sep}css{os.sep}{name}.css'
