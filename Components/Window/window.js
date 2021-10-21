@@ -19,7 +19,7 @@ function getWindowXml(_otladka){
                                 <div class="WinTitleRight"></div>
                                 <div class="WinTitle Title" name="label" draggable="false"></div>
                                 <div class="win_btn_container" style="margin-right: 15px">
-                                    <img name="loader" class="w-loading" src="Images/s.gif" onclick="abortLoading();"/>
+                                    <img name="loader" class="w-loading" src="./Components/Window/images/s.gif" onclick="abortLoading();"/>
                                     <div name="maximizedButton" class="window-control win_maximize"></div>
                                     <div name="closeButton" class="window-control win_close"></div>
                                     <div name="rememberWinSize" class="win_remembersize" onclick="rememberWindowSize(event);" title="Запомнить новый размер окна" style="display:none"></div>
