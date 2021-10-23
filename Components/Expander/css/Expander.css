@@ -1,0 +1,126 @@
+.ctrl_expander {
+    position: relative;
+    min-height: 24px;
+}
+.ctrl_expander > .expander_zone_click {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    height: 24px;
+    line-height: 24px;
+    padding-left: 21px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-decoration: none;
+    font-size: 13px;
+    color: #0088CC;
+    cursor: pointer;
+    background: url('/Components/Expander/images/arrow.png') 4px -7px no-repeat;
+}
+.ctrl_expander.show > .expander_zone_click {
+    background-position: 4px 10px;
+}
+.ctrl_expander.turn > .expander_zone_click {
+    top: auto;
+    bottom: 0;
+}
+.ctrl_expander > .expander_zone_click:hover {
+    color: #000;
+}
+.ctrl_expander.ctrl_disable > .expander_zone_click {
+    color: #555;
+    cursor: default;
+}
+.ctrl_expander > .expander_content {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: 100%;
+    padding: 24px 0 0;
+    display: none;
+}
+.ctrl_expander.show > .expander_content {
+    display: block;
+}
+.ctrl_expander.turn > .expander_content {
+    padding: 0 0 24px;
+}
+.ctrl_expander.vertical{
+    width: 24px;
+}
+.ctrl_expander.vertical.show
+{
+    width: auto;
+}
+.ctrl_expander.vertical.turn.show > .expander_content {
+    padding: 0 24px 0 0;
+}
+.ctrl_expander.vertical > .expander_content {
+    padding: 0 0 0 24px;
+}
+.ctrl_expander.vertical > .expander_zone_click {
+    left: 0;
+    right: auto;
+    bottom: auto;
+    top: 0;
+    height: 100%;
+    border-right: 1px solid #DDDDDD;
+    width: 0;
+    padding-left: 18px;
+    background: url('/Components/Expander/images/arrow_v.png') -12px 7px no-repeat;
+}
+.ctrl_expander.vertical.show > .expander_zone_click {
+    background-position: 4px 7px;
+}
+.ctrl_expander.vertical.turn.show > .expander_zone_click {
+    border: 0 none;
+    border-left: 1px solid #DDDDDD;
+    left: auto;
+    right: 0;
+    background-position: 4px 7px;
+}
+
+.ctrl_expander.vertical > .expander_zone_click .caption_cont {
+    display: none;
+/*   
+    display: inline-block;
+    transform: rotate(-90deg);
+*/
+}
+
+
+.ctrl_expandable_vertical_dir {
+   padding-top: 10px;
+   overflow: hidden;
+   -moz-transition: all 0.5s ease-in-out;
+   -ms-transition: all 0.5s ease-in-out;
+   -o-transition: all 0.5s ease-in-out;
+   -webkit-transition: all 0.5s ease-in-out;
+   transition: all 0.5s;
+   border-top: 1px solid rgba(100,100,100,0.5); /* Линия сверху текста */
+   border-bottom: 1px solid rgba(100,100,100,0.5); /* Линия снизу текста */
+}
+
+.ctrl_expandable_vertical_dir > .expander_zone_click:hover {
+    color: #000;
+    background-position:  4px -5px;
+}
+
+.ctrl_expandable_vertical_dir > .expander_zone_click {
+   /* top: 10;*/
+    left: 0;
+    right: 0;
+    bottom: auto;
+    height: 24px;
+    line-height: 24px;
+    padding-left: 21px;
+    overflow: hidden;
+    white-space: nowrap;
+    font-weight: bold;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(100,100,100,0.5); /* Линия снизу текста */
+    background: url('/Components/Expander/images/arrow.png')no-repeat;
+    background-position:  4px -7px;
+}

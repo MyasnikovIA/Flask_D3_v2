@@ -37,7 +37,7 @@ class LayoutSplit(Base):
                               </tr>
                 """)
         if self.orientation == "vertical":
-            self.print(f""" <td class="WinLayoutLeft" cmptype="{self.CmpType}" name="{self.name}" name="{self.name}"  style="cursor:e-resize;"  onmousedown="D3Api.LayoutSplitCtrl.moveSplit(event,'{self.direction}')"/> """)
+            self.print(f""" <td class="WinLayoutLeft" cmptype="{self.CmpType}" name="{self.name}"  style="cursor:e-resize;"  onmousedown="D3Api.LayoutSplitCtrl.moveSplit(event,'{self.direction}')"/> """)
 
         #if self.orientation == "horizon":
         #       self.print(f""" <tr  cmptype="{self.CmpType}" name="{self.name}"   style="display: table-row;  border-color: inherit; cursor:s-resize;">

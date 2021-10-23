@@ -48,8 +48,8 @@ class ComboItem(Base):
         return showtext, inp
 
     def show(self):
-        eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
-        atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
+        eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
+        atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         inp = ''
         showtext = ''
         if not self.parentElement.attrib.get("multiselect") == None:

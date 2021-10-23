@@ -25,8 +25,8 @@ class HyperLink(Base):
 
 
     def show(self):
-        eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
-        atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
+        eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
+        atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         self.print(f"""<a  cmptype="{self.CmpType}" tabindex="0" name="{self.name}" {eventsStr}{atr} {self.classStr} {self.style}>{self.caption}{self.text}""" )
         # Добавляется при инициализации  d3main.js d3theme.css
         #self.SetSysInfo.append("<scriptfile>Components/Mask/js/Mask.js</scriptfile>")

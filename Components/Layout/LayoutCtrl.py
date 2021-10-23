@@ -13,8 +13,8 @@ class Layout(Base):
             self.style = """ style="height:100%; width:100% ; ext-indent: initial; border-spacing: 2px; background-color: rgb(210, 210, 210);" """
 
     def show(self):
-        atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
-        eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
+        eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
+        atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         self.print(f""" <table class="WinLayout" cmptype="{self.CmpType}" name="{self.name}"  {self.style} {eventsStr} {atr}> """)
         # Добавляется при инициализации  d3main.js d3theme.css
         #self.SetSysInfo.append("<scriptfile>Components/Layout/js/Layout.js</scriptfile>")

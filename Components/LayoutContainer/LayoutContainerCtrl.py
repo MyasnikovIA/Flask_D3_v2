@@ -13,8 +13,8 @@ class LayoutContainer(Base):
             self.style = """ style="vertical-align: top; background-size: 100% 100%;" """
 
     def show(self):
-        eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
-        atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
+        eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
+        atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         self.print(f"""<td class="WinLayout" cmptype="{self.CmpType}" name="{self.name}"  {self.style} {atr} {eventsStr} >""")
 
 """

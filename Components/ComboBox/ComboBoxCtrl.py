@@ -85,8 +85,8 @@ class ComboBox(Base):
             self.placeholder = f' placeholder="{self.placeholder}" '
         if len(self.disabled)>0:
             self.disabled = ' disabled="true" '
-        eventsStr = " ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
-        atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
+        eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
+        atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         self.print(f"""
                       <div name="{self.name}" cmptype="{self.CmpType}" title="{self.title}" oncreate="{self.oncreate}" onpostclone="D3Api.ComboBoxCtrl.postClone(this);{self.onpostclone}" class="{' '.join(self.classCSS)}" {self.items_repeatername} dynitems="true" 
                        {self.items_dataset}  id="{self.id}"  {self.keyvalue} {self.style} {atr} >

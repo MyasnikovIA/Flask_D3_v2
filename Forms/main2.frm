@@ -8,6 +8,9 @@
             Form.MySendPHP = function() {
                 openD3Form('main',true)
             }
+            Form.MySendPHP = function() {
+                openD3Form('Exsample/main',true)
+            }
         ]]>
     </cmpScript>
 

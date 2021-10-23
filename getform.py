@@ -381,12 +381,13 @@ def readFile(pathForm):
 def getXMLObject(formName):
     global TEMP_XML_PAGE
     # TEMP_DS_PAGE = {}
-
+    formName = formName.replace("/",os.sep)
     pathForm = f"{FORM_PATH}{os.sep}{formName}.frm"
     pathUserForm = f"{USER_FORM_PATH}{os.sep}{formName}.frm"
     pathUserFormDir = f"{USER_FORM_PATH}{os.sep}{formName}.d"
     if os.path.exists(pathUserForm):
         pathForm = pathUserForm
+    print(pathForm)
     rootForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?>\n{readFile(pathForm)}')
     if os.path.exists(pathUserFormDir):
         filesArr = [os.path.join(pathUserFormDir, fileName) for fileName in os.listdir(pathUserFormDir) if

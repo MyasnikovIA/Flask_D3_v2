@@ -54,8 +54,8 @@ class CheckBox(Base):
         if len(self.disabled)>0:
             self.disabled = " disabled=\"disabled\" "
 
-        eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
-        atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
+        eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
+        atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         inp = ''
         showtext = ''
         if not self.parentElement.attrib.get("multiselect") == None:

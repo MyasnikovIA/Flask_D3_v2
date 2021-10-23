@@ -2,7 +2,7 @@ import uuid
 import random
 from datetime import datetime
 from Etc.conf import get_option
-
+import re
 
 class Base:
     def __init__(self, attrs):
@@ -112,8 +112,9 @@ class Base:
         """
         генерируем случайное число на основании даты + случайное число + имени формы
         """
-        return str(uuid.uuid5(uuid.NAMESPACE_DNS,f"{datetime.now().microsecond}{random.randint(0,9999999)}{self.formName}" )).replace("-", "")
-
+        return str(uuid.uuid5(uuid.NAMESPACE_DNS,
+                              f"{datetime.now().microsecond}{random.randint(0, 9999999)}{self.formName}")).replace("-",
+                                                                                                                   "")
 
 
 class BaseCtrl(Base):
@@ -128,9 +129,8 @@ class BaseCtrl(Base):
             self.formInfo = f""" formName="{self.formName}" """
 
     def show(self):
-        eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
-        atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
-
+        eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
+        atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {atr}  {eventsStr} {self.formInfo}>""")
         # Добавляется при инициализации  d3main.js d3theme.css
         # self.SetSysInfo.append("<scriptfile>Components/Base/js/Base.js</scriptfile>")
@@ -195,3 +195,7 @@ def getBooleanAttr(name, attrs, default, remove=True):
 
 def RemoveArrKeyCondition(arr, condition='on'):
     return {k[v] for k, v in arr.items() if k[:2] == condition}
+
+
+def str_replace(elsrctxt, eldsttxt, txt):
+    return txt.replace(elsrctxt, eldsttxt)

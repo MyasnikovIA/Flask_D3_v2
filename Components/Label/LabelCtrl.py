@@ -45,8 +45,8 @@ class Label(Base):
 
 
     def show(self):
-        eventsStr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if k[:2] == "on")
-        atr = "  ".join(f"{k}='{v}'" for k, v in self.attrs.items() if not k[:2] == "on")
+        eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
+        atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         if len(self.classCSS) > 0:
             classCSSStr = f""" class='{' '.join(self.classCSS)}'"""
         else:
