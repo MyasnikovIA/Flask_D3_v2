@@ -387,8 +387,10 @@ def getXMLObject(formName):
     pathUserFormDir = f"{USER_FORM_PATH}{os.sep}{formName}.d"
     if os.path.exists(pathUserForm):
         pathForm = pathUserForm
-    print(pathForm)
-    rootForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?>\n{readFile(pathForm)}')
+    # print(pathForm)
+    xmlText = f'<?xml version="1.0" encoding="UTF-8" ?>\n{readFile(pathForm)}'
+    # print(xmlText)
+    rootForm = ET.fromstring(xmlText)
     if os.path.exists(pathUserFormDir):
         filesArr = [os.path.join(pathUserFormDir, fileName) for fileName in os.listdir(pathUserFormDir) if
                     fileName[-4:] == "dfrm"]

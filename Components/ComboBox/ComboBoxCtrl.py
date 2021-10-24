@@ -81,15 +81,12 @@ class ComboBox(Base):
             self.text = self.attrs["text"]
             del self.attrs["text"]
 
+        self.placeholder = getDomAttrRemove('placeholder', None, self.attrs);
+        self.disabled = getDomAttrRemove('disabled', None, self.attrs);
+        self.readonly = getDomAttrRemove('readonly', None, self.attrs);
 
 
     def show(self):
-        if len(self.readonly)>0:
-            self.readonly = ' readonly="readonly" '
-        if len(self.placeholder)>0:
-            self.placeholder = f' placeholder="{self.placeholder}" '
-        if len(self.disabled)>0:
-            self.disabled = ' disabled="true" '
         eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         self.print(f"""
