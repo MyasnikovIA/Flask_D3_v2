@@ -75,6 +75,11 @@ class ComboBox(Base):
         else:
             self.zindex = f'style="z-index:{self.attrs["zindex"]}"'
             del self.attrs["zindex"]
+        if not "text" in self.attrs:
+            self.text = ''
+        else:
+            self.text = self.attrs["text"]
+            del self.attrs["text"]
 
 
 
@@ -88,18 +93,13 @@ class ComboBox(Base):
         eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         self.print(f"""
-                      <div name="{self.name}" cmptype="{self.CmpType}" title="{self.title}" oncreate="{self.oncreate}" onpostclone="D3Api.ComboBoxCtrl.postClone(this);{self.onpostclone}" class="{' '.join(self.classCSS)}" {self.items_repeatername} dynitems="true" 
-                       {self.items_dataset}  id="{self.id}"  {self.keyvalue} {self.style} {atr} >
-                          <div class="cmbb-input">
-                               <input cmpparse="{self.CmpType}" type="text"
-                                 onchange="D3Api.stopEvent();{self.onchange}" 
-                                 onclick="D3Api.ComboBoxCtrl.downClick(this);{self.onclick}"
-                                 onkeydown="D3Api.ComboBoxCtrl.keyDownInput(this);{self.onkeydown}"
-                                 onkeyup="D3Api.ComboBoxCtrl.keyUpInput(this);{self.onkeyup}" {self.disabled}/>
-                         </div>
-                       <div cmpparse="{self.CmpType}" class="cmbb-button" onclick="D3Api.ComboBoxCtrl.downClick(this);" title="Выбрать из списка">
-                       </div><div cmptype="Base" name="ComboItemsList_{self.name}" id="d3ctrl{self.genName()}"><div cmptype="ComboBoxDL" cont="cmbbdroplist" class="cmbb-droplist" id="d3ctrl{self.genName()}" {self.zindex} >
-                       <table>
+           <div name="{self.name}" cmptype="{self.CmpType}" title="{self.title}" oncreate="{self.oncreate}" onpostclone="D3Api.ComboBoxCtrl.postClone(this);{self.onpostclone}" class="{' '.join(self.classCSS)}" {self.items_repeatername} dynitems="true" {self.items_dataset}  id="{self.id}"  {self.keyvalue} {self.style} {atr} >
+                <div class="cmbb-input">
+                     <input cmpparse="{self.CmpType}" type="text"  onchange="D3Api.stopEvent();{self.onchange}" onclick="D3Api.ComboBoxCtrl.downClick(this);{self.onclick}" onkeydown="D3Api.ComboBoxCtrl.keyDownInput(this);{self.onkeydown}" onkeyup="D3Api.ComboBoxCtrl.keyUpInput(this);{self.onkeyup}" {self.disabled}/>
+               </div>
+               <div cmpparse="{self.CmpType}" class="cmbb-button" onclick="D3Api.ComboBoxCtrl.downClick(this);" title="Выбрать из списка">
+           </div><div cmptype="Base" name="ComboItemsList_{self.name}" id="d3ctrl{self.genName()}"><div cmptype="ComboBoxDL" cont="cmbbdroplist" class="cmbb-droplist" id="d3ctrl{self.genName()}" {self.zindex} >
+           <table>
 """)
 
 

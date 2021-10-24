@@ -16,40 +16,30 @@ D3Api.DependencesCtrl = new function()
         dom.D3Dependences.repeater = dom.D3Form.getRepeater(D3Api.getProperty(dom,'repeatername'));
         dom.D3Dependences.required = {};
         dom.D3Dependences.depend ={};
-           
         var req = D3Api.getProperty(dom, 'required', '').split(';');
         var dep = D3Api.getProperty(dom, 'depend', '').split(';');
-
-        if(dom.D3Dependences.repeater)
-        {
+        if(dom.D3Dependences.repeater) {
             dom.D3Dependences.repeater.addEvent('onafter_clone',function(){registerRequiredDepend(dom,req,dep)});
             dom.D3Dependences.repeater.addEvent('onclone_remove',function(){D3Api.DependencesCtrl.refresh(dom);});
-        }else
-        {
-            if(dom.D3Form.currentContext && D3Api.hasProperty(dom.D3Form.currentContext,'isclone') && D3Api.hasProperty(dom.D3Form.currentContext,'repeatername'))
-            {
+        }else {
+            if(dom.D3Form.currentContext && D3Api.hasProperty(dom.D3Form.currentContext,'isclone') && D3Api.hasProperty(dom.D3Form.currentContext,'repeatername')) {
                 var rep = dom.D3Form.getRepeater(D3Api.getProperty(dom.D3Form.currentContext,'repeatername'));
-                rep.addEventOnce('onclone_remove',function(){
-                    for(var name in dom.D3Dependences.depend)
-                    {
-                        if(dom.D3Dependences.depend.hasOwnProperty(name)){
+                rep.addEventOnce('onclone_remove',function() {
+                    for(var name in dom.D3Dependences.depend) {
+                        if(dom.D3Dependences.depend.hasOwnProperty(name)) {
                             refreshDepend(dom,name,true);
                         }
-
                     }
                 });
             }
             registerRequiredDepend(dom,req,dep);
         }
     };
-    function registerRequiredDepend(dom,req,dep)
-    {
-        for(var i = 0, ic = req.length; i < ic; i++)
-        {
+    function registerRequiredDepend(dom,req,dep) {
+        for(var i = 0, ic = req.length; i < ic; i++) {
             D3Api.DependencesCtrl.addRequiredControl(dom, req[i], false);
         }
-        for(var i = 0, ic = dep.length; i < ic; i++)
-        {
+        for(var i = 0, ic = dep.length; i < ic; i++) {
             D3Api.DependencesCtrl.addDependControl(dom, dep[i], false);
         }
         D3Api.DependencesCtrl.refresh(dom);

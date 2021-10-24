@@ -62,26 +62,18 @@ D3Api.ComboBoxCtrl = new function ()
      * @param _dom
      */
     this.create = function ComboBoxCtrl_create(_dom)
-    {
-        _dom.options = null;
+    {   _dom.options = null;
         _dom._droplistDom = null;
         _dom.dynItems = D3Api.hasProperty(_dom, 'dynitems');
         D3Api.ComboBoxCtrl.setOptions(_dom);
         D3Api.ComboBoxCtrl.refreshEmptyItem(_dom);
         var input = D3Api.ComboBoxCtrl.getInput(_dom);
         input._combo_box = _dom;
-
         var item = D3Api.ComboBoxCtrl.getItemDataset(_dom);
-
-	if (item != null)
-            return;
-
-	item = D3Api.ComboBoxCtrl.getItemStaticSelected(_dom);
-
-	if (item == null)
-            return;
-
-	D3Api.ComboBoxCtrl.setItemSelected(_dom,item.option);
+        if (item != null) return;
+        item = D3Api.ComboBoxCtrl.getItemStaticSelected(_dom);
+        if (item == null) return;
+        D3Api.ComboBoxCtrl.setItemSelected(_dom,item.option);
     }
 
     /**
@@ -491,18 +483,26 @@ D3Api.ComboBoxCtrl = new function ()
      */
     this.setStateAll = function(_dom,state)
     {
-        if(state)
-        {
+        if(state) {
             var vals = [];
-            for(var i = 0; i < _dom.options.length; i++)
-            {
-                if (_dom.options[i].getAttribute("isd3repeater") == null) {
-                    continue;
+            for(var i = 0; i < _dom.options.length; i++) {
+                if (_dom.options[i].getAttribute("isd3repeaterSkip") !== null) { continue; }
+                var valueItems = D3Api.ComboItemCtrl.getValue(_dom.options[i]);
+                if (valueItems.length > 0) {
+                    vals.push(D3Api.ComboItemCtrl.getValue(_dom.options[i]));
                 }
-                vals.push(D3Api.ComboItemCtrl.getValue(_dom.options[i]));
+                _dom.options[i].querySelector('[type="checkbox"]').checked = false;
             }
-            _dom.querySelector('[cmpparse="ComboBox"]').value = vals.join(';');
-        }else {
+            txt = vals.join(';'); //txt.substr(1);
+            if (txt.substr(0,1)==';') {
+               txt = txt.substr(1);
+            }
+            _dom.querySelector('[cmpparse="ComboBox"]').value = txt;
+        } else {
+            for(var i = 0; i < _dom.options.length; i++) {
+                if (_dom.options[i].getAttribute("isd3repeaterSkip") !== null) { continue; }
+                _dom.options[i].querySelector('[type="checkbox"]').checked = false;
+            }
             _dom.querySelector('[cmpparse="ComboBox"]').value = "";
         }
     }
@@ -1551,17 +1551,26 @@ D3Api.ComboItemCtrl = new function()
     }
     this.checkItem = function(item)
     {
+        var vals = [];
         var cb = D3Api.getControlByDom(item,'ComboBox');
-        var tmpval = cb.querySelector('[cmpparse="ComboBox"]').value;
-        var chValue =  item.getAttribute("value");
-        tmpval = tmpval.split(';');
-        var ind = tmpval.indexOf(chValue);
-        if ((item.querySelector('[cmpparse="ComboItem"]').value ==='on')  && (ind == -1)) {
-            tmpval.push(chValue);
-        } else {
-            tmpval.splice(ind,1);
+        var opened = item.parentElement.firstElementChild
+        var el = opened.nextElementSibling;
+        while (el) {
+            if (el.querySelector('[cmpparse="ComboItem"]').checked) {
+                var chValue =  el.getAttribute("value");
+                var text = el.firstElementChild.firstElementChild.nextElementSibling.nextElementSibling.innerHTML;
+                vals.push(chValue);
+            }
+            el = el.nextElementSibling;
         }
-        cb.querySelector('[cmpparse="ComboBox"]').value = tmpval.join(';');
+        if (vals.length>0) {
+           opened.querySelector('[type="checkbox"]').checked = false;
+        }
+        txt = vals.join(';'); //txt.substr(1);
+        if (txt.substr(0,1)==';') {
+           txt = txt.substr(1);
+        }
+        cb.querySelector('[cmpparse="ComboBox"]').value = txt;
     }
     this.getInput = function(_dom)
     {

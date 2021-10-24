@@ -8,3 +8,67 @@
 {
     height: 100%;
 }
+
+
+
+element.style {
+}
+.ctrl_edit input {
+    height: 100%;
+}
+
+input[type="text"], input[type="password"], textarea {
+    border: 1 none;
+    border-color: rgb(160,160,160)
+    outline: none;
+    height: 22px;
+    padding: 3px 6px;
+    color: #000000;
+    font-weight: normal;
+    min-width: 0%;
+    width: 100%;
+    font-size: 13px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    background: transparent;
+    border-radius: 3px;
+    margin: 0;
+    font-family: "Segoe UI", Candara, "Bitstream Vera Sans", "DejaVu Sans", "Bitstream Vera Sans", "Trebuchet MS", Verdana, "Verdana Ref", sans-serif;
+}
+
+input[type="text" i] {
+    padding: 1px 2px;
+}
+input {
+    -webkit-writing-mode: horizontal-tb !important;
+    font-style: ;
+    font-variant-ligatures: ;
+    font-variant-caps: ;
+    font-variant-numeric: ;
+    font-variant-east-asian: ;
+    font-weight: ;
+    font-stretch: ;
+    font-size: ;
+    font-family: ;
+    text-rendering: auto;
+    color: -internal-light-dark(black, white);
+    letter-spacing: normal;
+    word-spacing: normal;
+    line-height: normal;
+    text-transform: none;
+    text-indent: 0px;
+    text-shadow: none;
+    display: inline-block;
+    text-align: start;
+    appearance: auto;
+    -webkit-rtl-ordering: logical;
+    cursor: text;
+    background-color: -internal-light-dark(rgb(255, 255, 255), rgb(59, 59, 59));
+    margin: 0em;
+    padding: 1px 2px;
+    border-width: 2px;
+    border-style: inset;
+    border-color: -internal-light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
+    border-image: initial;
+}

@@ -12,7 +12,6 @@ class Edit(Base):
     """
     def __init__(self, attrs):
         super().__init__(attrs)
-        self.style = getDomAttrRemove('style', None, self.attrs);
         self.readonly = getBooleanAttr('readonly', self.attrs, 'false');
 
         if 'class' not in self.attrs:
@@ -36,6 +35,18 @@ class Edit(Base):
         self.readonly = getDomAttrRemove('readonly', None, self.attrs);
         self.disabled = getDomAttrRemove('disabled', None, self.attrs);
         self.format = RemoveArrKeyRtrn(self.attrs,'format', '');
+
+        if not "width" in self.attrs:
+            width = "100%"
+        else:
+            width = self.attrs["width"]
+            del self.attrs["width"]
+        if not "style" in self.attrs:
+            self.style = f'style = "width: {width};"'
+        else:
+            self.style = f""" style = "width: {width};{self.attrs["style"]}" """
+            del self.attrs["style"]
+
 
     def show(self):
         eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")

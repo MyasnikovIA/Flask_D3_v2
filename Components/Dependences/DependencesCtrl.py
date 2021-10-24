@@ -1,16 +1,16 @@
 from Components.Base.BaseCtrl import *
 
 
-class Mask(Base):
+class Dependences(Base):
     def __init__(self, attrs):
         super().__init__(attrs)
         self.CmpType = 'Dependences';
         self.tag = 'div';
-        if not "Dependences" in self.attrs:
-            self.Dependences = ""
+        if not "depend" in self.attrs:
+            self.depend = ""
         else:
-            self.Dependences = f""" Dependences = "{self.attrs["Dependences"]}" """
-            del self.attrs["Dependences"]
+            self.depend = f""" depend = "{self.attrs["depend"]}" """
+            del self.attrs["depend"]
 
         if not "required" in self.attrs:
             self.required = ""
@@ -32,7 +32,7 @@ class Mask(Base):
 
     def show(self):
         self.print(
-            f"""<div  cmptype="{self.CmpType}" name="{self.name}"{self.Dependences}{self.required}{self.repeatername}{self.condition}  style="display:none" >""")
+            f"""<div  cmptype="{self.CmpType}" name="{self.name}"{self.depend}{self.required}{self.repeatername}{self.condition}  style="display:none" >""")
         # Добавляется при инициализации  d3main.js d3theme.css
         # self.SetSysInfo.append("<scriptfile>Components/Dependences/js/Dependences.js</scriptfile>")
         # self.SetSysInfo.append("<cssfile>Components/Dependences/css/Dependences.css</cssfile>")

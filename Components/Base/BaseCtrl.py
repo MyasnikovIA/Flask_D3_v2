@@ -33,12 +33,6 @@ class Base:
         else:
             self.readonly = ""
 
-        if "placeholder" in attrs:
-            self.placeholder = attrs["placeholder"]
-            del attrs["readonly"]
-        else:
-            self.placeholder = ""
-
         if "disabled" in attrs:
             self.disabled = attrs["disabled"]
             del attrs["disabled"]
@@ -151,16 +145,21 @@ def getDomAttr(name, value='', attrs=None):
 
 
 def getDomAttrRemove(name, value='', attrs=None):
-    if attrs != None:
-        v = RemoveArrKeyRtrn(attrs, name);
-        if len(v) > 0:
-            value = v
-        if len(v) == 0 and value == None:
-            return ''
-    if value == 'true':
-        value = name
-    value = value.replace("'", "\'")
-    return f""" {name} = '{value}' """
+
+    if name in attrs:
+        val = attrs[name]
+        if len(val)==0 and not value == None:
+            val = value
+        if val == 'true':
+            val = name
+        val = val.replace("\"", "\\\"")
+        del attrs["placeholder"]
+        return f""" {name} = "{val}" """
+    else:
+        if not value == None:
+            return f""" {name} = "{value}" """
+        else:
+            return ""
 
 
 def RemoveArrKeyRtrn(arr, key, default=''):

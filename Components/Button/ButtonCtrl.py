@@ -8,6 +8,12 @@ class Button(Base):
     </div>
 
     <button type="button" class="btn btn-primary">Primary</button>
+
+
+    <div onclick="Form.MySendPHP();" name="ButtonOk" cmptype="Button" title="" tabindex="0" class="ctrl_button box-sizing-force ctrl_disable" style="" id="d3ctrl1211635005317033">
+         <div class="btn_caption btn_center minwidth">Запуск</div>
+    </div>
+
     """
 
     def __init__(self,attrs):
@@ -15,10 +21,10 @@ class Button(Base):
         self.CmpType = 'Button';
         self.tag = 'div';
         self.events={}
-        self.style = []
+        self.style = ['width: 255px']
         self.classCSS = []
         if 'style' in attrs:
-            self.style = [i for i in RemoveArrKeyRtrn(attrs, 'style').split(";")]
+            self.style.extend([i for i in RemoveArrKeyRtrn(attrs, 'style').split(";")])
         # ====================================================
         # ====================================================
         # ====================================================
