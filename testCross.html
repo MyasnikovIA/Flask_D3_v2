@@ -1,0 +1,16 @@
+<script>
+  var popMessage = function(){
+        var xhr = new XMLHttpRequest()
+		xhr.open( 'GET','http://192.168.15.200:9091/getform.php?cache_enabled=0&modal=0&Form=Tutorial%2FDialog%2FDialog&cache=c865f9af408fb94ce38db76e0b211b032&blockName=d_wg_delete_Ctrl', true )
+		xhr.onreadystatechange = function() {
+		  if (xhr.readyState != 4) { return; }
+		  if (xhr.status === 200) {
+			console.log('result', xhr.responseText)
+		  } else {
+			console.log('err', xhr.responseText)
+		  }
+		}
+		xhr.send()
+  }
+  popMessage();
+</script>

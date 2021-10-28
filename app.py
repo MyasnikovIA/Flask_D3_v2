@@ -134,13 +134,11 @@ def after_request(response):
     return response
 
 @app.route('/')
-@cross_origin()
 def example():
     return app.send_static_file('index.html')
 
 
 @app.route('/~<name>', methods=['GET'])
-@cross_origin()
 def d3theme_files(name):
     if "d3theme" in name:
         # return app.send_static_file('external/d3/d3theme.css')
@@ -154,7 +152,6 @@ def d3theme_files(name):
 
 
 @app.route('/<the_path>.php', methods=['GET', 'POST'])
-@cross_origin()
 def getform_php_files(the_path):
     sessionObj = getSessionObject()
     agent_info = getAgetntInfo()
@@ -183,13 +180,11 @@ def getform_php_files(the_path):
 
 
 @app.route('/<name>.js')
-@cross_origin()
 def js_files(name):
     return app.send_static_file('js/' + name + '.js')
 
 
 @app.route('/<path:path>')
-@cross_origin()
 def all_files(path):
     # {os.sep})}
     if '/~Cmp' in path and 'Components/' in path:
