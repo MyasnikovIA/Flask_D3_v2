@@ -31,7 +31,8 @@ class ToolbarItemGroup(Base):
         if len(self.classCSS) > 0:
             classStr = f' class="{" ".join(self.classCSS)}" '
 
-        self.print(f"""<span  name="{self.name}" cmptype="ToolbarItemGroup" {classStr} id="d3ctrl{self.genName()}" {stleTxt} {eventsStr} {atr} > """)
+        self.print(f"""<span  name="{self.name}" cmptype="toolbarItemGroup" {classStr} id="d3ctrl{self.genName()}" {stleTxt} {eventsStr} {atr} > """)
+        #self.print(f"""<span  name="{self.name}" cmptype="ToolbarItemGroup" {classStr} id="d3ctrl{self.genName()}" {stleTxt} {eventsStr} {atr} > """)
 
         # Добавляется при инициализации  d3main.js d3theme.css
         # self.SetSysInfo.append("<scriptfile>Components/Image/js/Image.js</scriptfile>")

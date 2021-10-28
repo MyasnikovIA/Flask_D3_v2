@@ -45,3 +45,7 @@
 |---|---|---|---|
 |align|ориентация|string|align="left" - прижать к леву <br> align="right" - прижать к праву|
 
+## Примечание
+
+Если в cmpToolbar указать "bottom" тогда элемент нарисуется снизу 
+<br/>``<cmpToolbar  name="tlb_Ctrl" bottom="1">``  

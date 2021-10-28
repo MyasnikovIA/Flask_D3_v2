@@ -30,7 +30,8 @@
                                mask_template="999-999-999 99"/>
     <br/>Ввести TOKEN <cmpEdit name="ctrlTOKEN" width="50%" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
                          mask_template_regular="^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$"
-                         mask_check_regular="^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$"/>
+                         mask_check_regular="^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$"
+                         help="Укажите токен ключ"/>
 
     <br/><cmpButton name="ButtonOk" onclick="Form.MySendPHP();" caption="Запуск"/>
 

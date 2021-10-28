@@ -9,5 +9,5 @@
             }
         ]]>
     </cmpScript>
-    <cmpCheckBox name="myChek" caption="pMENU"/>
+    <cmpCheckBox name="myChek" caption="pMENU" />
 </div>

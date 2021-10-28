@@ -10,6 +10,14 @@ D3Api.ToolbarCtrl = new function()
      */
     this.init = function(dom)
     {
+        // если форма развернуа на весь экран
+        if ((dom.parentElement.parentElement.getAttribute("class") === "D3MainContainer") && (dom.getAttribute("bottom")) ){
+           dom.style.right = "0px";
+           dom.style.left = "0px";
+           dom.style.bottom = "0px";
+           dom.style.width = "100%";
+        }
+
         D3Api.BaseCtrl.initEvent(dom,'onchange');
         dom.D3Base.addEvent('onchange_property',function(property,value){
             if (property == 'value')

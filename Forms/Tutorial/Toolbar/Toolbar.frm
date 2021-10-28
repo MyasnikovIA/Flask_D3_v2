@@ -5,7 +5,7 @@
         ]]>
     </cmpScript>
 
-    <cmpToolbar  name="tlb_Ctrl" caption="Заголовок"  sttf="true" info="true">
+    <cmpToolbar  name="tlb_Ctrl" caption="Заголовок"  sttf="true" info="true" style="bottom: 20px;">
         <cmpToolbarItemGroup align="left">
             <cmpButton name="reports_Ctrl" popupmenu="p_reports_list_Ctrl" caption="Отчеты" width="50px" />
             <cmpPopupMenu name="p_reports_list_Ctrl">

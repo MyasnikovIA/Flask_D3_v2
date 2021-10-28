@@ -162,7 +162,7 @@ def getDomAttrRemove(name, value='', attrs=None):
         if val == 'true':
             val = name
         val = val.replace("\"", "\\\"")
-        del attrs["placeholder"]
+        del attrs[name]
         return f""" {name} = "{val}" """
     else:
         if not value == None:

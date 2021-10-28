@@ -14,6 +14,14 @@ class Toolbar(Base):
             self.styleArr.extend([i for i in attrs['style'].split(";")])
             del self.attrs['style']
 
+        if 'bottom' in self.attrs:
+            # self.styleArr.extend(["position: absolute","right: -10px",'left: 10px','bottom: 10px']);
+            self.styleArr.append("position: absolute")
+            self.styleArr.append("right:10px")
+            self.styleArr.append('left: 10px')
+            self.styleArr.append('bottom: 10px')
+            # del self.attrs['bottom']
+
         self.classCSS = ["toolbarCtrl"]
         if 'class' in self.attrs:
             self.classCSS.extend([i for i in attrs['class'].split(" ")])
@@ -27,6 +35,9 @@ class Toolbar(Base):
         if 'caption' in self.attrs:
             self.caption = self.attrs['caption']
             del self.attrs['caption']
+        if 'text' in self.attrs:
+            del self.attrs['text']
+
 
 
     def show(self):
@@ -39,13 +50,18 @@ class Toolbar(Base):
         classStr = ""
         if len(self.classCSS)>0:
             classStr = f' class="{" ".join(self.classCSS)}" '
+        captText=""
+        if len(self.caption)>0:
+            captText = f'<span class="header">{self.caption}</span>'
+
+
 
         self.print(f"""
 <div name="{self.name}" cmptype="Toolbar" {atr} {classStr} {atr} onchange="{self.onchange};D3Api.ToolbarCtrl.onChangeToolbar(this);" id="d3ctrl{self.genName()}" {stleTxt} {eventsStr}>
     <div class="toolbarCtrl_container">
-        <span class="header">{ self.caption}</span>
+        {captText}
 """ )
 
         # Добавляется при инициализации  d3main.js d3theme.css
-        #self.SetSysInfo.append("<scriptfile>Components/Image/js/Image.js</scriptfile>")
-        #self.SetSysInfo.append("<cssfile>Components/Image/css/Image.css</cssfile>")
+        #self.SetSysInfo.append("<scriptfile>Components/Toolbar/js/Toolbar.js</scriptfile>")
+        #self.SetSysInfo.append("<cssfile>Components/Toolbar/css/Toolbar.css</cssfile>")
