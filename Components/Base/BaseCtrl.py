@@ -2,6 +2,7 @@ import uuid
 import random
 from datetime import datetime
 from Etc.conf import get_option,ROOT_DIR
+from getform import parseFrm,getXMLObject
 import re
 import os
 
@@ -85,6 +86,13 @@ class Base:
             del attrs['parentElement']
         else:
             self.parentElement = {}
+
+        #  Элемент XML SRC
+        if 'nodeXML' in attrs:
+            self.nodeXML = attrs['nodeXML']
+            del attrs['nodeXML']
+        else:
+            self.nodeXML = None
 
         # Последовательный номер элемента
         if 'num_element' in attrs:

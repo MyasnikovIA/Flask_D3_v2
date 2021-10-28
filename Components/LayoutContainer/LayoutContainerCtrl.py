@@ -11,11 +11,24 @@ class LayoutContainer(Base):
             del self.attrs["style"]
         else:
             self.style = """ style="vertical-align: top; background-size: 100% 100%;" """
+        self.path = ""
+        if 'path' in self.attrs:
+            self.path = self.attrs["path"]
+            del self.attrs['path']
 
     def show(self):
         eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
-        self.print(f"""<td class="WinLayout" cmptype="{self.CmpType}" name="{self.name}"  {self.style} {atr} {eventsStr} >""")
+        if len(self.path) == 0 :
+            self.print(f"""<td class="WinLayout" cmptype="{self.CmpType}" name="{self.name}"  {self.style} {atr} {eventsStr} >""")
+        else:
+            rootForm = getXMLObject(self.path)
+            sysinfoBlock, htmlContent = parseFrm(rootForm, self.path, {}, 0)  # парсим форму
+            self.print( f"""<td class="WinLayout" cmptype="{self.CmpType}" name="{self.name}"  {self.style} {atr} {eventsStr} >{htmlContent}""")
+            self.SetSysInfo.extend(sysinfoBlock)
+        # Добавляется при инициализации  d3main.js d3theme.css
+        # self.SetSysInfo.append("<scriptfile>Components/LayoutContainer/js/LayoutContainer.js</scriptfile>")
+        # self.SetSysInfo.append("<cssfile>Components/LayoutContainer/css/LayoutContainer.css</cssfile>")
 
 """
 cmptype="{self.CmpType}" name="{self.name}"  

@@ -157,11 +157,11 @@ def getTempPage(name, defoultValue=''):
     return res.get("txt"), res.get("mime")
 
 
-def setTempPage(name, html='', mime='application/plain'):
+def setTempPage(name, html='', mime='application/plain',blockName=""):
     global TMP_PAGE_CAHE
     if TMP_PAGE_CAHE == None:
         TMP_PAGE_CAHE = {}
-    TMP_PAGE_CAHE[name] = {"txt": html, "mime": mime}
+    TMP_PAGE_CAHE[f"{name}{blockName}"] = {"txt": html, "mime": mime}
 
 
 def existTempPage(name):

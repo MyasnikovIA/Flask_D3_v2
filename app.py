@@ -1,7 +1,6 @@
 import os
 
 from flask import Flask, session
-from flask_cors import CORS, cross_origin
 from flask import request, jsonify
 from getform import *
 import shutil
@@ -9,7 +8,7 @@ import json
 import hashlib
 from inspect import getfullargspec
 
-from Etc.conf import get_option, ROOT_DIR,getAgetntInfo
+from Etc.conf import get_option, ROOT_DIR, getAgetntInfo
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
 
@@ -18,7 +17,6 @@ from System.d3theme import show as d3theme_css
 # https://www.py4u.net/discuss/183138
 
 app = Flask(__name__, static_folder='.')
-cors = CORS(app)
 app.secret_key = str(uuid.uuid1()).replace("-", "")
 app.config['CORS_HEADERS'] = 'Content-Type'
 TEMP_DIR_PATH = f'{ROOT_DIR}{os.sep}{get_option("TempDir", "temp/")}'
@@ -125,6 +123,16 @@ def sendCostumBin(pathFile):
         return txt, mime
 
 
+@app.after_request
+def after_request(response):
+    # CORS in flask
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    header['Access-Control-Allow-Headers'] = '*'
+    header['Access-Control-Allow-Methods'] = '*'
+    header['Server'] = 'D3apiServer'
+    return response
+
 @app.route('/')
 @cross_origin()
 def example():
@@ -154,7 +162,8 @@ def getform_php_files(the_path):
         formName = getParam('Form')
         cache = getParam('cache')
         dataSetName = getParam('DataSet', "")
-        frm = getParsedForm(formName, cache, dataSetName, agent_info)
+        blockName = getParam('blockName', "")
+        frm = getParsedForm(formName, cache, dataSetName, agent_info, blockName)
         return frm, 200, {'content-type': 'application/plain'}
 
     if the_path == "request":

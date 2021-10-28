@@ -8,5 +8,4 @@
      <cmpButton caption="PopupMenu component"  onclick="openD3Form('Tutorial/PopupMenu/PopupMenu',true)" />
      <cmpButton caption="CheckBox component"  onclick="openD3Form('Tutorial/CheckBox/CheckBox',true)" />
      <cmpButton caption="Dialog component"  onclick="openD3Form('Tutorial/Dialog/Dialog',true)" />
-     <cmpButton caption="SubForm component"  onclick="openD3Form('Tutorial/SubForm/SubForm',true)" />
 </div>

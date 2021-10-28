@@ -87,7 +87,7 @@ def getObjctClass(module_class_string, **kwargs):
     return obj
 
 
-def handle_property(root, formName, parentRoot={}, num_element=0):
+def parseFrm(root, formName, parentRoot={}, num_element=0):
     """
     Функция предназначена для рекурсивного обхода дерева XML (формы),
     и заены  элементов тэк который начинается с стмволов "cmp" (<cmpButton name="test">)
@@ -120,6 +120,7 @@ def handle_property(root, formName, parentRoot={}, num_element=0):
         attrib["text"] = root.text
     attrib["formName"] = formName
     attrib["parentElement"] = parentRoot
+    attrib["nodeXML"] = root
     attrib["num_element"] = num_element
 
     # дописать проверку наличия компонента файла
@@ -170,19 +171,19 @@ def handle_property(root, formName, parentRoot={}, num_element=0):
                 htmlContent.append("".join(obj.HTML_DST))
             if hasattr(obj, 'SetSysInfo'):
                 sysinfoBlock.extend(obj.SetSysInfo)
-            if hasattr(obj, 'text') and not obj.text==None:
+            if hasattr(obj, 'text') and not obj.text == None:
                 htmlContent.append(obj.text)
     # =========== Рекурсионый обход дерева ============================
     if hasattr(root, 'getchildren'):
         for elem in root.getchildren():
-            loc_SetSysInfo, text = handle_property(elem, formName, root, 0)
+            loc_SetSysInfo, text = parseFrm(elem, formName, root, 0)
             sysinfoBlock.extend(loc_SetSysInfo)
             htmlContent.append(text)
     elif len(root) > 0:
         num_element = 0
         for elem in root:
             num_element += 1
-            loc_SetSysInfo, text = handle_property(elem, formName, root, num_element)
+            loc_SetSysInfo, text = parseFrm(elem, formName, root, num_element)
             sysinfoBlock.extend(loc_SetSysInfo)
             htmlContent.append(text)
     # =================================================================
@@ -232,9 +233,16 @@ def handle_property(root, formName, parentRoot={}, num_element=0):
     return sysinfoBlock, "".join(htmlContent)
 
 
-def getSrc(formName, cache, dataSetName="", agent_info={}):
+def getSrc(formName, cache, dataSetName="", agent_info={}, blockName=""):
     rootForm = getXMLObject(formName)
-    sysinfoBlock, text = handle_property(rootForm, formName)  # парсим форму
+    if len(blockName) == 0:
+        sysinfoBlock, text = parseFrm(rootForm, formName)  # парсим форму
+    else:
+        nodes = rootForm.findall(f"*[@name='{blockName}']") # ишим фрагмент формы по атребуту имени
+        if len(nodes) > 0 and not nodes[0].tag == "cmpDataSet"  and not nodes[0].tag == "cmpAction": # пропускаем если нашли cmpDataSet или cmpAction
+            sysinfoBlock, text = parseFrm(nodes[0], formName)  # парсим первый найденый фрагмент формы
+        else:
+            return f"<!-- Block {blockName} not found in {formName} -->"
     resTxt = [text]
     resTxt.append('\n<div cmptype="sysinfo" style="display:none;">')
     for line in sysinfoBlock:
@@ -243,9 +251,9 @@ def getSrc(formName, cache, dataSetName="", agent_info={}):
     return "".join(resTxt)
 
 
-def getTemp(formName, cache, dataSetName, agent_info):
+def getTemp(formName, cache, dataSetName, agent_info, blockName=""):
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir", "temp/")}'
-    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_{formName.replace(os.sep, '_')}.frm"
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_{formName.replace(os.sep, '_')}{blockName}.frm"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
@@ -255,26 +263,26 @@ def getTemp(formName, cache, dataSetName, agent_info):
         return txt
     if not os.path.exists(cmpFiletmp):
         with open(cmpFiletmp, "wb") as d3_css:
-            txt = getSrc(formName, cache, dataSetName, agent_info)
+            txt = getSrc(formName, cache, dataSetName, agent_info, blockName)
             d3_css.write(txt.encode())
-            setTempPage(cmpFiletmp, txt)
+            setTempPage(cmpFiletmp, txt, blockName)
             return txt
     else:
         with open(cmpFiletmp, "rb") as infile:
             txt = infile.read()
-            setTempPage(cmpFiletmp, txt)
+            setTempPage(cmpFiletmp, txt, blockName)
             return txt
 
 
-def getParsedForm(formName, cache, dataSetName="", agent_info={}):
+def getParsedForm(formName, cache, dataSetName="", agent_info={}, blockName=""):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
       !!!  необходимо переписать, и добавить логику DFRM (частичног опереопределения XML формы)
     """
     if get_option("TempDir") and (+get_option("debug")) < 1:
-        return getTemp(formName, cache, dataSetName, agent_info)
+        return getTemp(formName, cache, dataSetName, agent_info, blockName)
     else:
-        return getSrc(formName, cache, dataSetName, agent_info)
+        return getSrc(formName, cache, dataSetName, agent_info, blockName)
 
 
 def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
@@ -389,7 +397,7 @@ def readFile(pathForm):
 def getXMLObject(formName):
     global TEMP_XML_PAGE
     # TEMP_DS_PAGE = {}
-    formName = formName.replace("/",os.sep)
+    formName = formName.replace("/", os.sep)
     pathForm = f"{FORM_PATH}{os.sep}{formName}.frm"
     pathUserForm = f"{USER_FORM_PATH}{os.sep}{formName}.frm"
     pathUserFormDir = f"{USER_FORM_PATH}{os.sep}{formName}.d"
@@ -539,7 +547,7 @@ DataSet
   "page": 0
 }
 
-def handle_property(root):
+def parseFrm(root):
     attrib = root.attrib.copy()
     if len(root.attrib) > 0:
         data = " ".join(f'{k}="{v}"' for k, v in root.attrib.items())
@@ -563,10 +571,10 @@ def handle_property(root):
     # =========== Рекурсионый обход дерева ============================
     if hasattr(root, 'getchildren'):
         for elem in root.getchildren():
-            handle_property(elem)
+            parseFrm(elem)
     elif len(root) > 0:
         for elem in root:
-            handle_property(elem)
+            parseFrm(elem)
     # =================================================================
     if not root.text == None and root.tail == None:
         print(f"</{root.tag}>", end="")

@@ -39,9 +39,8 @@
             <!-- Разделительны элемент (вертикальный) -->
             <cmpLayoutSplit orientation="vertical"/>
 
-            <cmpLayoutContainer>
-                <cmpLabel caption="Правая панель"/>
-            </cmpLayoutContainer>
+            <!-- Правая панель -->
+            <cmpLayoutContainer path="Tutorial/main"/>
 
         <!-- Разделительны элемент (горизонтальный) -->
         <cmpLayoutSplit orientation="horizon" direction="top"/>

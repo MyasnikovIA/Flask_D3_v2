@@ -5,7 +5,7 @@ from Etc.conf import get_option, ROOT_DIR, getTempPage, setTempPage, existTempPa
 import hashlib
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
-            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem',]
+            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog']
 
 def readfile(name):
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{name}'

@@ -59,8 +59,22 @@ class Expander(Base):
             self.classTxt = self.attrs['class']
             del self.attrs['class']
 
+        self.path = ""
+        if 'path' in self.attrs:
+            self.path = self.attrs["path"]
+            del self.attrs['path']
+
     def show(self):
         eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         self.print(
             f""" <div  cmptype="{self.CmpType}" class="ctrl_expandable_vertical_dir {self.showClass}{self.classTxt}" style="height:{self.heightSrc};{self.style};" {self.height} {atr} {eventsStr} {self.stylePar}> <div class="expander_zone_click" style="{self.backgroundPosition}{self.img}" onclick="D3Api.ExpanderCtrl.toggleHeight(this,500);{self.onclick};return false">{self.caption}</div><br/> {self.text} """)
+        # Добавляется при инициализации  d3main.js d3theme.css
+        # self.SetSysInfo.append("<scriptfile>Components/Expander/js/Expander.js</scriptfile>")
+        # self.SetSysInfo.append("<cssfile>Components/Expander/css/Expander.css</cssfile>")
+
+        if len(self.path) > 0:
+            rootForm = getXMLObject(self.path)
+            sysinfoBlock, htmlContent = parseFrm(rootForm, self.path, {}, 0)  # парсим форму
+            self.print(htmlContent)
+            self.SetSysInfo.extend(sysinfoBlock)

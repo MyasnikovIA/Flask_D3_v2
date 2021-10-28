@@ -77,6 +77,13 @@
 
 ## Cвойство cmpLayoutContainer "caption" 
 ```xml
- <cmpLayoutContainer caption="Заголовок панели" />
+ <cmpLayoutContainer caption="Заголовок панели"/>
 ```
+## Cвойство cmpLayoutContainer "path" 
+Указывет путь к форме , которая будет помещена в контейнер
+```xml
+ <cmpLayoutContainer caption="Заголовок панели" path="Tutorial/main"/>
+```
+
+
 Произвольный текст

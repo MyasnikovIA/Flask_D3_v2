@@ -5,7 +5,7 @@
 ## Примеры синтаксиса
 
 <pre>
-<cmpCheckBox name="rf_r" valuechecked="1" valueunchecked="0" caption="Нерезидент РФ" onchange="Form.onChangeRF();"/>
+<component cmptype="CheckBox" name="rf_r" valuechecked="1" valueunchecked="0" caption="Нерезидент РФ" onchange="Form.onChangeRF();"/>
 </pre>
 
 ### Свойства компонента CheckBox

@@ -10,6 +10,7 @@
 |show|Признак показывать блок в раскрытом состоянии|string| Можно не указывать; show="false";  show="true"; |
 |img| Ссылка на картинку (url)|string| Можно не указывать; картинка должна  иметь размеры width:10px height:25px |
 |style|css-стиль компонента|string|   |
+|path|Путь к форме, которая будет помещена в контейнер|string|   |
 
 ```xml
     
@@ -17,4 +18,12 @@
        <cmpButton caption="Содержимое разворачивающегося блока"/>
    </cmpExpander>
 
+```
+
+ 
+
+```xml
+   <cmpExpander height="200px" show="false" caption="Заголовок" img="Components/Expander/images/arrow.png" path="Tutorial/main" >
+       <cmpButton caption="Содержимое разворачивающегося блока"/>
+   </cmpExpander>
 ```
