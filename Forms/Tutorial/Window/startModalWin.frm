@@ -37,7 +37,7 @@
     <cmpButton caption="Модальное окно" onclick="Form.selectOkato()"></cmpButton>
     <cmpTextArea value="Результат" name="consoleWeb" height="320px" width="840px" left="10px"></cmpTextArea>
 
-    <div  name="can_edit" class="ctrl_edit editControl box-sizing-force" style=" width:220; height:25px" id="d3ctrl651601829680105">
+    <div  name="can_edit" class="ctrl_edit editControl box-sizing-force" style=" width:60%; height:25px" id="d3ctrl651601829680105">
         <div class="edit-input">
             <input text="" value="Значение , которое парадается в модальное окно" onchange="D3Api.stopEvent();" style="width:200;height:75%;"/>
         </div>
