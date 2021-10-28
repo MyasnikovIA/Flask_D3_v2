@@ -16,7 +16,6 @@ class PopupMenu(Base):
         if 'style'in self.attrs:
             self.styleArr.extend([i for i in attrs['style'].split(";")])
             del self.attrs['style']
-
         if 'text' in self.attrs:
             del self.attrs['text']
 

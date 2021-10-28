@@ -1,7 +1,7 @@
 from Components.Base.BaseCtrl import *
 
-class Button(Base):
 
+class Button(Base):
     """
     <div  onclick="Form.runDataSet()" cmptype="Button" name="cmp5f7b4c4706deb" title=""  tabindex="0" class="ctrl_button box-sizing-force" style="width: 255px;">
        <div class="btn_caption btn_center minwidth" >запустить runDataSet</div>
@@ -16,15 +16,20 @@ class Button(Base):
 
     """
 
-    def __init__(self,attrs):
+    def __init__(self, attrs):
         super().__init__(attrs)
         self.CmpType = 'Button';
         self.tag = 'div';
-        self.events={}
-        self.style = ['width: 255px']
+        self.events = {}
+        self.style = []
         self.classCSS = []
         if 'style' in attrs:
             self.style.extend([i for i in RemoveArrKeyRtrn(attrs, 'style').split(";")])
+        if "width" in self.attrs:
+            self.style.append(f'width: {self.attrs["width"]}')
+            del self.attrs["width"]
+        else:
+            self.style.append('width: 255px')
         # ====================================================
         # ====================================================
         # ====================================================
@@ -56,9 +61,9 @@ class Button(Base):
         if len(self.popupmenu) > 0 and ('onclick' not in self.attrs):
             self.attrs['onclick'] = f"D3Api.ButtonCtrl.showPopupMenu(this,'{self.popupmenu}');"
         elif len(self.popupmenu) > 0 and ('onclick' in self.attrs):
-            self.attrs['onclick'] = f"""{self.attrs['onclick']} D3Api.ButtonCtrl.showPopupMenu(this,'{self.popupmenu}'); """
+            self.attrs[
+                'onclick'] = f"""{self.attrs['onclick']} D3Api.ButtonCtrl.showPopupMenu(this,'{self.popupmenu}'); """
         self.data = getDomAttrRemove('data', None, self.attrs);
-
 
     def show(self):
         eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
@@ -68,16 +73,15 @@ class Button(Base):
         else:
             classCSSStr = ""
         minwidth = ""
-        if len(self.nominwidth)>0:
-            minwidth="minwidth"
-        popupmenuCss=""
+        if len(self.nominwidth) > 0:
+            minwidth = "minwidth"
+        popupmenuCss = ""
         popupmenuTag = ""
         if len(self.popupmenu) > 0:
             popupmenuCss = ' style="display: inline-block;" '
             popupmenuTag = """<i class="fas fa-angle-down" style="padding-left: 5px;float: right;padding-top: 4px"></i>"""
-        self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {eventsStr} tabindex="0" {classCSSStr} style="{" ".join(self.style)}" {self.data} >{self.icon}<div class="btn_caption btn_center {minwidth}" {popupmenuCss}>{self.caption}</div>{popupmenuTag}""")
+        self.print(
+            f"""<div  cmptype="{self.CmpType}" name="{self.name}" {eventsStr} tabindex="0" {classCSSStr} style="{" ".join(self.style)}" {self.data} >{self.icon}<div class="btn_caption btn_center {minwidth}" {popupmenuCss}>{self.caption}</div>{popupmenuTag}""")
         # Добавляется при инициализации  d3main.js d3theme.css
-        #self.SetSysInfo.append("<scriptfile>Components/Button/js/Button.js</scriptfile>")
-        #self.SetSysInfo.append("<cssfile>Components/Button/css/Button.css</cssfile>")
-
-
+        # self.SetSysInfo.append("<scriptfile>Components/Button/js/Button.js</scriptfile>")
+        # self.SetSysInfo.append("<cssfile>Components/Button/css/Button.css</cssfile>")
