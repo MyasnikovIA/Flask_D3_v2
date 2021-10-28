@@ -4,4 +4,6 @@
      <cmpButton caption="Сombobox component"  onclick="openD3Form('Tutorial/ComboBox/ComboBox',true)" />
      <cmpButton caption="Dependences component"  onclick="openD3Form('Tutorial/Dependences/Dependences',true)" />
      <cmpButton caption="Mask component"  onclick="openD3Form('Tutorial/Mask/Mask',true)" />
+     <cmpButton caption="TextArea component"  onclick="openD3Form('Tutorial/TextArea/TextArea',true)" />
+     <cmpButton caption="PopupMenu component"  onclick="openD3Form('Tutorial/PopupMenu/PopupMenu',true)" />
 </div>

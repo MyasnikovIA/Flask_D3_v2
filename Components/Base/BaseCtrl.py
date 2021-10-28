@@ -1,8 +1,9 @@
 import uuid
 import random
 from datetime import datetime
-from Etc.conf import get_option
+from Etc.conf import get_option,ROOT_DIR
 import re
+import os
 
 class Base:
     def __init__(self, attrs):

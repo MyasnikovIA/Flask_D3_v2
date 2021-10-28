@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="./~d3theme"/>
     <script type="text/javascript" src="./~d3main"></script>
 </head>
-<body>
+<body oncontextmenu="return D3Api.onContextMenuBody(event);">
 
 <div id="D3MainContainer" class="D3MainContainer">
     <div class="slider hidden" style="width:400px;position:absolute;right:0;top:55px;z-index: 100;">
@@ -40,8 +40,6 @@
                 D3Api.showForm('Tutorial/main', undefined, {history: false});
             }
         },true);
-
-
 </script>
 </body>
 </html>

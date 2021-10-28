@@ -191,8 +191,10 @@ def handle_property(root, formName, parentRoot={}, num_element=0):
         if is_enyTag == 0:
             htmlContent.append(f"</{root.tag}>")
         else:
-            if len(obj.tag) > 0:
+            if len(obj.tag) > 0 and not hasattr(obj, 'tagCls'):
                 htmlContent.append(f"</{obj.tag}>")
+            elif hasattr(obj, 'tagCls'):
+                htmlContent.append(obj.tagCls)
             elif hasattr(obj, 'SysInfoTag') and len(obj.SysInfoTag) > 0:
                 sysinfoBlock.append(f"</{obj.SysInfoTag}>")
 
@@ -200,24 +202,30 @@ def handle_property(root, formName, parentRoot={}, num_element=0):
         if is_enyTag == 0:
             htmlContent.append(root.tail)
         else:
-            if len(obj.tag) > 0:
+            if len(obj.tag) > 0 and not hasattr(obj, 'tagCls'):
                 htmlContent.append(f"</{obj.tag}>")
+            elif hasattr(obj, 'tagCls'):
+                htmlContent.append(obj.tagCls)
             elif hasattr(obj, 'SysInfoTag') and len(obj.SysInfoTag) > 0:
                 sysinfoBlock.append(f"</{obj.SysInfoTag}>")
             htmlContent.append(obj.tail)
     elif not root.text == None and not root.tail == None:
         if is_enyTag == 0:
             if hasattr(obj, 'tag'):
-                if len(obj.tag) > 0:
+                if len(obj.tag) > 0 and not hasattr(obj, 'tagCls'):
                     htmlContent.append(f"</{obj.tag}>")
+                elif hasattr(obj, 'tagCls'):
+                    htmlContent.append(obj.tagCls)
                 elif hasattr(obj, 'SysInfoTag') and len(obj.SysInfoTag) > 0:
                     sysinfoBlock.append(f"</{obj.SysInfoTag}>")
             else:
                 htmlContent.append(f"</{root.tag}>")
             htmlContent.append(root.tail)
         else:
-            if len(obj.tag) > 0:
+            if len(obj.tag) > 0 and not hasattr(obj, 'tagCls'):
                 htmlContent.append(f"</{obj.tag}>")
+            elif hasattr(obj, 'tagCls'):
+                htmlContent.append(obj.tagCls)
             elif hasattr(obj, 'SysInfoTag') and len(obj.SysInfoTag) > 0:
                 sysinfoBlock.append(f"</{obj.SysInfoTag}>")
             htmlContent.append(obj.tail)

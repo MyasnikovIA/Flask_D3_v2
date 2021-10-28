@@ -5,7 +5,7 @@ function rememberWindowSize(_type){
 function getWindowXml(_otladka){
    if(!_otladka || empty(document.getElementById('roleComposition').value) || empty(document.getElementById('roleShow').value)) _otladka=0;
    var s = `  <div name="overlow" class="win_overlow"></div>
-              <table class="window WinContent" name="modal_win" style="left:0;top:0; height:80%; width:90% ;border-collapse: collapse; ext-indent: initial; border-spacing: 2px; background-color: rgb(210, 210, 210); border-radius: 10px;">
+              <table class="window WinContent" name="modal_win" style="left:0;top:0; height:80%; width:90% ;border-collapse: collapse; ext-indent: initial; border-spacing: 2px; background-color: rgb(210, 210, 210); border-radius: 10px;" oncontextmenu="return D3Api.onContextMenuBody(event);" >
                     <tbody>
                         <tr style="display: table-row; vertical-align: inherit; border-color: inherit;">
                             <td class="WinContentLeftTop"></td>

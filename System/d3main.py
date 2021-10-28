@@ -4,7 +4,8 @@ import codecs
 from Etc.conf import get_option, ROOT_DIR, getTempPage, setTempPage, existTempPage
 import hashlib
 
-compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander']
+compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
+            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem',]
 
 def readfile(name):
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{name}'

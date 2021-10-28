@@ -1,0 +1,125 @@
+div.popupMenu
+{
+    cursor: pointer;
+    width: auto;
+    position: fixed;
+    display: none;
+    border: 1px solid rgb(165, 165, 165);
+    background-color: rgb(255, 255, 255);
+    border-radius: 6px 6px 6px 6px;
+    box-shadow: 0px 3px 10px -1px rgba(0, 0, 0, 0.45);
+    padding: 5px 0;
+}
+div.popupMenu.waitAction
+{
+    overflow: hidden;
+}
+div.popupMenu.waitAction > div.item, 
+div.popupMenu.waitAction > div.popupGroupItem
+{
+    display: none;
+}
+div.popupMenu div.item.waittext
+{
+    display: none;
+    padding: 5px 15px;
+}
+div.popupMenu.waitAction>div.item.waittext
+{
+    display: block;
+}
+div.popupMenu.notactive>div.item>table
+{
+    /*opacity: 0.3;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=30);*/
+}
+div.popupMenu.notactive>div.item.active>table
+{
+    opacity: 1;
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+}
+div.popupMenu:hover
+{
+    /*display: block;*/
+}
+div.popupMenu div.item
+{
+    position: relative;
+}
+div.popupMenu div.item.separator
+{
+    border-top: 1px solid #E5E5E5;
+    margin: 9px 1px;
+}
+div.popupMenu div.item td.itemCaption
+{
+    white-space: nowrap;
+    padding: 0px 15px 0px 28px;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    line-height: 20px;
+}
+div.popupMenu div.item[default="true"] td.itemCaption
+{
+    font-weight: bold;
+}
+div.popupMenu div.item td.caret
+{
+    background: url('Components/PopupMenu/images/haveitems.png') no-repeat left center transparent;
+    width: 8px;
+    display: none;
+}
+div.popupMenu div.item.haveItems > table td.caret
+{
+    display: table-cell;
+}
+div.popupMenu div.item:hover, div.popupMenu div.item:active
+{
+    background-color: #0081C2;
+}
+div.popupMenu div.item:hover >table>tbody>tr> td.itemCaption, div.popupMenu div.item:active >table>tbody>tr> td.itemCaption
+{
+    color: #FFFFFF;
+    cursor:pointer;
+}
+div.popupMenu div.item div.subItems
+{
+    display: none;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+div.popupMenu div.item.active>div.subItems
+{
+    display: block;
+}
+div.popupMenu div.item.ctrl_disable
+{
+    background-color: transparent !important;
+}
+div.popupMenu div.item.ctrl_disable>table
+{
+    cursor: default;
+}
+div.popupMenu div.item.ctrl_disable>table>tbody>tr>td.itemCaption
+{
+    color: #999999;
+    text-shadow: none;
+}
+div.popupMenu div.item .itemIcon
+{
+    vertical-align: middle;
+    border: 0 none;
+    margin-left: -19px;
+    margin-right: 3px;
+    margin-top: -2px;
+}
+div.popupMenu div.item.ctrl_disable .itemIcon
+{
+    opacity: 0.5;
+}
+div.popupMenu div.item .itemIcon[src=""]
+{
+    display: none;
+}
