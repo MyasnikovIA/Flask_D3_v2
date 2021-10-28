@@ -10,4 +10,5 @@
      <cmpButton caption="Dialog component"  onclick="openD3Form('Tutorial/Dialog/Dialog',true)" />
      <cmpButton caption="SubForm component"  onclick="openD3Form('Tutorial/SubForm/SubForm',true)" />
      <cmpButton caption="Window component"  onclick="openD3Form('Tutorial/Window/startModalWin',true)" />
+     <cmpButton caption="image component"  onclick="openD3Form('Tutorial/Image/image',true)" />
 </div>
