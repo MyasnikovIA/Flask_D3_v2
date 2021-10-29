@@ -1,5 +1,6 @@
 from Components.Base.BaseCtrl import *
 
+
 class Edit(Base):
     """
          <table  cmptype="Edit" name='testEd'  title='' class="editControl" cellspacing="0" cellpadding="0" style="vertical-align:bottom; width:114px;  display:inline-table;" >
@@ -10,6 +11,7 @@ class Edit(Base):
               </tr>
          </table>
     """
+
     def __init__(self, attrs):
         super().__init__(attrs)
         self.readonly = getBooleanAttr('readonly', self.attrs, 'false');
@@ -34,7 +36,7 @@ class Edit(Base):
         self.format = getDomAttrRemove('format', None, self.attrs);
         self.readonly = getDomAttrRemove('readonly', None, self.attrs);
         self.disabled = getDomAttrRemove('disabled', None, self.attrs);
-        self.format = RemoveArrKeyRtrn(self.attrs,'format', '');
+        self.format = RemoveArrKeyRtrn(self.attrs, 'format', '');
 
         if not "width" in self.attrs:
             width = "100%"
@@ -47,7 +49,6 @@ class Edit(Base):
             self.style = f""" style = "width: {width};{self.attrs["style"]}" """
             del self.attrs["style"]
 
-
     def show(self):
         eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
@@ -55,9 +56,9 @@ class Edit(Base):
             classCSSStr = f""" class='{' '.join(self.classCSS)}'"""
         else:
             classCSSStr = ""
-        self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}"  {classCSSStr} {self.style} {self.placeholder}  {atr}  disabled onchange="D3Api.stopEvent();">
+        self.print(
+            f"""<div  cmptype="{self.CmpType}" name="{self.name}"  {classCSSStr} {self.style} {self.placeholder}  {atr}  disabled onchange="D3Api.stopEvent();">
                         <input cmpparse="Edit"  {self.type} {self.value} {self.maxlength} {self.readonly} {eventsStr}  onchange="D3Api.stopEvent(); " {self.placeholder} {self.disabled} />""")
         # Добавляется при инициализации  d3main.js d3theme.css
-        #self.SetSysInfo.append("<scriptfile>Components/Edit/js/Edit.js</scriptfile>")
-        #self.SetSysInfo.append("<cssfile>Components/Edit/css/Edit.css</cssfile>")
-
+        # self.SetSysInfo.append("<scriptfile>Components/Edit/js/Edit.js</scriptfile>")
+        # self.SetSysInfo.append("<cssfile>Components/Edit/css/Edit.css</cssfile>")

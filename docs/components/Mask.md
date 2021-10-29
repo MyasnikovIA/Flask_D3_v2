@@ -61,3 +61,20 @@ D3Api.MaskCtrl.setParam (control, parametr, value)
 ```js
 D3Api.MaskCtrl.setParam(getControl('ValueClone'), 'mask_type', 'date');
 ```
+
+
+## Работа с масками
+
+Для назначения компоненту маски с помощью макроса прилагается следующий пример.
+
+```js
+var vMaska = 'S 00000009';
+var MaskaCheck = '(.?) [0-g]?[0-g]?[0-g]?[0-g]?[0-g]?[0-g]?[0-g]?[0-9]';
+var MaskaTemplate = 'x xxxxxxx9';
+
+D3Api.MaskCtrl.setParam(getControl('document_number'), 'mask_check_regular', '^'+MaskaCheck+'$');
+D3Api.MaskCtrl.setParam(getControl('document_number'), 'mask_template', MaskaTemplate);
+D3Api.MaskCtrl.setParam(getControl('document_number'), 'mask_original', MaskaTemplate);
+D3Api.MaskCtrl.setParam(getControl('document_number'), 'mask_strip', true);
+setControlProperty('document_number','hint',vMaska);
+```
