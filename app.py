@@ -159,8 +159,7 @@ def getform_php_files(the_path):
         formName = getParam('Form')
         cache = getParam('cache')
         dataSetName = getParam('DataSet', "")
-        blockName = getParam('blockName', "")
-        frm = getParsedForm(formName, cache, dataSetName, agent_info, blockName)
+        frm = getParsedForm(formName, cache, dataSetName, agent_info)
         return frm, 200, {'content-type': 'application/plain'}
 
     if the_path == "request":
@@ -172,7 +171,7 @@ def getform_php_files(the_path):
             for dataSetName in dataSet:
                 typeQuery = dataSet[dataSetName]["type"]
                 paramsQuery = dataSet[dataSetName]["params"]
-                resultTxt = dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj, agent_info)
+                resultTxt = dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, sessionObj, agent_info)
                 # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
     return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {

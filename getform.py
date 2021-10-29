@@ -233,16 +233,9 @@ def parseFrm(root, formName, parentRoot={}, num_element=0):
     return sysinfoBlock, "".join(htmlContent)
 
 
-def getSrc(formName, cache, dataSetName="", agent_info={}, blockName=""):
+def getSrc(formName, cache, dataSetName="", agent_info={}):
     rootForm = getXMLObject(formName)
-    if len(blockName) == 0:
-        sysinfoBlock, text = parseFrm(rootForm, formName)  # парсим форму
-    else:
-        nodes = rootForm.findall(f"*[@name='{blockName}']") # ишим фрагмент формы по атребуту имени
-        if len(nodes) > 0 and not nodes[0].tag == "cmpDataSet"  and not nodes[0].tag == "cmpAction": # пропускаем если нашли cmpDataSet или cmpAction
-            sysinfoBlock, text = parseFrm(nodes[0], formName)  # парсим первый найденый фрагмент формы
-        else:
-            return f"<!-- Block {blockName} not found in {formName} -->"
+    sysinfoBlock, text = parseFrm(rootForm, formName)  # парсим форму
     resTxt = [text]
     resTxt.append('\n<div cmptype="sysinfo" style="display:none;">')
     for line in sysinfoBlock:
@@ -251,7 +244,10 @@ def getSrc(formName, cache, dataSetName="", agent_info={}, blockName=""):
     return "".join(resTxt)
 
 
-def getTemp(formName, cache, dataSetName, agent_info, blockName=""):
+def getTemp(formName, cache, dataSetName, agent_info):
+    if ":" in formName:
+        blockName = formName.split(":")[0]
+        formName = formName.split(":")[1]
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir", "temp/")}'
     cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_{formName.replace(os.sep, '_')}{blockName}.frm"
     if not os.path.exists(cmpDirSrc):
@@ -263,26 +259,26 @@ def getTemp(formName, cache, dataSetName, agent_info, blockName=""):
         return txt
     if not os.path.exists(cmpFiletmp):
         with open(cmpFiletmp, "wb") as d3_css:
-            txt = getSrc(formName, cache, dataSetName, agent_info, blockName)
+            txt = getSrc(formName, cache, dataSetName, agent_info)
             d3_css.write(txt.encode())
-            setTempPage(cmpFiletmp, txt, blockName)
+            setTempPage(cmpFiletmp, txt)
             return txt
     else:
         with open(cmpFiletmp, "rb") as infile:
             txt = infile.read()
-            setTempPage(cmpFiletmp, txt, blockName)
+            setTempPage(cmpFiletmp, txt)
             return txt
 
 
-def getParsedForm(formName, cache, dataSetName="", agent_info={}, blockName=""):
+def getParsedForm(formName, cache, dataSetName="", agent_info={}):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
       !!!  необходимо переписать, и добавить логику DFRM (частичног опереопределения XML формы)
     """
     if get_option("TempDir") and (+get_option("debug")) < 1:
-        return getTemp(formName, cache, dataSetName, agent_info, blockName)
+        return getTemp(formName, cache, dataSetName, agent_info)
     else:
-        return getSrc(formName, cache, dataSetName, agent_info, blockName)
+        return getSrc(formName, cache, dataSetName, agent_info)
 
 
 def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
@@ -388,7 +384,7 @@ def joinDfrm(rootForm, rootDfrmForm):
 
 def readFile(pathForm):
     if not os.path.exists(pathForm):
-        return f"<!--  Не найден файл: {pathForm} -->"
+        return f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{pathForm}" not found </error>'
     with codecs.open(pathForm, 'r', encoding='utf8') as f:
         xmlContentSrc = f.read()
     return xmlContentSrc
@@ -397,6 +393,10 @@ def readFile(pathForm):
 def getXMLObject(formName):
     global TEMP_XML_PAGE
     # TEMP_DS_PAGE = {}
+    blockName = ""
+    if ":" in formName:
+        blockName = formName.split(":")[1]
+        formName = formName.split(":")[0]
     formName = formName.replace("/", os.sep)
     pathForm = f"{FORM_PATH}{os.sep}{formName}.frm"
     pathUserForm = f"{USER_FORM_PATH}{os.sep}{formName}.frm"
@@ -405,7 +405,6 @@ def getXMLObject(formName):
         pathForm = pathUserForm
     # print(pathForm)
     xmlText = f'<?xml version="1.0" encoding="UTF-8" ?>\n{readFile(pathForm)}'
-    # print(xmlText)
     rootForm = ET.fromstring(xmlText)
     if os.path.exists(pathUserFormDir):
         filesArr = [os.path.join(pathUserFormDir, fileName) for fileName in os.listdir(pathUserFormDir) if
@@ -414,30 +413,37 @@ def getXMLObject(formName):
         for fileName in filesArr:
             xmldfrmtext.append(readFile(fileName))
         rootDfrmForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?><div>\n{"".join(xmldfrmtext)}</div>')
-        return joinDfrm(rootForm, rootDfrmForm)
+        rootForm = joinDfrm(rootForm, rootDfrmForm)
+
+    if not blockName == "":  # получаем блок XML с именем blockName
+        nodes = rootForm.findall(f"*[@name='{blockName}']")  # ишим фрагмент формы по атребуту имени
+        if len(nodes) > 0:
+            rootForm = nodes[0]
+        else:
+            rootForm = ET.fromstring(
+                f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{formName}" not found </error>')
     return rootForm
 
 
-def dataSetQuery(formName, dataSetName, typeQuery, paramsQuery, sessionObj, agent_info):
+def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj, agent_info):
     """
     Функция обработки запросов DataSet и Action с клиентских форм
     """
+    dataSetName=""
+    if ":" in formName:
+        dataSetName = formName.split(":")[0]
+        # formName = formName.split(":")[1]
     # print(formName, dataSetName, typeQuery, paramsQuery)
     resObject = {dataSetName: {"type": typeQuery, "data": [], "locals": {}, "position": 0, "rowcount": 0}}
     uid = ""
     if "_uid_" in paramsQuery:
         uid = paramsQuery["_uid_"]
         del paramsQuery["_uid_"]
-
-    # pathForm = getXMLSRC(formName)
-    # pathForm = f"{FORM_PATH}{os.sep}{formName}.frm"
-    # with codecs.open(pathForm, 'r', encoding='utf8') as f:
-    #    xmlContentSrc = f.read()
-    # xmlContent = xmlContentSrc
-    # xmlContent = getXMLSRC(formName)
-    # xmlContent = f'<?xml version="1.0" encoding="UTF-8" ?>\n{xmlContent}'
-    # rootForm = ET.fromstring(xmlContent)
-
+    if len(dataSetName)==0:
+        resObject = {"dataSetName": {"type": typeQuery, "data": [], "locals": {}, "position": 0, "rowcount": 0}}
+        resObject["dataSetName"]["uid"] = uid
+        resObject["dataSetName"]["error"] = "Имя блока не определено"
+        return json.dumps(resObject)
     rootForm = getXMLObject(formName)
     for dataSetXml in rootForm.findall(f'cmp{typeQuery}'):
         if not "name" in dataSetXml.attrib:
