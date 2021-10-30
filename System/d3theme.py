@@ -30,18 +30,18 @@ def getSrc(agent_info):
     for cmp in compList:
         cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}css{os.sep}{cmp}.css'
         res.append(readfile(cmpDirSrc))
-        cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}css{os.sep}{cmp}_{agent_info.get("platform")}.css'
+        cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}css{os.sep}{cmp}_{agent_info["platform"]}.css'
         res.append(readfile(cmpDirSrc))
     # Обязательные стили
     res.append(readfile('Components/Window/css/win.css'))
-    res.append(readfile(f'Components/Window/css/win_{agent_info.get("platform")}.css'))
+    res.append(readfile(f'Components/Window/css/win_{agent_info["platform"]}.css'))
     res.append(readfile('Components/Layout/css/Layout.css'))
-    res.append(readfile(f'Components/Window/css/win_{agent_info.get("platform")}.css'))
+    res.append(readfile(f'Components/Window/css/win_{agent_info["platform"]}.css'))
     return "".join(res)
 
 def getTemp(agent_info):
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir","temp/")}'
-    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_d3theme.css"
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info['platform']}_d3theme.css"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""

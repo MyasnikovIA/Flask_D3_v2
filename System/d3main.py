@@ -1,3 +1,4 @@
+import json
 from flask import session, request, jsonify
 import os
 import codecs
@@ -78,7 +79,7 @@ def getSrc(agent_info):
     for cmp in compList:
         cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}.js'
         res.append(readfile(cmpDirSrc))
-        cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}_{agent_info.get("platform")}.js'
+        cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}_{agent_info["platform"]}.js'
         res.append(readfile(cmpDirSrc))
 
 
@@ -138,6 +139,9 @@ def getSrc(agent_info):
     res.append('D3Api.SYS_CONFIG = {"formCache":false,"showDependence":false};')
     res.append('D3Api.SYS_CONFIG.debug = 1;')
     res.append('D3Api.startInit = function (){};')
+    res.append(f'D3Api.agent_info = { json.dumps(agent_info)};')
+
+
     return "".join(res)
 
 

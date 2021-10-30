@@ -121,8 +121,13 @@ def sendCostumBin(pathFile):
             return f"File {pathFile} not found", mimeType(".txt")
     else:
         return txt, mime
-
-
+def getAgentObj(req):
+    user_agent = request.headers.get('User-Agent')
+    browser = request.user_agent.browser
+    version = request.user_agent.version and int(req.user_agent.version.split('.')[0])
+    platform = request.user_agent.platform
+    #uas = request.user_agent.string
+    return {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform}
 @app.after_request
 def after_request(response):
     # CORS in flask
@@ -135,26 +140,37 @@ def after_request(response):
 
 @app.route('/')
 def example():
+    user_agent = request.headers.get('User-Agent')
     return app.send_static_file('index.html')
 
 
 @app.route('/~<name>', methods=['GET'])
 def d3theme_files(name):
+    user_agent = request.headers.get('User-Agent')
+    browser = request.user_agent.browser
+    version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
+    platform = request.user_agent.platform
+    agent_info = {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform}
+
     if "d3theme" in name:
         # return app.send_static_file('external/d3/d3theme.css')
-        return d3theme_css(getAgetntInfo()), 200, {'content-type': 'text/css'}
+        return d3theme_css(agent_info), 200, {'content-type': 'text/css'}
         # return app.send_static_file('external/d3/~d3theme'), 200, {'content-type': 'text/css'}
 
     if "d3main" in name:
         # return app.send_static_file('external/d3/d3api.js')
-        return d3main_js(getAgetntInfo()), 200, {'content-type': 'application/json'}
+        return d3main_js(agent_info), 200, {'content-type': 'application/json'}
         # return app.send_static_file('System/d3main.py'), 200, {'content-type': 'application/json'}
 
 
 @app.route('/<the_path>.php', methods=['GET', 'POST'])
 def getform_php_files(the_path):
     sessionObj = getSessionObject()
-    agent_info = getAgetntInfo()
+    user_agent = request.headers.get('User-Agent')
+    browser = request.user_agent.browser
+    version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
+    platform = request.user_agent.platform
+    agent_info = {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform}
     if the_path == 'getform':
         formName = getParam('Form')
         cache = getParam('cache')

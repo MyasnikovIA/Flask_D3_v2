@@ -100,6 +100,14 @@ class Base:
             del attrs['num_element']
         else:
             self.num_element = 0
+
+        # информация о подключаемом устройстве
+        if 'agent_info' in attrs:
+            self.agent_info = attrs['agent_info']
+            del attrs['agent_info']
+        else:
+            self.agent_info = {}
+
         self.attrs = attrs
         self.SetSysInfo = []
         self.HTML_DST = []

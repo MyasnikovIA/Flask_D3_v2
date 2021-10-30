@@ -89,7 +89,7 @@ def getObjctClass(module_class_string, **kwargs):
     return obj
 
 
-def parseFrm(root, formName, parentRoot={}, num_element=0):
+def parseFrm(root, formName, parentRoot={}, num_element=0, agent_info={}):
     """
     Функция предназначена для рекурсивного обхода дерева XML (формы),
     и заены  элементов тэк который начинается с стмволов "cmp" (<cmpButton name="test">)
@@ -124,7 +124,7 @@ def parseFrm(root, formName, parentRoot={}, num_element=0):
     attrib["parentElement"] = parentRoot
     attrib["nodeXML"] = root
     attrib["num_element"] = num_element
-
+    attrib["agent_info"] = agent_info
     # дописать проверку наличия компонента файла
     compFileName = os.path.join(COMPONENT_PATH, compName, f'{compName}Ctrl.py')
     if os.path.isfile(compFileName):
@@ -236,8 +236,9 @@ def parseFrm(root, formName, parentRoot={}, num_element=0):
 
 
 def getSrc(formName, cache, dataSetName="", agent_info={}):
+    # cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
     rootForm = getXMLObject(formName)
-    sysinfoBlock, text = parseFrm(rootForm, formName)  # парсим форму
+    sysinfoBlock, text = parseFrm(rootForm, formName,{},0,agent_info)  # парсим форму
     resTxt = [text]
     resTxt.append('\n<div cmptype="sysinfo" style="display:none;">')
     for line in sysinfoBlock:
@@ -247,11 +248,12 @@ def getSrc(formName, cache, dataSetName="", agent_info={}):
 
 
 def getTemp(formName, cache, dataSetName, agent_info):
+    # {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform}
     if ":" in formName:
         blockName = formName.split(":")[0]
         formName = formName.split(":")[1]
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir", "temp/")}'
-    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_{formName.replace(os.sep, '_')}{blockName}.frm"
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
