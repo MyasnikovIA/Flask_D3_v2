@@ -134,14 +134,12 @@ def getSrc(agent_info):
     # }, true);
     # """)
 
-    res.append('})();')
-    res.append(f'D3Api.SYS_CACHE_UID = "{genCacheUid()}";')
-    res.append('D3Api.SYS_CONFIG = {"formCache":false,"showDependence":false};')
-    res.append('D3Api.SYS_CONFIG.debug = 1;')
-    res.append('D3Api.startInit = function (){};')
-    res.append(f'D3Api.agent_info = { json.dumps(agent_info)};')
-
-
+    res.append('})();\r')
+    res.append(f'\rD3Api.SYS_CACHE_UID = "{genCacheUid()}";')
+    res.append('\rD3Api.SYS_CONFIG = {"formCache":false,"showDependence":false};')
+    res.append('\rD3Api.SYS_CONFIG.debug = 1;')
+    res.append('\rD3Api.startInit = function (){};')
+    res.append(f'\rD3Api.agent_info = { json.dumps(agent_info)};')
     return "".join(res)
 
 

@@ -1,5 +1,6 @@
 import codecs
 import importlib
+import os.path
 import uuid
 import ast
 import json
@@ -249,11 +250,12 @@ def getSrc(formName, cache, dataSetName="", agent_info={}):
 
 def getTemp(formName, cache, dataSetName, agent_info):
     # {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform}
+    blockName = ""
     if ":" in formName:
         blockName = formName.split(":")[0]
         formName = formName.split(":")[1]
-    cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir", "temp/")}'
-    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
+    cmpDirSrc =  os.path.join(ROOT_DIR,get_option("TempDir", "temp/"))  # f'{ROOT_DIR}{get_option("TempDir", "temp/")}' # .replace("/",os.sep)
+    cmpFiletmp =os.path.join(cmpDirSrc,agent_info['platform'],f"{formName.replace(os.sep, '_')}{blockName}.frm")   # f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
@@ -262,6 +264,9 @@ def getTemp(formName, cache, dataSetName, agent_info):
     if not txt == "":
         return txt
     if not os.path.exists(cmpFiletmp):
+        print(os.path.dirname(cmpFiletmp))
+        if not os.path.exists(os.path.dirname(cmpFiletmp)):
+            os.makedirs(os.path.dirname(cmpFiletmp))
         with open(cmpFiletmp, "wb") as d3_css:
             txt = getSrc(formName, cache, dataSetName, agent_info)
             d3_css.write(txt.encode())
