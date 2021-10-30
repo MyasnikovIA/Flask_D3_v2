@@ -1,0 +1,140 @@
+.ctrl_pageControl {
+    width: 100%;
+    height: 100%;
+}
+.pageControl-content {
+    width: 100%;
+    height: 100%;
+}
+.ctrl_pageControl[mode="horizontal"] {
+    padding: 35px 0 0;
+}
+.ctrl_pageControl[mode="horizontal"] > .div_ul
+{
+    position: relative;
+    height: 35px;
+    margin: -35px 0 0;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+}
+.ctrl_pageControl[mode="vertical"] > .div_ul {
+    margin: 0 15px;
+}
+.ctrl_pageControl[mode="horizontal"].bg
+{
+    border-bottom: 2px solid #5C98BB;
+}
+.ctrl_pageControlTabs
+{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    height: 30px;
+    position: relative;
+}
+.ctrl_pageControlTabs.bg
+{
+    background-color: #FFFFFF;
+}
+.ctrl_pageControl[mode="horizontal"] > .div_ul .ctrl_pageControlTabBtn
+{
+    display: inline-block;
+    line-height: 20px;
+}
+.ctrl_pageControlTabBtn .centerTB
+{
+    float: left;
+    height: 20px;
+    padding: 5px;
+    width: auto;
+    cursor: pointer;
+    font-size: 16px;
+    display: inline-block;
+    margin-right: 16px;
+    border-bottom: 5px solid #DDDDDD;
+    color: #0066CC;
+}
+.ctrl_pageControl[mode="horizontal"] > .div_ul .ctrl_pageControlTabBtn .centerTB:hover
+{
+    border-bottom-color: #0066CC;
+}
+.ctrl_pageControl[mode="horizontal"] > .div_ul .ctrl_pageControlTabBtn.active .centerTB
+{
+    color: #000000;
+    border-bottom-color: #000000;
+}
+.ctrl_pageControlTabBtn.ctrl_disable
+{
+    background-color: transparent !important;
+}
+.ctrl_pageControlTabBtn.ctrl_disable .centerTB
+{
+    color: #C5C5C5;
+    cursor: default;
+    border-bottom-color: #DDDDDD;
+}
+.ctrl_pageControlTabPage
+{
+    min-height: 100px;
+    display: none;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+}
+.button_scroll {
+    display: none;
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 35px;
+    opacity: 0.9;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;   
+    user-select: none;
+}
+.button_scroll:hover {
+    opacity: 1;
+}
+.next_scroll {
+    right: 0;
+    background: url("~CmpPageControl/scroll_next") no-repeat scroll 0 -6px transparent;
+}
+.prior_scroll {
+    left: 0;
+    background: url("~CmpPageControl/scroll_prior") no-repeat scroll 0 -6px transparent;
+}
+.div_ul::before {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 5px;
+    background-color: #dddddd;
+}
+.ctrl_pageControl[mode="vertical"] {
+    display: flex;
+    flex-direction: row;
+}
+.ctrl_pageControl[mode="vertical"] > .div_ul .ctrl_pageControlTabBtn .centerTB
+{
+    white-space: nowrap;
+    float: none;
+    border-bottom: none;
+    border-left: 5px solid #DDDDDD;
+    margin: 3px 0;
+    padding: 10px 5px;
+    width: 100%;
+}
+.ctrl_pageControl[mode="vertical"] > .div_ul .ctrl_pageControlTabBtn .centerTB:hover
+{
+    border-left-color: #0066CC;
+}
+.ctrl_pageControl[mode="vertical"] > .div_ul .ctrl_pageControlTabBtn.active .centerTB
+{
+    color: #000000;
+    border-left-color: #000000;
+}

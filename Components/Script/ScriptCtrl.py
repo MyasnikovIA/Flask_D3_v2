@@ -8,7 +8,7 @@ class Script(Base):
         self.tag = 'textarea';
 
     def show(self):
-        self.print(f"""<{self.tag} cmptype={self.CmpType} name="{self.name}" style="display:none;"> {self.text}""")
+        self.print(f"""<{self.tag} cmptype={self.CmpType} name="{self.name}" style="display:none;">""")
         # подгрузка библитек
-        # self.SetSysInfo.append("<scriptfile>Components/Label/js/Label.js</scriptfile>")
-        # self.SetSysInfo.append("<cssfile>Components/Label/css/Label.css</cssfile>")
+        # self.SetSysInfo.append("<scriptfile>Components/Script/js/Script.js</scriptfile>")
+        # self.SetSysInfo.append("<cssfile>Components/Script/css/Script.css</cssfile>")

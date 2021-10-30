@@ -11,6 +11,8 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 
+from xml.dom import minidom
+
 from app import getSession, setSession
 from Etc.conf import *
 
@@ -334,53 +336,87 @@ def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
     return argsQuery, sessionVar
 
 
-def joinDfrm(rootForm, rootDfrmForm):
+def joinDfrm(formName,rootForm):
     """
     Обработать DFRM и FRM
     Необходимо дописать замену найденой ноды на ноду из DFRM
     """
+    pathUserFormDir = f"{USER_FORM_PATH}{os.sep}{formName}.d"
+    if os.path.exists(pathUserFormDir):
+        filesArr = [os.path.join(pathUserFormDir, fileName) for fileName in os.listdir(pathUserFormDir) if
+                    fileName[-4:] == "dfrm"]
+        xmldfrmtext = []
+        for fileName in filesArr:
+            xmldfrmtext.append(readFile(fileName))
+        rootDfrmForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?><div>\n{"".join(xmldfrmtext)}</div>')
+        for nodeXml in rootDfrmForm.iter(f'node'):
+            findName = nodeXml.attrib.get("target")
+            pos = nodeXml.attrib.get("pos")
+            nodForm = None
+            if "name" in rootForm.attrib:
+                if rootForm.attrib.get('name') == findName:
+                    nodForm = rootForm
+            if nodForm == None:
+                nodForm = rootForm.find(f"./*[@name='{findName}']")
+            if nodForm == None:
+                continue
+            if pos == None:
+                continue
+            if pos == "del":
+                rootForm.remove(nodForm)
+            if pos == "after":
+                fragArr = []
+                for appEl in nodeXml.findall("*"):
+                    # nodForm.append(appEl)
+                    # nodForm.insert(0, appEl)
+                    fragArr.append((ET.tostring(appEl)).decode('UTF-8'))
+                txt = " ".join(fragArr)
+                children = ET.fromstring(f'''<root>{ET.tostring(nodForm).decode('UTF-8')}{txt}</root>''')
+                nodForm.clear()
+                nodForm.extend(children)
+            if pos == "before":
+                fragArr = []
+                for appEl in nodeXml.findall("*"):
+                    fragArr.append((ET.tostring(appEl)).decode('UTF-8'))
+                txt = " ".join(fragArr)
+                children = ET.fromstring(f'''<root>{txt}{ET.tostring(nodForm).decode('UTF-8')}</root>''')
+                nodForm.clear()
+                nodForm.extend(children)
+            if pos == "replace":
+                fragArr = []
+                for appEl in nodeXml.findall("*"):
+                   fragArr.append((ET.tostring(appEl)).decode('UTF-8'))
+                txt = " ".join(fragArr)
+                children = ET.fromstring(f'''<root>{txt}</root>''')
+                nodForm.clear()
+                nodForm.extend(children)
+        for attrXml in rootDfrmForm.iter('attr'):
+            findNameAttr = attrXml.attrib.get("target")
+            nodSrcForm = None
+            if "name" in rootForm.attrib:
+                if rootForm.attrib.get('name') == findNameAttr:
+                    nodSrcForm = rootForm
+            if nodSrcForm == None:
+                nodSrcForm = rootForm.find(f"./*[@name='{findNameAttr}']")
+            pos = attrXml.attrib.get("pos")
+            nameFrag = attrXml.attrib.get("name")
+            value = attrXml.attrib.get("value")
+            if nodSrcForm == None:
+                continue
+            if pos == "del":
+                nodSrcForm.attrib.pop(nameFrag, None)
+            if pos == "replace":
+                nodSrcForm.attrib[nameFrag] = value
+            if pos == "after":
+                nodSrcForm.attrib[nameFrag] = f"{nodSrcForm.attrib.get(nameFrag)}{value}"
+            if pos == "before":
+                nodSrcForm.attrib[nameFrag] = f"{value}{nodSrcForm.attrib.get(nameFrag)}"
+            if pos == "add":
+                nodSrcForm.attrib[nameFrag] = value
+    # print(ET.tostring(rootForm))
     # nodes = [nodeXml for nodeXml in rootDfrmForm.findall(f'node')]
     # nodes.extend([attrXml for attrXml in rootDfrmForm.findall(f'attr')])
     return rootForm
-    for nodeXml in rootDfrmForm.findall(f'node'):
-        findName = nodeXml.attrib.get("target")
-        nodSrcForm = rootForm.find(f"./*[@name='{findName}']")
-        if nodSrcForm == None:
-            continue
-        pos = nodeXml.attrib.get("pos")
-        print(pos)
-        if pos == None:
-            continue
-        if pos == "replace":
-            print("+")
-            # print(nodeXml.text)
-            # print(ET.tostring(nodeXml).decode())
-            hodeArrText = ET.tostring(nodeXml).decode().split("\n")
-            hodeText = "\n".join([j for i, j in enumerate(hodeArrText) if i not in [0, len(hodeArrText) - 1]])
-            print(hodeText)
-            print(nodSrcForm.get("node"))
-            # print(ET.tostring(nodSrcForm).decode())
-            print("+")
-            # nodSrcForm.fromstring(ET.tostring(nodeXml).decode())
-        # print(nodeXml.tag, ET.tostring(nodeXml).decode())
-        # print(nodSrcForm.tag, ET.tostring(nodSrcForm).decode())
-        # name = nodeXml.attrib.get("name")
-        # value = nodeXml.attrib.get("value")
-        # print(nodeXml.tag,ET.tostring(nodeXml).decode())
-        # print(nodeXml.tag,ET.tostring(nodeXml).decode())
-
-    for attrXml in rootDfrmForm.findall(f'attr'):
-        findName = attrXml.attrib.get("target")
-        nodSrcForm = rootForm.find(f"./*[@name='{findName}']")
-        if nodSrcForm == None:
-            continue
-        pos = attrXml.attrib.get("pos")
-        name = attrXml.attrib.get("name")
-        value = attrXml.attrib.get("value")
-        print(attrXml.tag, ET.tostring(attrXml).decode())
-
-    return rootForm
-
 
 def readFile(pathForm):
     if not os.path.exists(pathForm):
@@ -400,20 +436,12 @@ def getXMLObject(formName):
     formName = formName.replace("/", os.sep)
     pathForm = f"{FORM_PATH}{os.sep}{formName}.frm"
     pathUserForm = f"{USER_FORM_PATH}{os.sep}{formName}.frm"
-    pathUserFormDir = f"{USER_FORM_PATH}{os.sep}{formName}.d"
     if os.path.exists(pathUserForm):
         pathForm = pathUserForm
     # print(pathForm)
     xmlText = f'<?xml version="1.0" encoding="UTF-8" ?>\n{readFile(pathForm)}'
     rootForm = ET.fromstring(xmlText)
-    if os.path.exists(pathUserFormDir):
-        filesArr = [os.path.join(pathUserFormDir, fileName) for fileName in os.listdir(pathUserFormDir) if
-                    fileName[-4:] == "dfrm"]
-        xmldfrmtext = []
-        for fileName in filesArr:
-            xmldfrmtext.append(readFile(fileName))
-        rootDfrmForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?><div>\n{"".join(xmldfrmtext)}</div>')
-        rootForm = joinDfrm(rootForm, rootDfrmForm)
+    rootForm = joinDfrm(formName,rootForm)
 
     if not blockName == "":  # получаем блок XML с именем blockName
         nodes = rootForm.findall(f"*[@name='{blockName}']")  # ишим фрагмент формы по атребуту имени

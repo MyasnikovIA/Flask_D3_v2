@@ -5,7 +5,7 @@ import hashlib
 
 theme = get_option('Theme');
 compList = ['Label','Form','Edit','Button' ,'Base','Window','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
-            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar']
+            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl']
 
 def readCmpCss(name, ext=''):
     cmpDirSrc = f'{ROOT_DIR}Components{os.sep}{name}{os.sep}css{os.sep}{name}.css'

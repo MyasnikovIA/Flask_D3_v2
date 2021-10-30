@@ -14,4 +14,5 @@
      <cmpButton caption="Toolbar component"  onclick="openD3Form('Tutorial/Toolbar/Toolbar',true)" />
      <cmpButton caption="Menu component"  onclick="openD3Form('Tutorial/Menu/Menu',true,{width: 200, height: 740})" />
      <cmpButton caption="Desktop component"  onclick="openD3Form('Tutorial/Desktop/Desktop',true,{width: 1200, height: 900})" />
+     <cmpButton caption="PageControl component"  onclick="openD3Form('Tutorial/PageControl/PageControl',true,{width: 1200, height: 900})" />
 </div>

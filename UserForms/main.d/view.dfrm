@@ -1,14 +1,40 @@
 <div>
+    <!-- модификация атребутов  в юзер формах (переопределение базового функционала)-->
+    <!--
+    <attr target="Button1" name="onclick" pos="del"/>
     <attr target="Button1" name="onclick" value="base().showPrg(true);" pos="replace"/>
-    <node target="MainScript" pos="replace">
-        <cmpScript>
-            <![CDATA[
-                Form.onCreate = function() {
-                    setVar("form_params22","12345");
-                    setVar("paramArrDS",{"testparam1":123,"testParam2":345});
-                    console.log("1111111111");
-                }
-            ]]>
-        </cmpScript>
+    <attr target="Button1" name="onclick" value="base().showPrg(true);" pos="after"/>
+    <attr target="Button1" name="onclick" value="base().showPrg(true);" pos="before"/>
+    <attr target="Button1" name="onmousedown" value="base().showPrg(true);" pos="add"/>
+    -->
+
+
+    <!--node target="MyScript" pos="del"/-->
+    <!--
+    <attr target="MAINFORM" name="onshow" value="Form.onShow();" pos="add"/>
+    <node target="MyScript" pos="replace">
+       <cmpScript name="MyScript">
+        <![CDATA[
+            Form.onShow = function() {
+                console.log("test");
+            }
+        ]]>
+       </cmpScript>
     </node>
+    -->
+   <!--
+    <node target="MyScript" pos="after">
+       <cmpScript name="MyScript">
+        <![CDATA[ Form.onShow = function() { console.log("test"); } ]]>
+       </cmpScript>
+    </node>
+  -->
+
+    <node target="MyScript" pos="before">
+       <cmpScript name="MyScript">
+        <![CDATA[ Form.onShow = function() { console.log("1111111"); } ]]>
+       </cmpScript>
+    </node>
+
+
 </div>
