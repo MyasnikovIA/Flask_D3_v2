@@ -1258,9 +1258,9 @@ D3Api.D3Form = function (name, xml) {
     setParamsAction.addSysInfoParam({get: 'ps_params', srctype: 'var', src: 'ps_params'});
 
 
-    var CacheSessDelete = createModule('CacheSessDelete');
-    CacheSessDelete.requestParams['form'] = 'System/CacheSessDelete/CacheSessDelete';
-    CacheSessDelete.addSysInfoParam({get: 'formCache', srctype: 'var', src: 'formCache'});
+    // var CacheSessDelete = createModule('CacheSessDelete');
+    // CacheSessDelete.requestParams['form'] = 'System/CacheSessDelete/CacheSessDelete';
+    // CacheSessDelete.addSysInfoParam({get: 'formCache', srctype: 'var', src: 'formCache'});
 
     //События, которые оборачиваются внутренним обработчиком
     /*this.execDomEvents = new Array(
@@ -3878,13 +3878,13 @@ D3Api.D3Form = function (name, xml) {
             return;
         }
         /* удаление сессионого кэша */
-        setVar('formCache', this.formCache);
-        CacheSessDelete.execute(function(){
-            if(typeof _func == "function"){
-                _func();
-            }
-        });
-        clearSelection();
+        //setVar('formCache', this.formCache);
+        //CacheSessDelete.execute(function(){
+        //    if(typeof _func == "function"){
+        //        _func();
+        //    }
+        //});
+        //clearSelection();
         /*если показано модальное окно - работаем только с ним и его содержимым*/
         var open_modal_cont = D3Api.getDomBy(D3Api.D3MainContainer, 'div[id="open_modal"]');
         if(open_modal_cont && D3Api.showedDom(open_modal_cont) && open_modal_cont.childNodes.length >1 && open_modal_cont.childNodes[0].D3Form){

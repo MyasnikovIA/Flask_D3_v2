@@ -2,13 +2,14 @@ import json
 from flask import session, request, jsonify
 import os
 import codecs
-from Etc.conf import get_option, ROOT_DIR, getTempPage, setTempPage, existTempPage
+from Etc.conf import get_option, getTempPage, setTempPage, existTempPage
 import hashlib
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
             'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl']
 
-def readfile(name):
+def readfile(session,name):
+    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{name}'
     if os.path.exists(cmpDirSrc):
         with codecs.open(cmpDirSrc, encoding='utf-8') as f:
@@ -53,34 +54,34 @@ def getTemp(agent_info):
             return txt
 
 
-def getSrc(agent_info):
+def getSrc(session):
     random = "c"
     hesh = random + hashlib.md5(f'{getIdClient()}'.encode('utf-8')).hexdigest()
     res = []
     res.append('(function(){')
-    res.append(readfile('System/js/polyfill.js'))
-    res.append(readfile('System/js/clipboard.min.js'))
-    res.append(readfile('System/js/main.js'))
-    res.append(readfile('System/js/dataset.js'))
-    res.append(readfile('System/js/action.js'))
-    res.append(readfile('System/js/module.js'))
-    res.append(readfile('System/js/repeater.js'))
-    res.append(readfile('System/js/common.js'))
-    res.append(readfile('System/js/md5.js'))
-    res.append(readfile('System/js/notify.js'))
-    res.append(readfile('System/js/crc32/crc32.js'))
+    res.append(readfile(session,'System/js/polyfill.js'))
+    res.append(readfile(session,'System/js/clipboard.min.js'))
+    res.append(readfile(session,'System/js/main.js'))
+    res.append(readfile(session,'System/js/dataset.js'))
+    res.append(readfile(session,'System/js/action.js'))
+    res.append(readfile(session,'System/js/module.js'))
+    res.append(readfile(session,'System/js/repeater.js'))
+    res.append(readfile(session,'System/js/common.js'))
+    res.append(readfile(session,'System/js/md5.js'))
+    res.append(readfile(session,'System/js/notify.js'))
+    res.append(readfile(session,'System/js/crc32/crc32.js'))
     # подключаем компоненты
-    res.append(readfile('System/js/Base.js'))
-    res.append(readfile('Components/Window/common.js'))
-    res.append(readfile('Components/Window/win_sys.js'))
-    res.append(readfile('Components/Window/window.js'))
+    res.append(readfile(session,'System/js/Base.js'))
+    res.append(readfile(session,'Components/Window/common.js'))
+    res.append(readfile(session,'Components/Window/win_sys.js'))
+    res.append(readfile(session,'Components/Window/window.js'))
     #res.append(readfile('Components/Layout/js/Layout.js'))
     #res.append(readfile('Components/LayoutSplit/js/LayoutSplit.js'))
     for cmp in compList:
         cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}.js'
-        res.append(readfile(cmpDirSrc))
-        cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}_{agent_info["platform"]}.js'
-        res.append(readfile(cmpDirSrc))
+        res.append(readfile(session,cmpDirSrc))
+        # cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}_{session["platform"]}.js'
+        # res.append(readfile(cmpDirSrc))
 
 
 
@@ -139,12 +140,13 @@ def getSrc(agent_info):
     res.append('\rD3Api.SYS_CONFIG = {"formCache":false,"showDependence":false};')
     res.append('\rD3Api.SYS_CONFIG.debug = 1;')
     res.append('\rD3Api.startInit = function (){};')
-    res.append(f'\rD3Api.agent_info = { json.dumps(agent_info)};')
+    # res.append(f'\rD3Api.agent_info = { json.dumps(agent_info)};')
     return "".join(res)
 
 
-def show(agent_info):
-    if get_option("TempDir") and (+get_option("debug"))<1:
-        return getTemp(agent_info)
-    else:
-        return getSrc(agent_info)
+def show(session):
+    return getSrc(session)
+    #if get_option("TempDir") and (+get_option("debug"))<1:
+    #    return getTemp(agent_info)
+    #else:
+    #    return getSrc(agent_info)

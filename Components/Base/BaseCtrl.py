@@ -1,7 +1,7 @@
 import uuid
 import random
 from datetime import datetime
-from Etc.conf import get_option,ROOT_DIR
+from Etc.conf import get_option
 from getform import parseFrm,getXMLObject
 import re
 import os
@@ -102,11 +102,11 @@ class Base:
             self.num_element = 0
 
         # информация о подключаемом устройстве
-        if 'agent_info' in attrs:
-            self.agent_info = attrs['agent_info']
-            del attrs['agent_info']
+        if 'session' in attrs:
+            self.session = attrs['session']
+            del attrs['session']
         else:
-            self.agent_info = {}
+            self.session = {}
 
         self.attrs = attrs
         self.SetSysInfo = []

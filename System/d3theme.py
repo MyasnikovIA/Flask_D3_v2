@@ -1,13 +1,14 @@
 import os
 import codecs
-from Etc.conf import get_option, ROOT_DIR, getTempPage, setTempPage, existTempPage
+from Etc.conf import get_option, getTempPage, setTempPage, existTempPage
 import hashlib
 
 theme = get_option('Theme');
 compList = ['Label','Form','Edit','Button' ,'Base','Window','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
             'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl']
 
-def readCmpCss(name, ext=''):
+def readCmpCss(session,name, ext=''):
+    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
     cmpDirSrc = f'{ROOT_DIR}Components{os.sep}{name}{os.sep}css{os.sep}{name}.css'
     if os.path.exists(cmpDirSrc):
         with codecs.open(cmpDirSrc, encoding='utf-8') as f:
@@ -16,7 +17,8 @@ def readCmpCss(name, ext=''):
     return ""
 
 
-def readfile(name):
+def readfile(session,name):
+    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{name}'
     if os.path.exists(cmpDirSrc):
         with codecs.open(cmpDirSrc, encoding='utf-8') as f:
@@ -25,23 +27,25 @@ def readfile(name):
     return ""
 
 
-def getSrc(agent_info):
+def getSrc(session):
+
     res = []
     for cmp in compList:
         cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}css{os.sep}{cmp}.css'
-        res.append(readfile(cmpDirSrc))
-        cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}css{os.sep}{cmp}_{agent_info["platform"]}.css'
-        res.append(readfile(cmpDirSrc))
+        res.append(readfile(session,cmpDirSrc))
+        # cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}css{os.sep}{cmp}_{session["platform"]}.css'
+        # res.append(readfile(cmpDirSrc))
     # Обязательные стили
-    res.append(readfile('Components/Window/css/win.css'))
-    res.append(readfile(f'Components/Window/css/win_{agent_info["platform"]}.css'))
-    res.append(readfile('Components/Layout/css/Layout.css'))
-    res.append(readfile(f'Components/Window/css/win_{agent_info["platform"]}.css'))
+    res.append(readfile(session,'Components/Window/css/win.css'))
+    #res.append(readfile(f'Components/Window/css/win_{session["platform"]}.css'))
+    res.append(readfile(session,'Components/Layout/css/Layout.css'))
+    #res.append(readfile(f'Components/Window/css/win_{session["platform"]}.css'))
     return "".join(res)
 
-def getTemp(agent_info):
+def getTemp(session):
+    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir","temp/")}'
-    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info['platform']}_d3theme.css"
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{session['platform']}_d3theme.css"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
@@ -50,7 +54,7 @@ def getTemp(agent_info):
     if txt == "":
         if not os.path.exists(cmpFiletmp):
             with open(cmpFiletmp,"wb") as d3_css:
-                txt = getSrc(agent_info)
+                txt = getSrc(session)
                 d3_css.write(txt.encode())
                 setTempPage(cmpFiletmp,txt)
                 return txt
@@ -62,8 +66,9 @@ def getTemp(agent_info):
     else:
         return txt
 
-def show(agent_info):
-    if get_option("TempDir") and (+get_option("debug"))<1:
-        return getTemp(agent_info)
-    else:
-        return getSrc(agent_info)
+def show(session):
+    return getSrc(session)
+    #if get_option("TempDir") and (+get_option("debug"))<1:
+    #    return getTemp(agent_info)
+    #else:
+    #    return getSrc(agent_info)

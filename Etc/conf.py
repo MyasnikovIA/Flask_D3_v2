@@ -3,7 +3,7 @@ from app import request
 
 from pathlib import Path
 
-ROOT_DIR = f"{Path(__file__).parent.parent}{os.sep}"
+# ROOT_DIR = f"{Path(__file__).parent.parent}{os.sep}"
 
 global ConfigOptions
 ConfigOptions = {

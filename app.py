@@ -9,7 +9,7 @@ import copy
 import hashlib
 from inspect import getfullargspec
 
-from Etc.conf import get_option, ROOT_DIR
+from Etc.conf import get_option
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
 
@@ -20,7 +20,6 @@ from System.d3theme import show as d3theme_css
 app = Flask(__name__, static_folder='.')
 app.secret_key = str(uuid.uuid1()).replace("-", "")
 app.config['CORS_HEADERS'] = 'Content-Type'
-TEMP_DIR_PATH = f'{ROOT_DIR}{os.sep}{get_option("TempDir", "temp/")}'
 
 
 # ====================================================================================================================
@@ -80,16 +79,31 @@ def getSessionObject():
     return session
 
 def getAgentInfo(request):
-    user_agent = request.headers.get('User-Agent')
-    browser = request.user_agent.browser
-    version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
-    platform = request.user_agent.platform
-    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-        ip = request.environ['REMOTE_ADDR']
-    else:
-        ip = request.environ['HTTP_X_FORWARDED_FOR']
-    ses= getSessionObject()
-    return {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform,"ip":ip}
+    if not "AgentInfo" in session:
+        session["AgentInfo"]={}
+    if not request.user_agent is None:
+        session["AgentInfo"]={}
+        session["AgentInfo"]['User-Agent'] = request.headers.get('User-Agent')
+        session["AgentInfo"]['browser'] = request.user_agent.browser
+        session["AgentInfo"]['version'] = request.user_agent.version and int(request.user_agent.version.split('.')[0])
+        session["AgentInfo"]['platform'] = request.user_agent.platform
+        if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+            session["AgentInfo"]['ip'] = request.environ['REMOTE_ADDR']
+        else:
+            session["AgentInfo"]['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
+    session["AgentInfo"]['Forms'] = ConfigOptions['Forms']
+    if not 'debug' in session["AgentInfo"] and request.args.get("debug") == None:
+        session["AgentInfo"]['debug'] = ConfigOptions['debug']
+    if not request.args.get("debug") == None:
+        session["AgentInfo"]['debug'] = request.args.get("debug")
+    if not 'UserForms' in session["AgentInfo"] and request.args.get("f") == None:
+        session["AgentInfo"]['UserForms'] = ConfigOptions['UserForms']
+    if not request.args.get("f") == None:
+        session["AgentInfo"]['UserForms'] = request.args.get("f")
+    session["AgentInfo"]['TempDir'] = ConfigOptions['TempDir']
+    session["AgentInfo"]['ROOT_DIR'] = f"{os.path.dirname(Path(__file__))}{os.sep}"
+    session["AgentInfo"]['TEMP_DIR_PATH'] = os.path.join(os.path.dirname(Path(__file__)),ConfigOptions['TempDir'])
+    return session["AgentInfo"]
 # ====================================================================================================================
 # ====================================================================================================================
 
@@ -126,26 +140,24 @@ def example():
 
 @app.route('/~<name>', methods=['GET'])
 def d3theme_files(name):
-    agent_info = getAgentInfo(request)
     if "d3theme" in name:
         # return app.send_static_file('external/d3/d3theme.css')
-        return d3theme_css(agent_info), 200, {'content-type': 'text/css'}
+        return d3theme_css(session), 200, {'content-type': 'text/css'}
         # return app.send_static_file('external/d3/~d3theme'), 200, {'content-type': 'text/css'}
 
     if "d3main" in name:
         # return app.send_static_file('external/d3/d3api.js')
-        return d3main_js(agent_info), 200, {'content-type': 'application/json'}
+        return d3main_js(session), 200, {'content-type': 'application/json'}
         # return app.send_static_file('System/d3main.py'), 200, {'content-type': 'application/json'}
 
 
 @app.route('/<the_path>.php', methods=['GET', 'POST'])
 def getform_php_files(the_path):
-    agent_info = getAgentInfo(request)
     if the_path == 'getform':
         formName = getParam('Form')
         cache = getParam('cache')
         dataSetName = getParam('DataSet', "")
-        frm = getParsedForm(formName, cache, dataSetName, agent_info)
+        frm = getParsedForm(formName, cache, dataSetName, session)
         return frm, 200, {'content-type': 'application/plain'}
 
     if the_path == "request":
@@ -157,7 +169,7 @@ def getform_php_files(the_path):
             for dataSetName in dataSet:
                 typeQuery = dataSet[dataSetName]["type"]
                 paramsQuery = dataSet[dataSetName]["params"]
-                resultTxt = dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session, agent_info)
+                resultTxt = dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
                 # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
     return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {
@@ -171,14 +183,9 @@ def js_files(name):
 
 @app.route('/<path:path>')
 def all_files(path):
-    # print(request.args.get("debug"))
-    global ConfigOptions
-    configOptions = copy.copy(ConfigOptions)
-    if not request.args.get("debug") == None:
-        configOptions["debug"] = request.args.get("debug")
-    if not request.args.get("f") == None:
-        configOptions["UserForms"] = request.args.get("f")
-
+    if path[-3:].lower() in ["tml","css",".js"]:
+        getAgentInfo(request)
+    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
     # {os.sep})}
     if '/~Cmp' in path and 'Components/' in path:
         cmp = path[path.find('Components/') + len('Components/'): path.find('/~Cmp') - len('/~Cmp') + 1]
