@@ -1,15 +1,13 @@
 import uuid
 import random
 from datetime import datetime
-from Etc.conf import get_option
+
 from getform import parseFrm,getXMLObject
 import re
 import os
 
 class Base:
     def __init__(self, attrs):
-        self.isDebug = int(get_option("debug", 0))
-
         # Имя формы на которой расположен элемент
         if "formName" in attrs:
             self.formName = attrs["formName"]
@@ -106,7 +104,7 @@ class Base:
             self.session = attrs['session']
             del attrs['session']
         else:
-            self.session = {}
+            self.session = None
 
         self.attrs = attrs
         self.SetSysInfo = []

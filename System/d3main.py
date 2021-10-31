@@ -2,7 +2,7 @@ import json
 from flask import session, request, jsonify
 import os
 import codecs
-from Etc.conf import get_option, getTempPage, setTempPage, existTempPage
+from Etc.conf import getTempPage, setTempPage, existTempPage
 import hashlib
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
@@ -30,9 +30,10 @@ def genCacheUid():
     hesh = random + hashlib.md5(f'{getIdClient()}'.encode('utf-8')).hexdigest()
     return hesh
 
-def getTemp(agent_info):
-    cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir","temp/")}'
-    cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info.get('platform')}_d3main.js"
+def getTemp(session):
+    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
+    cmpDirSrc = session["AgentInfo"]['TEMP_DIR_PATH']
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{session['AgentInfo']['platform']}_d3main.js"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
@@ -40,10 +41,9 @@ def getTemp(agent_info):
         txt,mime  = getTempPage(cmpFiletmp,'')
     if not txt == "":
         return txt
-
     if not os.path.exists(cmpFiletmp):
         with open(cmpFiletmp,"wb") as d3_js:
-            txt = getSrc(agent_info)
+            txt = getSrc(session)
             d3_js.write(txt.encode())
             setTempPage(cmpFiletmp, txt)
             return txt
@@ -145,7 +145,10 @@ def getSrc(session):
 
 
 def show(session):
+    if "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0":
+        return getTemp(session)
     return getSrc(session)
+
     #if get_option("TempDir") and (+get_option("debug"))<1:
     #    return getTemp(agent_info)
     #else:

@@ -6,22 +6,21 @@ import ast
 import json
 import sys
 import re
+from Etc.conf import ConfigOptions,existTempPage,setTempPage,getTempPage
 
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
-
 from xml.dom import minidom
-
 from app import getSession, setSession
-from Etc.conf import *
+
 
 global COMPONENT_PATH
 COMPONENT_PATH = os.path.join(os.path.dirname(__file__), 'Components')
-FORM_PATH = os.path.join(os.path.dirname(__file__), get_option('Forms', '/Forms/')[1:])
-USER_FORM_PATH = os.path.join(os.path.dirname(__file__), get_option('UserForms', '/UserForms/')[1:])
-TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), get_option('cache_dir'))
+FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['Forms'][1:])
+USER_FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['UserForms'][1:])
+TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['TempDir'])
 
 
 def stripCode(srcCode=""):
@@ -254,7 +253,7 @@ def getTemp(formName, cache, dataSetName, session):
     if ":" in formName:
         blockName = formName.split(":")[0]
         formName = formName.split(":")[1]
-    cmpDirSrc =  os.path.join(ROOT_DIR,get_option("TempDir", "temp/"))
+    cmpDirSrc =  TEMP_DIR_PATH
     cmpFiletmp =os.path.join(cmpDirSrc,session["AgentInfo"]['platform'],f"{formName.replace(os.sep, '_')}{blockName}.frm")   # f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
@@ -264,7 +263,6 @@ def getTemp(formName, cache, dataSetName, session):
     if not txt == "":
         return txt
     if not os.path.exists(cmpFiletmp):
-        print(os.path.dirname(cmpFiletmp))
         if not os.path.exists(os.path.dirname(cmpFiletmp)):
             os.makedirs(os.path.dirname(cmpFiletmp))
         with open(cmpFiletmp, "wb") as d3_css:
@@ -284,7 +282,7 @@ def getParsedForm(formName, cache, dataSetName="", session={}):
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
       !!!  необходимо переписать, и добавить логику DFRM (частичног опереопределения XML формы)
     """
-    if get_option("TempDir") and (+get_option("debug")) < 1:
+    if "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0":
         return getTemp(formName, cache, dataSetName, session)
     else:
         return getSrc(formName, cache, dataSetName, session)
@@ -475,7 +473,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     # =============== Вставляем инициализированые переменные =======================
     argsQuery, sessionVar = parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj)
     varsDebug = {}
-    if get_option("debug") > 0:
+    if not sessionObj["AgentInfo"]['debug'] == '0':
         varsDebug = argsQuery.copy()
     # =============================================================================
     if typeQuery == "DataSet":
@@ -515,7 +513,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
            resObject[dataSetName]["type"] = typeQuery
            resObject[dataSetName]["position"] = 0
            resObject[dataSetName]["page"] = 0
-           if get_option("debug") > 0:
+           if not sessionObj["AgentInfo"]['debug'] == '0':
                resObject[dataSetName]["var"] = varsDebug
                resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
 
@@ -547,7 +545,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
            resObject[dataSetName]["data"] = dataVarReturn
            resObject[dataSetName]["type"] = typeQuery
            resObject[dataSetName]["uid"] = uid
-           if get_option("debug") > 0:
+           if not sessionObj["AgentInfo"]['debug'] == '0':
                resObject[dataSetName]["var"] = varsDebug
                resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
            return json.dumps(resObject)
@@ -555,116 +553,6 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     # print(ET.tostring(dataSetXml).decode())
     return json.dumps(resObject)
 
-
-
-def dataSetQuery2(formName, typeQuery, paramsQuery, sessionObj):
-    """
-    Функция обработки запросов DataSet и Action с клиентских форм
-    """
-    dataSetName=""
-    if ":" in formName:
-        dataSetName = formName.split(":")[1]
-    # print(formName, dataSetName, typeQuery, paramsQuery)
-    resObject = {dataSetName: {"type": typeQuery, "data": [], "locals": {}, "position": 0, "rowcount": 0}}
-    uid = ""
-    if "_uid_" in paramsQuery:
-        uid = paramsQuery["_uid_"]
-        del paramsQuery["_uid_"]
-    if len(dataSetName)==0:
-        resObject = {"dataSetName": {"type": typeQuery, "data": [], "locals": {}, "position": 0, "rowcount": 0}}
-        resObject["dataSetName"]["uid"] = uid
-        resObject["dataSetName"]["error"] = "Имя блока не определено"
-        return json.dumps(resObject)
-    rootForm = getXMLObject(formName)
-    for dataSetXml in rootForm.findall(f'cmp{typeQuery}'):
-        if not "name" in dataSetXml.attrib:
-            return f'{"error":"Не найден атрибут с именем"}'
-        if not dataSetXml.attrib.get("name") == dataSetName:
-            continue
-        # =============== Вставляем инициализированые переменные =======================
-        argsQuery, sessionVar = parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj)
-        varsDebug = {}
-        if get_option("debug") > 0:
-            varsDebug = argsQuery.copy()
-        # =============================================================================
-        if typeQuery == "Action":
-            if "query_type" in dataSetXml.attrib:
-                query_type = dataSetXml.attrib.get("query_type")
-            if query_type == "server_python":  # выполнить Python скрипт
-                code = stripCode(dataSetXml.text)
-                dataVarReturn = {}
-                localVariableTemp = {}
-                try:
-                    localVariableTemp = exec_then_eval(argsQuery, code, sessionObj)
-                except:
-                    resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
-                for elementDict in localVariableTemp:
-                    if elementDict[:2] == '__' or elementDict == 'elementDict' \
-                            or elementDict == 'localVariableTemp' or elementDict == 'sys':
-                        continue
-                    if elementDict in sessionVar:  # запоменаем переменные сессии
-                        sessionObj[elementDict] = localVariableTemp[elementDict]
-                    else:
-                        dataVarReturn[elementDict] = localVariableTemp[elementDict]
-                del localVariableTemp
-                resObject[dataSetName]["data"] = dataVarReturn
-                resObject[dataSetName]["type"] = typeQuery
-                resObject[dataSetName]["uid"] = uid
-                if get_option("debug") > 0:
-                    resObject[dataSetName]["var"] = varsDebug
-                    resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
-                return json.dumps(resObject)
-
-        if typeQuery == "DataSet":
-            query_type = "sql"
-            if "query_type" in dataSetXml.attrib:
-                query_type = dataSetXml.attrib.get("query_type")
-            if query_type == "server_python":  # выполнить Python скрипт
-                code = stripCode(dataSetXml.text)
-                dataVarReturn = {}
-                localVariableTemp = {}
-                try:
-                    localVariableTemp = exec_then_eval(argsQuery, code, sessionObj)
-                except:
-                    resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
-                for elementDict in localVariableTemp:
-                    if elementDict[:2] == '__' or elementDict == 'elementDict' \
-                            or elementDict == 'localVariableTemp' or elementDict == 'sys':
-                        continue
-                    if elementDict in sessionVar:  # запоменаем переменные сессии
-                        sessionObj[elementDict] = localVariableTemp[elementDict]
-                    else:
-                        dataVarReturn[elementDict] = localVariableTemp[elementDict]
-                del localVariableTemp
-                if "data" in dataVarReturn:
-                    resObject[dataSetName]["data"] = dataVarReturn["data"]
-                    resObject[dataSetName]["rowcount"] = len(dataVarReturn["data"])
-                    del dataVarReturn["data"]
-                resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
-                if "position" in dataVarReturn:
-                    resObject[dataSetName]["rowcount"] = dataVarReturn['position']
-                    del dataVarReturn['position']
-                if "rowcount" in dataVarReturn:
-                    resObject[dataSetName]["rowcount"] = dataVarReturn['rowcount']
-                    del dataVarReturn['rowcount']
-                resObject[dataSetName]["locals"] = dataVarReturn
-                resObject[dataSetName]["uid"] = uid
-                resObject[dataSetName]["type"] = typeQuery
-                resObject[dataSetName]["position"] = 0
-                resObject[dataSetName]["page"] = 0
-                if get_option("debug") > 0:
-                    resObject[dataSetName]["var"] = varsDebug
-                    resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
-
-                return json.dumps(resObject)
-            else:
-                # дописать обработку SQL запроса
-                s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {},
-                                   "position": 0, "rowcount": 0}}
-                return json.dumps(s)
-    s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {},
-                       "position": 0, "rowcount": 0}}
-    return json.dumps(s)
 
 
 """

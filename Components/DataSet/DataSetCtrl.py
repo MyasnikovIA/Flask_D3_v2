@@ -19,10 +19,11 @@ class DataSet(Base):
             self.activateoncreate = self.attrs.get("activateoncreate")
         else:
             self.activateoncreate = "true"
-        if self.isDebug>0:
-            self.text = f"""<!-- DataSet="{self.name}"  formName="{self.formName}"  {self.text}  -->"""
-        else:
-            self.text = ""
+        #if self.isDebug>0:
+        #    self.text = f"""<!-- DataSet="{self.name}"  formName="{self.formName}"  {self.text}  -->"""
+        #else:
+        #    self.text = ""
+        self.text = ""
 
     def show(self):
         # подгрузка библитек

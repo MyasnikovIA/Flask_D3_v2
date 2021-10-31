@@ -1,9 +1,8 @@
 import os
 import codecs
-from Etc.conf import get_option, getTempPage, setTempPage, existTempPage
+from Etc.conf import  getTempPage, setTempPage, existTempPage
 import hashlib
 
-theme = get_option('Theme');
 compList = ['Label','Form','Edit','Button' ,'Base','Window','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
             'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl']
 
@@ -44,8 +43,8 @@ def getSrc(session):
 
 def getTemp(session):
     ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
-    cmpDirSrc = f'{ROOT_DIR}{os.sep}{get_option("TempDir","temp/")}'
-    cmpFiletmp = f"{cmpDirSrc}{os.sep}{session['platform']}_d3theme.css"
+    cmpDirSrc = session["AgentInfo"]['TEMP_DIR_PATH']
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{session['AgentInfo']['platform']}_d3theme.css"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
@@ -67,8 +66,6 @@ def getTemp(session):
         return txt
 
 def show(session):
+    if "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0":
+        return getTemp(session)
     return getSrc(session)
-    #if get_option("TempDir") and (+get_option("debug"))<1:
-    #    return getTemp(agent_info)
-    #else:
-    #    return getSrc(agent_info)

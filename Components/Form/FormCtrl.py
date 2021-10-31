@@ -7,8 +7,7 @@ class Form(Base):
         self.CmpType = 'Base'
         self.tag = 'div'
         self.formInfo = ""
-        if self.isDebug>0:
-            self.formInfo = f""" formName="{self.formName}" """
+        self.formInfo = f""" formName="{self.formName}" """
         if "text" in attrs:
             self.text = attrs["text"]
             del attrs["text"]

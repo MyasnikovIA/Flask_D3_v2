@@ -2,14 +2,17 @@ import os
 
 from flask import Flask,redirect, session
 from flask import request, jsonify
-from getform import *
+from Etc.conf import ConfigOptions,existTempPage,getTempPage
+
+
 import shutil
 import json
-import copy
+from pathlib import Path
+import uuid
+import getform
 import hashlib
 from inspect import getfullargspec
 
-from Etc.conf import get_option
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
 
@@ -107,7 +110,6 @@ def getAgentInfo(request):
 # ====================================================================================================================
 # ====================================================================================================================
 
-
 def sendCostumBin(pathFile):
     txt = ""
     if existTempPage(pathFile):
@@ -150,6 +152,8 @@ def d3theme_files(name):
         return d3main_js(session), 200, {'content-type': 'application/json'}
         # return app.send_static_file('System/d3main.py'), 200, {'content-type': 'application/json'}
 
+def getParam(name, defoultValue=''):
+    return request.args.get(name, default=defoultValue)
 
 @app.route('/<the_path>.php', methods=['GET', 'POST'])
 def getform_php_files(the_path):
@@ -157,7 +161,7 @@ def getform_php_files(the_path):
         formName = getParam('Form')
         cache = getParam('cache')
         dataSetName = getParam('DataSet', "")
-        frm = getParsedForm(formName, cache, dataSetName, session)
+        frm = getform.getParsedForm(formName, cache, dataSetName, session)
         return frm, 200, {'content-type': 'application/plain'}
 
     if the_path == "request":
@@ -169,7 +173,7 @@ def getform_php_files(the_path):
             for dataSetName in dataSet:
                 typeQuery = dataSet[dataSetName]["type"]
                 paramsQuery = dataSet[dataSetName]["params"]
-                resultTxt = dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
+                resultTxt = getform.dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
                 # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
     return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {
@@ -214,7 +218,8 @@ def all_files(path):
 
 
 if __name__ == '__main__':
-    if get_option("debug") > 0:
+    if "debug" in ConfigOptions and not ConfigOptions["debug"] == '0':
+        TEMP_DIR_PATH = os.path.join(os.path.dirname(Path(__file__)), ConfigOptions['TempDir'])
         if os.path.exists(TEMP_DIR_PATH):
             for root, dirs, files in os.walk(TEMP_DIR_PATH):
                 for f in files:
@@ -223,5 +228,6 @@ if __name__ == '__main__':
                     shutil.rmtree(os.path.join(root, d))
         else:
             os.mkdir(TEMP_DIR_PATH)
+
     app.debug = True
     app.run(host='0.0.0.0', port=9091)

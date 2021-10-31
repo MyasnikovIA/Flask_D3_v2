@@ -1,7 +1,4 @@
 import os
-from app import request
-
-from pathlib import Path
 
 # ROOT_DIR = f"{Path(__file__).parent.parent}{os.sep}"
 
@@ -114,8 +111,7 @@ ConfigOptions = {
 }
 
 
-def getParam(name, defoultValue=''):
-    return request.args.get(name, default=defoultValue)
+"""
 
 
 def get_option(name, defoultValue=""):
@@ -129,18 +125,12 @@ def is_design_mode():
 
 def getAgetntInfo():
     res = {}
-    """
-    {
-        'platform': request.user_agent.platform,
-        'browser': request.user_agent.browser,
-        'version': request.user_agent.version
-    }
-    """
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
         res['ip'] = request.environ['REMOTE_ADDR']
     else:
         res['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
     return res
+"""
 
 ###-----------------------------------------------------------------------------------------------
 ###------ Механизм буфиризации контента, для ускорения продуктового сервета ----------------------
