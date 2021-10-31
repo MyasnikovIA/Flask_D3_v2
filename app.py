@@ -67,9 +67,21 @@ def mimeType(pathFile):
 # ====================================================================================================================
 # ====================================================================================================================
 # ====================================================================================================================
+def getSession(name, defoult):
+    if not name in session:
+        return defoult
+    return session[name]
+
+def setSession(name, value):
+    session[name] = value
+
+
+def getSessionObject():
+    return session
+
+"""
 global SESSION
 SESSION = {}
-
 
 def getSession(name, defoult):
     global SESSION
@@ -105,7 +117,7 @@ def getIdClient():
     else:
         return jsonify({'ip': request.environ['HTTP_X_FORWARDED_FOR'], "agent": agent})
 
-
+"""
 # ====================================================================================================================
 # ====================================================================================================================
 
@@ -167,7 +179,6 @@ def d3theme_files(name):
 
 @app.route('/<the_path>.php', methods=['GET', 'POST'])
 def getform_php_files(the_path):
-    sessionObj = getSessionObject()
     user_agent = request.headers.get('User-Agent')
     browser = request.user_agent.browser
     version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
@@ -189,7 +200,7 @@ def getform_php_files(the_path):
             for dataSetName in dataSet:
                 typeQuery = dataSet[dataSetName]["type"]
                 paramsQuery = dataSet[dataSetName]["params"]
-                resultTxt = dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, sessionObj, agent_info)
+                resultTxt = dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session, agent_info)
                 # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
     return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {
