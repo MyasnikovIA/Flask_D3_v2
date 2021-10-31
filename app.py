@@ -79,45 +79,16 @@ def setSession(name, value):
 def getSessionObject():
     return session
 
-"""
-global SESSION
-SESSION = {}
-
-def getSession(name, defoult):
-    global SESSION
-    key = getIdClient()
-    if not key in SESSION:
-        SESSION[key] = {}
-        return defoult
-    if not name in SESSION[key]:
-        return defoult
-    return SESSION[key][name]
-
-
-def setSession(name, value):
-    global SESSION
-    key = getIdClient()
-    if not key in SESSION:
-        SESSION[key] = {}
-    SESSION[key][name] = value
-
-
-def getSessionObject():
-    global SESSION
-    key = getIdClient()
-    if not key in SESSION:
-        SESSION[key] = {}
-    return SESSION[key]
-
-
-def getIdClient():
-    agent = request.headers.get('User-Agent')
+def getAgentInfo(request):
+    user_agent = request.headers.get('User-Agent')
+    browser = request.user_agent.browser
+    version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
+    platform = request.user_agent.platform
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-        return jsonify({'ip': request.environ['REMOTE_ADDR'], "agent": agent})
+        ip = request.environ['REMOTE_ADDR']
     else:
-        return jsonify({'ip': request.environ['HTTP_X_FORWARDED_FOR'], "agent": agent})
-
-"""
+        ip = request.environ['HTTP_X_FORWARDED_FOR']
+    return {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform,"ip":ip}
 # ====================================================================================================================
 # ====================================================================================================================
 
@@ -134,13 +105,7 @@ def sendCostumBin(pathFile):
             return f"File {pathFile} not found", mimeType(".txt")
     else:
         return txt, mime
-def getAgentObj(req):
-    user_agent = request.headers.get('User-Agent')
-    browser = request.user_agent.browser
-    version = request.user_agent.version and int(req.user_agent.version.split('.')[0])
-    platform = request.user_agent.platform
-    #uas = request.user_agent.string
-    return {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform}
+
 @app.after_request
 def after_request(response):
     # CORS in flask
@@ -160,12 +125,7 @@ def example():
 
 @app.route('/~<name>', methods=['GET'])
 def d3theme_files(name):
-    user_agent = request.headers.get('User-Agent')
-    browser = request.user_agent.browser
-    version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
-    platform = request.user_agent.platform
-    agent_info = {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform}
-
+    agent_info = getAgentInfo(request)
     if "d3theme" in name:
         # return app.send_static_file('external/d3/d3theme.css')
         return d3theme_css(agent_info), 200, {'content-type': 'text/css'}
@@ -179,11 +139,7 @@ def d3theme_files(name):
 
 @app.route('/<the_path>.php', methods=['GET', 'POST'])
 def getform_php_files(the_path):
-    user_agent = request.headers.get('User-Agent')
-    browser = request.user_agent.browser
-    version = request.user_agent.version and int(request.user_agent.version.split('.')[0])
-    platform = request.user_agent.platform
-    agent_info = {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform}
+    agent_info = getAgentInfo(request)
     if the_path == 'getform':
         formName = getParam('Form')
         cache = getParam('cache')
