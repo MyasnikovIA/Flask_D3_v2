@@ -9,7 +9,7 @@ import copy
 import hashlib
 from inspect import getfullargspec
 
-from Etc.conf import get_option, ROOT_DIR, getAgetntInfo
+from Etc.conf import get_option, ROOT_DIR
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
 
