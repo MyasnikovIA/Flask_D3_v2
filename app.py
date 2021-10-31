@@ -1,10 +1,11 @@
 import os
 
-from flask import Flask, session
+from flask import Flask,redirect, session
 from flask import request, jsonify
 from getform import *
 import shutil
 import json
+import copy
 import hashlib
 from inspect import getfullargspec
 
@@ -140,8 +141,9 @@ def after_request(response):
 
 @app.route('/')
 def example():
-    user_agent = request.headers.get('User-Agent')
-    return app.send_static_file('index.html')
+    #user_agent = request.headers.get('User-Agent')
+    #return app.send_static_file('index.html')
+    return redirect("/index.html")
 
 
 @app.route('/~<name>', methods=['GET'])
@@ -201,6 +203,14 @@ def js_files(name):
 
 @app.route('/<path:path>')
 def all_files(path):
+    print(request.args.get("debug"))
+    global ConfigOptions
+    configOptions = copy.copy(ConfigOptions)
+    if not request.args.get("debug") == None:
+        configOptions["debug"] = request.args.get("debug")
+    if not request.args.get("f") == None:
+        configOptions["UserForms"] = request.args.get("f")
+
     # {os.sep})}
     if '/~Cmp' in path and 'Components/' in path:
         cmp = path[path.find('Components/') + len('Components/'): path.find('/~Cmp') - len('/~Cmp') + 1]
