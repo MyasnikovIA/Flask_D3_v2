@@ -88,6 +88,7 @@ def getAgentInfo(request):
         ip = request.environ['REMOTE_ADDR']
     else:
         ip = request.environ['HTTP_X_FORWARDED_FOR']
+    ses= getSessionObject()
     return {'user_agent':user_agent,'browser':browser,'version':version,'platform':platform,"ip":ip}
 # ====================================================================================================================
 # ====================================================================================================================
@@ -170,7 +171,7 @@ def js_files(name):
 
 @app.route('/<path:path>')
 def all_files(path):
-    print(request.args.get("debug"))
+    # print(request.args.get("debug"))
     global ConfigOptions
     configOptions = copy.copy(ConfigOptions)
     if not request.args.get("debug") == None:
