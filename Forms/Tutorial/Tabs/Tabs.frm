@@ -1,4 +1,4 @@
-<cmpForm class="Main ActiveDashBoard box-sizing-force"  oncreate="Form.onCreate()" caption="Тестовое окно" >
+<cmpForm class="Main ActiveDashBoard box-sizing-force"  oncreate="Form.onCreate()" caption="Пример компонента Tabs (необходимо дописать)" >
     <cmpScript name="MainScript">
        <![CDATA[
             Form.onCreate = function() {

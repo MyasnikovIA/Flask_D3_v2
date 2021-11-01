@@ -16,4 +16,5 @@
      <cmpButton caption="PageControl horizontal"  onclick="openD3Form('Tutorial/PageControl/PageControl',true,{width: 1200, height: 900})" />
      <cmpButton caption="PageControl vertical"  onclick="openD3Form('Tutorial/PageControl/PageControlVert',true,{width: 1200, height: 900})" />
      <cmpButton caption="Tabs (аналог PageControl)"  onclick="openD3Form('Tutorial/Tabs/Tabs',true,{width: 1200, height: 900})" />
+     <cmpButton caption="Tree"  onclick="openD3Form('Tutorial/Tree/Tree',true,{width: 1200, height: 900})" />
 </div>
