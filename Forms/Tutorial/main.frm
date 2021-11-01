@@ -13,5 +13,6 @@
      <cmpButton caption="image component"  onclick="openD3Form('Tutorial/Image/image',true)" />
      <cmpButton caption="Toolbar component"  onclick="openD3Form('Tutorial/Toolbar/Toolbar',true)" />
      <cmpButton caption="Desktop component"  onclick="openD3Form('Tutorial/Desktop/Desktop',true,{width: 1200, height: 900})" />
-     <cmpButton caption="PageControl component"  onclick="openD3Form('Tutorial/PageControl/PageControl',true,{width: 1200, height: 900})" />
+     <cmpButton caption="PageControl horizontal"  onclick="openD3Form('Tutorial/PageControl/PageControl',true,{width: 1200, height: 900})" />
+     <cmpButton caption="PageControl vertical"  onclick="openD3Form('Tutorial/PageControl/PageControlVert',true,{width: 1200, height: 900})" />
 </div>

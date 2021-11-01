@@ -35,7 +35,7 @@
 }
 .ctrl_pageControlTabs.bg
 {
-    background-color: #FFFFFF;
+   /* background-color: #FFFFFF;*/
 }
 .ctrl_pageControl[mode="horizontal"] > .div_ul .ctrl_pageControlTabBtn
 {

@@ -280,7 +280,6 @@ def getTemp(formName, cache, dataSetName, session):
 def getParsedForm(formName, cache, dataSetName="", session={}):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
-      !!!  необходимо переписать, и добавить логику DFRM (частичног опереопределения XML формы)
     """
     if "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0":
         return getTemp(formName, cache, dataSetName, session)

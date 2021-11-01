@@ -1,6 +1,10 @@
 import uuid
 import random
 from datetime import datetime
+try:
+    import xml.etree.cElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
 
 from getform import parseFrm,getXMLObject
 import re

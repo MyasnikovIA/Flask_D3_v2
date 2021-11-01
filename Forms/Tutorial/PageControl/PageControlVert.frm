@@ -6,17 +6,18 @@
        ]]>
     </cmpScript>
 
-    <cmpPageControl>
+    <cmpPageControl mode="vertical">
           <cmpTabSheet caption="Колонка" name="tabColumn1">
               11111
           </cmpTabSheet>
           <cmpTabSheet caption="23423423" name="tabColumn2">
               22222
           </cmpTabSheet>
-          <cmpTabSheet caption="тест" name="tabColumn3">
+          <cmpTabSheet caption="тест" name="tabColumn3" active="true">
               33333
           </cmpTabSheet>
     </cmpPageControl>
+
 <!--
 <div cmptype="PageControl" name="cmp617c7ebf2ce7f" title="" tabindex="0" class="ctrl_pageControl bg box-sizing-force"  uniqid="pc617c7ebf2ceb6" mode="horizontal" id="d3ctrl101635548858541">
     <div cont="div_ul" class="div_ul box-sizing-force">

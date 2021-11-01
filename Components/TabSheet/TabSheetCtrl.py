@@ -6,12 +6,16 @@ class TabSheet(Base):
         self.SetSysInfo = []
         self.CmpType = 'TabSheet'
         self.tag = 'div'
-
+        if "text" in self.attrs:
+            self.text = self.attrs["text"]
+            del self.attrs["text"]
+        else:
+            self.text = ""
 
     def show(self):
         eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
-        self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {atr}  {eventsStr}>\n{self.text}""")
+        self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {atr}  {eventsStr}>\n""")
         # Добавляется при инициализации  d3main.js d3theme.css
         #self.SetSysInfo.append("<scriptfile>Components/TabSheet/js/TabSheet.js</scriptfile>")
         #self.SetSysInfo.append("<cssfile>Components/TabSheet/css/TabSheet.css</cssfile>")
