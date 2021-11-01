@@ -16,13 +16,48 @@ class Tabs(Base):
             self.text = attrs["text"]
             del attrs["text"]
         self.uniqid = self.genName()
-
         self.headHtml=[]
         self.bodyHtml = []
+        self.styleHtml = []
+        ind = -1
+        for element in self.nodeXML.findall('cmpTabsItem'):
+            ind = ind + 1
+            caption = ""
+            if element.attrib.get("caption"):
+                caption = element.attrib.get("caption")
+            active = ""
+            if element.attrib.get("active"):
+                active = "checked"
+            self.headHtml.append(f""" <input id="tab{self.uniqid}{ind}" type="radio"  name="{self.name}" {active}> <label for="tab{self.uniqid}{ind}" title="Wordpress">{caption}</label>""")
+            self.styleHtml.append(f""" #tab{self.uniqid}{ind}:checked ~ #content-tab{self.uniqid}{ind}, """)
+            element.attrib["id"] = f"content-tab{self.uniqid}{ind}"
+            sysinfoBlocktmp, htmlContent = parseFrm(element, self.formName, {}, 0)
+            self.SetSysInfo.extend(sysinfoBlocktmp)
+            self.bodyHtml.append(htmlContent)
+
     def show(self):
         eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
         self.print(f"""
+        <div class="tabs" {eventsStr} {atr}>
+              {" ".join(self.headHtml)}
+              {" ".join(self.bodyHtml)}
+            <style>
+                {" ".join(self.styleHtml)}
+                #tab9999990:checked ~ #content-tab9999990 
+                {{  display: block; }}
+            </style>
+        """)
+
+        # Добавляется при инициализации  d3main.js d3theme.css
+        # self.SetSysInfo.append("<scriptfile>Components/Tabs/js/Tabs.js</scriptfile>")
+        # self.SetSysInfo.append("<cssfile>Components/Tabs/css/Tabs.css</cssfile>")
+
+        # очистка содержимого блока
+        for element in self.nodeXML.findall('*'):
+            self.nodeXML.remove(element)
+
+"""
         <div class="tabs">
             <input id="tab1" type="radio" name="tabs" checked>
              <label for="tab1" title="Wordpress">Wordpress</label>
@@ -48,13 +83,4 @@ class Tabs(Base):
                 <p> Спецификация CSS3 — это неоспоримое будущее в области декоративного оформления веб-страниц, и ее разработка еще далека от завершения. Большинство модулей все еще продолжает совершенствоваться и модифицироваться, и ни один браузер не поддерживает все модули. Это означает, что CSS3 испытывает такие же сложности, как и HTML5. Веб-разработчикам нужно решать, какие возможности использовать, а какие игнорировать, а также каким образом заполнить зияющие пробелы в браузерной поддержке. </p>
                 <p> CSS3 не является частью спецификации HTML5. Эти два стандарта были разработаны отдельно друг от друга, разными людьми, работающими в разное время в различных местах. Но даже организация W3C призывает веб-разработчиков использовать HTML5 и CSS3 вместе, как часть одной новой волны современного веб-дизайна. </p>
             </section>
-""")
-
-        # self.print(f"""<div  cmptype="{self.CmpType}" name="{self.name}" {atr}  {eventsStr}>\n{self.text}""")
-        # Добавляется при инициализации  d3main.js d3theme.css
-        #self.SetSysInfo.append("<scriptfile>Components/PageControl/js/PageControl.js</scriptfile>")
-        #self.SetSysInfo.append("<cssfile>Components/PageControl/css/PageControl.css</cssfile>")
-
-        # очистка содержимого блока
-        for element in self.nodeXML.findall('*'):
-            self.nodeXML.remove(element)
+"""

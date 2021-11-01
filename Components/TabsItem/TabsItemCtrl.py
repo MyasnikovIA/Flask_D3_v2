@@ -12,11 +12,16 @@ class TabsItem(Base):
             del self.attrs["text"]
         else:
             self.text = ""
+        if "id" in self.attrs:
+            self.id = self.attrs["id"]
+            del self.attrs["id"]
+        else:
+            self.id = ""
 
     def show(self):
         eventsStr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if k[:2] == "on")
         atr = "  ".join(f'{k}="{v}"' for k, v in self.attrs.items() if not k[:2] == "on")
-        self.print(f"""<section id="content-tab2" cmptype="{self.CmpType}" name="{self.name}" {atr}  {eventsStr}>\n""")
+        self.print(f"""<section id="{self.id}" cmptype="{self.CmpType}" name="{self.name}" {atr}  {eventsStr}>\n""")
         # Добавляется при инициализации  d3main.js d3theme.css
         #self.SetSysInfo.append("<scriptfile>Components/TabsItem/js/TabsItem.js</scriptfile>")
         #self.SetSysInfo.append("<cssfile>Components/TabsItem/css/TabsItem.css</cssfile>")

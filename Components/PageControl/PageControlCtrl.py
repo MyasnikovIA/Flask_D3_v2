@@ -54,7 +54,7 @@ class PageControl(Base):
                 self.headHtml.append(f""" <li class="ctrl_pageControlTabBtn tab{ind}_{self.uniqid}  {active}" pageindex="{ind}" cmptype="TabSheet" name="tabColumn3" cmptype="TabSheet" title="" onclick="D3Api.PageControlCtrl.showTab(this);">  """)
                 self.headHtml.append(f"""   <a class="centerTB" cont="tabcaption">{caption}</a>  """)
                 self.headHtml.append(f""" </li> """)
-                sysinfoBlocktmp, htmlContent = parseFrm(element, "", {}, 0)
+                sysinfoBlocktmp, htmlContent = parseFrm(element, self.formName, {}, 0)
                 self.bodyHtml.append(f""" <div cont="page{ind}_{self.uniqid}" class="ctrl_pageControlTabPage page{ind}_{self.uniqid} ">""")
                 self.bodyHtml.append(htmlContent)
                 self.bodyHtml.append(f""" </div>""")

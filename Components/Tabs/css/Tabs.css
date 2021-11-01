@@ -1,27 +1,7 @@
-/* Базовые стили демо-страницы */
 
-        *,
-        *:before,
-        *:after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            height: 100%;
-        }
-
-        body {
-            font: 14px/1 "Open Sans", sans-serif;
-            color: #555;
-            background: #fafafa;
-        }
         /* фиксированное верхнее меню*/
 
         .top-nav {
-            background: #555555;
             box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.4);
             left: 0;
             opacity: 0.95;
@@ -38,7 +18,6 @@
         }
 
         .top-logo {
-            color: #ddd;
             font: bold 16px/20px "Crete Round", serif;
             padding-left: 10px;
             text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
@@ -69,7 +48,6 @@
         }
 
         .right-menu li a {
-            color: #B8B8B8;
             display: block;
             padding: 0.05em 0.75em;
             text-decoration: none;
@@ -77,7 +55,6 @@
         }
 
         .right-menu li a:hover {
-            color: #fff;
             text-shadow: none;
         }
 
@@ -118,8 +95,8 @@
 /* Базовый контейнер табов */
 
         .tabs {
-            min-width: 320px;
-            max-width: 800px;
+            /*min-width: 320px;*/
+            /*max-width: 800px;*/
             padding: 0px;
             margin: 0 auto;
         }
@@ -127,15 +104,14 @@
 
         .tabs > section {
             display: none;
-            padding: 15px;
-            background: #fff;
-            border: 1px solid #ddd;
+           /* padding: 15px; */
+           /* background: #fff;*/
+           /* border: 1px solid #ddd;*/
         }
 
         .tabs > section > p {
             margin: 0 0 5px;
             line-height: 1.5;
-            color: #383838;
 /* прикрутим анимацию */
             -webkit-animation-duration: 1s;
             animation-duration: 1s;
@@ -193,19 +169,19 @@
         }
 
         .tabs > label[for*="1"]:before {
-            content: "\f19a";
+            /*content: "\f19a";*/
         }
 
         .tabs > label[for*="2"]:before {
-            content: "\f17a";
+            /*content: "\f17a";*/
         }
 
         .tabs > label[for*="3"]:before {
-            content: "\f13b";
+            /* content: "\f13b";*/
         }
 
         .tabs > label[for*="4"]:before {
-            content: "\f13c";
+            /*content: "\f13c";*/
         }
 /* Изменения стиля переключателей вкладок при наведении */
 
@@ -217,18 +193,12 @@
 
         .tabs > input:checked + label {
             color: #555;
-            border-top: 1px solid #009933;
-            border-bottom: 1px solid #fff;
-            background: #fff;
+            /*border-top: 1px solid #009933;*/
+            /*border-bottom: 1px solid #fff;*/
+            /*background: #fff;*/
+            border-bottom: solid;
         }
-/* Активация секций с помощью псевдокласса :checked */
 
-        #tab1:checked ~ #content-tab1,
-        #tab2:checked ~ #content-tab2,
-        #tab3:checked ~ #content-tab3,
-        #tab4:checked ~ #content-tab4 {
-            display: block;
-        }
 /* Убираем текст с переключателей
 * и оставляем иконки на малых экранах
 */

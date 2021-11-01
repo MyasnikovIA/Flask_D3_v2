@@ -7,13 +7,13 @@
     </cmpScript>
 
     <cmpTabs>
-        <cmpTabsItem caption="Блок 1 ">
+        <cmpTabsItem caption="Блок 1" >
             содержимое  блока1
         </cmpTabsItem>
-        <cmpTabsItem caption="Блок 2 ">
+        <cmpTabsItem caption="Блок 2" >
             содержимое  блока2
         </cmpTabsItem>
-        <cmpTabsItem caption="Блок 3 ">
+        <cmpTabsItem caption="Блок 3" active="true">
             содержимое  блока3
         </cmpTabsItem>
     </cmpTabs>
