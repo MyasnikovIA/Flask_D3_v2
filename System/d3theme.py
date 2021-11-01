@@ -4,7 +4,7 @@ from Etc.conf import  getTempPage, setTempPage, existTempPage
 import hashlib
 
 compList = ['Label','Form','Edit','Button' ,'Base','Window','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
-            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl']
+            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl','Tabs']
 
 def readCmpCss(session,name, ext=''):
     ROOT_DIR = session["AgentInfo"]['ROOT_DIR']

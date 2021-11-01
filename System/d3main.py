@@ -6,7 +6,7 @@ from Etc.conf import getTempPage, setTempPage, existTempPage
 import hashlib
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
-            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl']
+            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl','Tabs']
 
 def readfile(session,name):
     ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
