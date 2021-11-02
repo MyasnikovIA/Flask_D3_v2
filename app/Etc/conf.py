@@ -10,7 +10,7 @@ ConfigOptions = {
     'OutCodePage': 'UTF-8',
     'FormEncoding': 'UTF8',
     'DatabaseCharset': 'UTF8',
-    'debug': "0",
+    'debug': "1",
     'Extensions': {'path': 'Extensions/', 'only': ['mis']},
     'TempDir': 'temp/',
     'fs_store_dir': f'../file_storage{os.sep}',
