@@ -177,8 +177,7 @@ def getform_php_files(the_path):
                 resultTxt = getform.dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
                 # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
-    return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {
-        'content-type': 'application/xml'}
+    return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {'content-type': 'application/json'}
 
 
 @app.route('/<name>.js')
@@ -232,5 +231,3 @@ if __name__ == '__main__':
 
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host='0.0.0.0', port=port)
-    #app.debug = True
-    #app.run(host='0.0.0.0', port=9091)
