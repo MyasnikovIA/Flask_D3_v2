@@ -8,7 +8,7 @@ set MIS_PORT_WEB=9091
 set MIS_PORT_SERVICE=5000
 
 
-docker run -d -p %MIS_PORT_WEB%:5000  -p %MIS_PORT_SERVICE%:8080   --name %MIS_DOCKER_NAME% --hostname %MIS_DOCKER_HOSTNAME% -v %MIS_ROOT%:/app  %MIS_DOCKER_IMAGE%
+docker run --rm -d -p %MIS_PORT_WEB%:5000  -p %MIS_PORT_SERVICE%:8080   --name %MIS_DOCKER_NAME% --hostname %MIS_DOCKER_HOSTNAME% -v %MIS_ROOT%:/app  %MIS_DOCKER_IMAGE%
 timeout 10
 start "" "http://127.0.0.1:%MIS_PORT_WEB%/" 
 
