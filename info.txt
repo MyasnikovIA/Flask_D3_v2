@@ -1,0 +1,13 @@
+
+docker save -o F:\DockerProject\Flask_Python_3.6\Flask_001(13.10.2020).tar python3.6_flask:flask_001     - выгразить контейнер в файл 
+docker load -i F:\DockerProject\Flask_Python_3.6\Flask_001(13.10.2020).tar
+
+
+-------------------------------------------------------------
+COMMIT IMAGE
+-------------------------------------------------------------
+docker ps
+docker images
+docker commit d02a9d321c4b mis_med_xdebug:Centos_7_08-10-2020
+-------------------------------------------------------------
+
