@@ -32,8 +32,7 @@ class ToolbarItemGroup(Base):
             classStr = f' class="{" ".join(self.classCSS)}" '
 
         self.print(f"""<span  name="{self.name}" cmptype="toolbarItemGroup" {classStr} id="d3ctrl{self.genName()}" {stleTxt} {eventsStr} {atr} > """)
-        #self.print(f"""<span  name="{self.name}" cmptype="ToolbarItemGroup" {classStr} id="d3ctrl{self.genName()}" {stleTxt} {eventsStr} {atr} > """)
 
         # Добавляется при инициализации  d3main.js d3theme.css
-        # self.SetSysInfo.append("<scriptfile>Components/Image/js/Image.js</scriptfile>")
-        # self.SetSysInfo.append("<cssfile>Components/Image/css/Image.css</cssfile>")
+        # self.SetSysInfo.append("<scriptfile>Components/ToolbarItemGroup/js/ToolbarItemGroup.js</scriptfile>")
+        # self.SetSysInfo.append("<cssfile>Components/ToolbarItemGroup/css/ToolbarItemGroup.css</cssfile>")
