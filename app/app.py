@@ -19,6 +19,7 @@ from System.d3theme import show as d3theme_css
 # https://habr.com/ru/post/222983/
 # https://programtalk.com/python-examples/sys.__stdout__/
 # https://www.py4u.net/discuss/183138
+# https://flask-russian-docs.readthedocs.io/ru/latest/quickstart.html
 
 app = Flask(__name__, static_folder='.')
 app.secret_key = str(uuid.uuid1()).replace("-", "")
