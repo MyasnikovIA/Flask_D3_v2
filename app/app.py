@@ -145,13 +145,13 @@ def example():
 def d3theme_files(name):
     if "d3theme" in name:
         # return app.send_static_file('external/d3/d3theme.css')
-        return d3theme_css(session), 200, {'content-type': 'text/css'}
         # return app.send_static_file('external/d3/~d3theme'), 200, {'content-type': 'text/css'}
+        return d3theme_css(session), 200, {'content-type': 'text/css'}
 
     if "d3main" in name:
         # return app.send_static_file('external/d3/d3api.js')
-        return d3main_js(session), 200, {'content-type': 'application/json'}
         # return app.send_static_file('System/d3main.py'), 200, {'content-type': 'application/json'}
+        return d3main_js(session), 200, {'content-type': 'application/json'}
 
 def getParam(name, defoultValue=''):
     return request.args.get(name, default=defoultValue)
