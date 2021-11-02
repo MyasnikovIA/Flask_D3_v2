@@ -177,6 +177,13 @@ def getform_php_files(the_path):
                 resultTxt = getform.dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
                 # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
+
+
+    if the_path == "upload":
+        username = request.cookies.get('username')
+        f = request.files['the_file']
+        f.save('uploads' + secure_filename(f.filename))
+
     return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {'content-type': 'application/json'}
 
 
