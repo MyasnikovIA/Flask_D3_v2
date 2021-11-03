@@ -141,81 +141,114 @@ function DWindow(_otladka){
 	    }
 	    var container=document.createElement('div');
 	    var docMoveEvent, docUpEvent, docResizeEvent, docResizeUpEvent, docEscPushEvent;
+	    var docMoveEventTouch, docUpEventTouch, docResizeEventTouch, docResizeUpEventTouch;
 	    var oldLeft=new Number(0);
 	    var oldTop=new Number(0);
 	    var captureX=new Number(0);
 	    var captureY=new Number(0);
-	    var _setDragOnMouseDown=function (evt){
-	    	var pos=getAbsolutePos(modal_win);
-	    	oldLeft=pos.x;oldTop=pos.y;
-	    	captureX=evt.pageX||evt.x;captureY=evt.pageY||evt.y;
-	    	var _windowObject=this;
-	    	this._removeDocEvent();
-            addClass(document.body,'noselect');
-            addClass(modal_win,'noselect');
-	    	addEvent(document,'mousemove',docMoveEvent=function (e){_windowObject._onMove(e||window.event);});
-	    	addEvent(document,'mouseup',docUpEvent=function (e){_windowObject._onMouseUp(e||window.event);});
-	    }
-	    this._onMove = function(evt) {this.setPosition(oldLeft-captureX+parseInt(evt.pageX||evt.x),oldTop-captureY+parseInt(evt.pageY||evt.y));}
-	    this._onMouseUp = function() {this._removeDocEvent();}
-	    this._removeDocEvent=function (){
-	    	if(docMoveEvent && docUpEvent){
-                            removeClass(document.body,'noselect');
-                            removeClass(modal_win,'noselect');
-	    		removeEvent(document,'mousemove',docMoveEvent);
-	    		removeEvent(document,'mouseup',docUpEvent);
-	    	}
-	    }
-	    this.fixedSize=false;
-	    var maximized=false;
-	    var _setMaximaizeOnDblClick = function() {
-	    	if(this.fixedSize)return;
-	    	var _h,_w;
-	    	if(maximized){
-	    		this.setPosition(left,top);
-	    		this.setSize(width,height);
-	    		_w = width;
-	    		_h = height;
-	    	}else{
-	    		this.rec = getAbsoluteRect(modal_win);
-	    		width=Math.max(this.rec.width,this.minWidth);
-	    		height=Math.max(this.rec.height,this.minHeight);
-	    		var docSize=getDocumentSize();
-	    		_setPosition.call(this,0,0);
-	    		_setSize.call(this,docSize.width,docSize.height);
-	    		_w = docSize.width;
-	    		_h = docSize.height;
-	    	}
-	    	maximized=!maximized;
-	    }
-        this._getDistance=function(e) {
-            var _windowObject=this;
-            var _w = _windowObject.rec.width, _h = _windowObject.rec.height;
-            if(!this.type) this.type = 'se';
-            if(this.type== 'se' || this.type == 'e')_w = Math.max(_windowObject.rec.width+(e.clientX - this.mX),this.minWidth);
-            if(this.type== 'se' || this.type == 's') _h = Math.max(_windowObject.rec.height+(e.clientY - this.mY),this.minHeight);
-            _setSize.call(this,_w,_h);
-        }
-        var _setResizeOnMouseDown=function (e) {
-            var _windowObject=this;
-            if(_windowObject.fixedSize)return;
-            _windowObject.mX = e.clientX;
-            _windowObject.mY = e.clientY;
-            _windowObject.rec = getAbsoluteRect(modal_win);
-            _windowObject._stopDistance();
-                    addClass(document.body,'noselect');
-                    addClass(modal_win,'noselect');
-            addEvent(document,'mousemove',docResizeEvent=function (e){_windowObject._getDistance(e||window.event);});
-            addEvent(document,'mouseup',docResizeUpEvent=function (e){maximized=false;_windowObject._stopDistance();});
-        }
-        this._stopDistance = function() {
-            if(docResizeEvent && docResizeUpEvent){
-                            removeClass(document.body,'noselect');
-                            removeClass(modal_win,'noselect');
-                removeEvent(document,'mousemove',docResizeEvent);
-                removeEvent(document,'mouseup',docResizeUpEvent);
+
+            var _setDragOnMouseDown=function (evt){
+                var _windowObject=this;
+                if ( D3Api.platform == 'android') {
+                    if (evt.target.getAttribute("name")=="maximizedButton") {
+                      _setMaximaizeOnDblClick.call(_windowObject,evt||window.event);
+                      evt.preventDefault && evt.preventDefault();
+                      return
+                    }
+                    if (evt.target.getAttribute("name")=="closeButton") {
+                      CloseButtonOnClick.call(_windowObject);
+                      evt.preventDefault && evt.preventDefault();
+                      return
+                    }
+                }
+                var pos=getAbsolutePos(modal_win);
+                oldLeft=pos.x;oldTop=pos.y;
+                captureX=evt.pageX||evt.x;captureY=evt.pageY||evt.y;
+                this._removeDocEvent();
+                addClass(document.body,'noselect');
+                addClass(modal_win,'noselect');
+                addEvent(document,'mousemove',docMoveEvent=function (e){_windowObject._onMove(e||window.event);});
+                addEvent(document,'mouseup',docUpEvent=function (e){_windowObject._onMouseUp(e||window.event);});
+                if ( D3Api.platform == 'android') {
+                   addEvent(document,'touchmove',docMoveEventTouch=function (event){_windowObject._onMove(event.changedTouches[0]||window.event); });
+                   addEvent(document,'touchend',docUpEventTouch=function (event){_windowObject._onMouseUp(event.changedTouches[0]||window.event); });
+                }
             }
-        }
+            this._onMove = function(evt) {this.setPosition(oldLeft-captureX+parseInt(evt.pageX||evt.x),oldTop-captureY+parseInt(evt.pageY||evt.y));}
+            this._onMouseUp = function() {  this._removeDocEvent();}
+
+            this._removeDocEvent=function (){
+                if(docMoveEventTouch && docUpEventTouch){
+                   removeClass(document.body,'noselect');
+                   removeClass(modal_win,'noselect');
+                   removeEvent(document,'touchmove',docMoveEventTouch);
+                   removeEvent(document,'touchend',docUpEventTouch);
+                }
+                if(docMoveEvent && docUpEvent){
+                    removeClass(document.body,'noselect');
+                    removeClass(modal_win,'noselect');
+                    removeEvent(document,'mousemove',docMoveEvent);
+                    removeEvent(document,'mouseup',docUpEvent);
+                }
+            }
+            this.fixedSize=false;
+            var maximized=false;
+            var _setMaximaizeOnDblClick = function() {
+                if(this.fixedSize)return;
+                var _h,_w;
+                if(maximized){
+                    this.setPosition(left,top);
+                    this.setSize(width,height);
+                    _w = width;
+                    _h = height;
+                }else{
+                    this.rec = getAbsoluteRect(modal_win);
+                    width=Math.max(this.rec.width,this.minWidth);
+                    height=Math.max(this.rec.height,this.minHeight);
+                    var docSize=getDocumentSize();
+                    _setPosition.call(this,0,0);
+                    _setSize.call(this,docSize.width,docSize.height);
+                    _w = docSize.width;
+                    _h = docSize.height;
+                }
+                maximized=!maximized;
+            }
+            this._getDistance=function(e) {
+                var _windowObject=this;
+                var _w = _windowObject.rec.width, _h = _windowObject.rec.height;
+                if(!this.type) this.type = 'se';
+                if(this.type== 'se' || this.type == 'e')_w = Math.max(_windowObject.rec.width+(e.clientX - this.mX),this.minWidth);
+                if(this.type== 'se' || this.type == 's') _h = Math.max(_windowObject.rec.height+(e.clientY - this.mY),this.minHeight);
+                _setSize.call(this,_w,_h);
+            }
+            var _setResizeOnMouseDown=function (e) {
+                var _windowObject=this;
+                if(_windowObject.fixedSize)return;
+                _windowObject.mX = e.clientX;
+                _windowObject.mY = e.clientY;
+                _windowObject.rec = getAbsoluteRect(modal_win);
+                _windowObject._stopDistance();
+                addClass(document.body,'noselect');
+                addClass(modal_win,'noselect');
+                addEvent(document,'mousemove',docResizeEvent=function (e){_windowObject._getDistance(e||window.event);});
+                addEvent(document,'mouseup',docResizeUpEvent=function (e){maximized=false;_windowObject._stopDistance();});
+                if ( D3Api.platform == 'android') {
+                    addEvent(document,'touchmove',docResizeEventTouch=function (event){_windowObject._getDistance(event.changedTouches[0]);});
+                    addEvent(document,'touchend',docResizeUpEventTouch=function (event){maximized=false;_windowObject._stopDistance();});
+                }
+            }
+            this._stopDistance = function() {
+                removeClass(document.body,'noselect');
+                removeClass(modal_win,'noselect');
+                if(docResizeEventTouch && docResizeUpEventTouch){
+                    removeEvent(document,'touchmove',docResizeEventTouch);
+                    removeEvent(document,'touchend',docResizeUpEventTouch);
+                }
+                if(docResizeEvent && docResizeUpEvent){
+                    removeEvent(document,'mousemove',docResizeEvent);
+                    removeEvent(document,'mouseup',docResizeUpEvent);
+                }
+            }
 	    this.Loading=function (_loading){
 	    	/*if(_loading)statusbar.innerHTML = "Подождите идет загрузка... ";
 	    	else statusbar.innerHTML = "";*/
@@ -238,16 +271,27 @@ function DWindow(_otladka){
 
             setDomVisible(helpbutton, false);
 	    	closebutton.onclick=function (e){CloseButtonOnClick.call(_windowObject);}
-	    	header.onmousedown=function (e){_setDragOnMouseDown.call(_windowObject,e||window.event);}
-	    	header.ondblclick=function (e){_setMaximaizeOnDblClick.call(_windowObject,e||window.event);};
-
-	    	sw_bottom.onmousedown=function (e){_windowObject.type='s';_setResizeOnMouseDown.call(_windowObject,e||window.event);}
-	    	s_bottom.onmousedown=function (e){_windowObject.type='s';_setResizeOnMouseDown.call(_windowObject,e||window.event);}
-	    	w_middle.onmousedown=header.onmousedown;w_middle.ondblclick=header.ondblclick;
-	    	e_middle.onmousedown=function (e){_windowObject.type='e';_setResizeOnMouseDown.call(_windowObject,e||window.event);};
-
-	    	sizer.onmousedown=function (e){_windowObject.type='se';_setResizeOnMouseDown.call(_windowObject,e||window.event);}
-	    	maximizedbutton.onclick=header.ondblclick;
+            maximizedbutton.onclick=function (e){_setMaximaizeOnDblClick.call(_windowObject,e||window.event);};
+            // добавляем обработчик событий  для android
+	        if ( D3Api.platform == 'android') {
+                header.ontouchstart=function (event){_setDragOnMouseDown.call(_windowObject,event.changedTouches[0]||window.event);}
+                s_bottom.ontouchstart=function (event){_windowObject.type='s';_setResizeOnMouseDown.call(_windowObject,event.changedTouches[0]||window.event);}
+                e_middle.ontouchstart=function (event){_windowObject.type='e';_setResizeOnMouseDown.call(_windowObject,event.changedTouches[0]||window.event);};
+                sizer.ontouchstart=function (event){_windowObject.type='se';_setResizeOnMouseDown.call(_windowObject,event.changedTouches[0]||window.event);}
+                w_middle.ontouchstart=header.ontouchstart;
+                header.ondblclick=function (event){_setMaximaizeOnDblClick.call(_windowObject,event||window.event);};
+            }
+            // добавляем обработчик событий для windows
+            if ( D3Api.platform == 'windows') {
+                header.onmousedown=function (e){_setDragOnMouseDown.call(_windowObject,e||window.event);}
+                header.ondblclick=function (e){_setMaximaizeOnDblClick.call(_windowObject,e||window.event);};
+                sw_bottom.onmousedown=function (e){_windowObject.type='s';_setResizeOnMouseDown.call(_windowObject,e||window.event);}
+                s_bottom.onmousedown=function (e){_windowObject.type='s';_setResizeOnMouseDown.call(_windowObject,e||window.event);}
+                w_middle.onmousedown=header.onmousedown;w_middle.ondblclick=header.ondblclick;
+                e_middle.onmousedown=function (e){_windowObject.type='e';_setResizeOnMouseDown.call(_windowObject,e||window.event);};
+                maximizedbutton.onclick=header.ondblclick;
+                sizer.onmousedown=function (e){_windowObject.type='se';_setResizeOnMouseDown.call(_windowObject,e||window.event);}
+            }
 	    	//reloadbutton.onclick=function (e){ReloadButtonOnClick.call(_windowObject);} т.к. сбивает Listener'ы с модальных окон
             this.setMaxSizeStyle();
         }

@@ -143,6 +143,7 @@ def example():
 
 @app.route('/~<name>', methods=['GET'])
 def d3theme_files(name):
+    getAgentInfo(request)
     if "d3theme" in name:
         # return app.send_static_file('external/d3/d3theme.css')
         # return app.send_static_file('external/d3/~d3theme'), 200, {'content-type': 'text/css'}
@@ -151,7 +152,7 @@ def d3theme_files(name):
     if "d3main" in name:
         # return app.send_static_file('external/d3/d3api.js')
         # return app.send_static_file('System/d3main.py'), 200, {'content-type': 'application/json'}
-        return d3main_js(session), 200, {'content-type': 'application/json'}
+        return d3main_js(session), 200, {'content-type': 'application/x-javascript'}
 
 def getParam(name, defoultValue=''):
     return request.args.get(name, default=defoultValue)

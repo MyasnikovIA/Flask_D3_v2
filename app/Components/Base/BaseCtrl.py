@@ -1,14 +1,16 @@
 import uuid
 import random
 from datetime import datetime
+
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
 
-from getform import parseFrm,getXMLObject
+from getform import parseFrm, getXMLObject
 import re
 import os
+
 
 class Base:
     def __init__(self, attrs):
@@ -129,6 +131,11 @@ class Base:
                               f"{datetime.now().microsecond}{random.randint(0, 9999999)}{self.formName}")).replace("-",
                                                                                                                    "")
 
+    def getPalatform(self):
+        if not self.session == None and "AgentInfo" in self.session and "platform" in self.session["AgentInfo"]:
+            return self.session["AgentInfo"]["platform"]
+        return "window"
+
 
 class BaseCtrl(Base):
 
@@ -164,10 +171,9 @@ def getDomAttr(name, value='', attrs=None):
 
 
 def getDomAttrRemove(name, value='', attrs=None):
-
     if name in attrs:
         val = attrs[name]
-        if len(val)==0 and not value == None:
+        if len(val) == 0 and not value == None:
             val = value
         if val == 'true':
             val = name

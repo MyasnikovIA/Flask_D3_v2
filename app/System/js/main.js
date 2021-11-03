@@ -11,7 +11,6 @@ D3BROWSERAPI = function () {
     this.firefox = (agt.indexOf('firefox') != -1 && (this.name = 'firefox')) ? true : false;
     this.chrome = (agt.indexOf('chrome') != -1 && (this.name = 'chrome')) ? true : false;
     this.safari = (agt.indexOf('safari') != -1 && agt.indexOf('chrome') == -1 && (this.name = 'safari')) ? true : false;
-
     var ver = agt.match(this.name + '[\/ ](([0-9]+)[0-9\.]*)');
     var ver2 = agt.match('version\/(([0-9]+)[0-9\.]*)');
 
@@ -57,6 +56,7 @@ D3Api = new function () {
     this.controlsApi = {};
     this.current_theme = '';
     this.GLOBAL_CONTEXT_FORM = null;
+    this.platform = (AGENT_INFO_PLATFORM) ? AGENT_INFO_PLATFORM : "windows";
     var uniq = 0;
     var SYSREQUEST = ''; // Не обновляет активность пользователя при обращении к серверу
     /**

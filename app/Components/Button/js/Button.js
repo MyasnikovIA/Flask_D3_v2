@@ -81,6 +81,14 @@ D3Api.ButtonCtrl = new function()
             D3Api.PopupMenuCtrl.show(menu,coords);
         }
     }
+
+    this.touchstartClick = function(event,_onClickFun){
+        // Необходимо решить проблему запуска кнопки на заднем фоне, если закрывают модальное окно
+        // console.log(event)
+        // console.log(event.changedTouches[0].target.getAttribute("name"))
+        // event.changedTouches[0]
+        _onClickFun && _onClickFun();
+    }
 }
 
 D3Api.controlsApi['Button'] = new D3Api.ControlBaseProperties(D3Api.ButtonCtrl);

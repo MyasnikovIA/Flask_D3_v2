@@ -57,10 +57,18 @@ def getTemp(session):
 def getSrc(session):
     random = "c"
     hesh = random + hashlib.md5(f'{getIdClient()}'.encode('utf-8')).hexdigest()
+
+
     res = []
     res.append('(function(){')
     res.append(readfile(session,'System/js/polyfill.js'))
     res.append(readfile(session,'System/js/clipboard.min.js'))
+
+    # Добавляем в фрэймворк информацию о платформе
+    if "AgentInfo" in session:
+        res.append(f'\r var AGENT_INFO_PLATFORM = "{session["AgentInfo"]["platform"] }";')
+    # ============================================
+
     res.append(readfile(session,'System/js/main.js'))
     res.append(readfile(session,'System/js/dataset.js'))
     res.append(readfile(session,'System/js/action.js'))
@@ -145,7 +153,7 @@ def getSrc(session):
 
 
 def show(session):
-    if "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0":
+    if "AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0":
         return getTemp(session)
     return getSrc(session)
 

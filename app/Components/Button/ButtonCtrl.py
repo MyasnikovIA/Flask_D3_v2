@@ -63,6 +63,14 @@ class Button(Base):
         elif len(self.popupmenu) > 0 and ('onclick' in self.attrs):
             self.attrs[
                 'onclick'] = f"""{self.attrs['onclick']} D3Api.ButtonCtrl.showPopupMenu(this,'{self.popupmenu}'); """
+         # Для Android платформы
+        if self.getPalatform() == "android":
+            self.attrs['ontouchstart'] = f""" D3Api.ButtonCtrl.touchstartClick(event,function(){{ {self.attrs['onclick']} }}); """
+            del self.attrs['onclick']
+
+
+        # if (D3Api.platform == 'android') {
+
         self.data = getDomAttrRemove('data', None, self.attrs);
 
     def show(self):
