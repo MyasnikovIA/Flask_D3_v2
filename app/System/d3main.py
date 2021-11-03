@@ -6,7 +6,8 @@ from Etc.conf import getTempPage, setTempPage, existTempPage
 import hashlib
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
-            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl','Tabs']
+            'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl','Tabs',
+            'OpenStreetMap',"OpenStreetMapLabel"]
 
 def readfile(session,name):
     ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
@@ -110,6 +111,10 @@ def getSrc(session):
     res.append(readfile(session,'Components/Window/common.js'))
     res.append(readfile(session,'Components/Window/win_sys.js'))
     res.append(readfile(session,'Components/Window/window.js'))
+
+    # подключаем библиотеку OSM
+    # res.append(readfile(session,'Components/OpenStreetMap/js/OpenLayers.js'))
+
     #res.append(readfile('Components/Layout/js/Layout.js'))
     #res.append(readfile('Components/LayoutSplit/js/LayoutSplit.js'))
     for cmp in compList:

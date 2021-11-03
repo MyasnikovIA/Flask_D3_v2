@@ -29,14 +29,21 @@ class Edit(Base):
             self.classCSS.append('box-sizing-force')
         self.CmpType = 'Edit';
         self.tag = 'div';
+
         self.placeholder = getDomAttrRemove('placeholder', None, self.attrs);
         self.maxlength = getDomAttrRemove('maxlength', None, self.attrs);
-        self.value = getDomAttrRemove('value', None, self.attrs);
         self.type = getDomAttrRemove('type', 'text', self.attrs);
         self.format = getDomAttrRemove('format', None, self.attrs);
-        self.readonly = getDomAttrRemove('readonly', None, self.attrs);
-        self.disabled = getDomAttrRemove('disabled', None, self.attrs);
         self.format = RemoveArrKeyRtrn(self.attrs, 'format', '');
+
+        if len(self.value) > 0:
+            self.value = f""" value="{self.value}" """
+
+        if len(self.readonly) > 0:
+            self.readonly = f""" readonly="readonly" """
+
+        if len(self.disabled) > 0:
+            self.disabled = f""" disabled="{self.disabled}" """
 
         if not "width" in self.attrs:
             width = "100%"

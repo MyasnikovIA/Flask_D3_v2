@@ -17,7 +17,7 @@
      <cmpButton caption="PageControl vertical"  onclick="openD3Form('Tutorial/PageControl/PageControlVert',true,{width: 1200, height: 900})" />
      <cmpButton caption="Tabs (аналог PageControl)"  onclick="openD3Form('Tutorial/Tabs/Tabs',true,{width: 1200, height: 900})" />
      <cmpButton caption="Tree"  onclick="openD3Form('Tutorial/Tree/Tree',true,{width: 1200, height: 900})" />
-     <cmpButton caption="EventTest"  onclick="openD3Form('Tutorial/EventTest/EventTest',true,{width: 1200, height: 900})" />
+     <cmpButton caption="OpenStreetMap"  onclick="openD3Form('Tutorial/OpenStreetMap/OpenStreetMap',true,{width: 1200, height: 900})" />
      <hr/>
      <cmpButton caption="Android D3extClient"  onclick="openD3Form('Tutorial/Android/alert',true,{width: 1200, height: 900})" />
 </div>

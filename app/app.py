@@ -112,6 +112,7 @@ def getAgentInfo(request):
 # ====================================================================================================================
 
 def sendCostumBin(pathFile):
+    # костыль для docker
     txt = ""
     if existTempPage(pathFile):
         txt, mime = getTempPage(pathFile, '')
@@ -120,7 +121,7 @@ def sendCostumBin(pathFile):
             with open(pathFile, "rb") as f:
                 return f.read(), mimeType(pathFile)
         else:
-            return f"File {pathFile} not found", mimeType(".txt")
+            return f"File {pathFile} not found {os.path.dirname(Path(__file__))}{os.sep}"  , mimeType(".txt")
     else:
         return txt, mime
 
@@ -197,7 +198,7 @@ def js_files(name):
 def all_files(path):
     if path[-3:].lower() in ["tml","css",".js"]:
         getAgentInfo(request)
-    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
+    ROOT_DIR = f"{os.path.dirname(Path(__file__))}{os.sep}"
     # {os.sep})}
     if '/~Cmp' in path and 'Components/' in path:
         cmp = path[path.find('Components/') + len('Components/'): path.find('/~Cmp') - len('/~Cmp') + 1]
