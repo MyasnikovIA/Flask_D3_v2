@@ -29,8 +29,7 @@ public class MainActivity extends AppCompatActivity {
         webView.addJavascriptInterface(new Android(this,webView), "Android");
         webView.loadUrl("http://128.0.24.172:9091");
 		// webView.loadUrl("file:///android_asset/mypage.html");
-
-        //webView.reload();
+        // webView.reload();
     }
 
     @Override

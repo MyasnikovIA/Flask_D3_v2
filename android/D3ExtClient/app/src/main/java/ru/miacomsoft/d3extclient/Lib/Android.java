@@ -8,7 +8,10 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
+import android.util.Log;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -39,10 +42,36 @@ public class Android {
         lastUpdate = System.currentTimeMillis();
     }
 
+
+    /** Show a toast from the web page */
+    @JavascriptInterface
+    public void showToast(String toast) {
+        Toast.makeText(parentActivity.getBaseContext(), toast, Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     *  Вывод консоли
+     * @param msg
+     */
+    @JavascriptInterface
+    public void console_log(String msg){
+        Log.d("console.log", msg);
+    }
+
+    /**
+     *  Вывод консоли
+     * @param msg
+     */
+    @JavascriptInterface
+    public void log(String msg){
+        Log.d("console.log", msg);
+    }
+
     /**
      * Переход в браузер
      * @param UrlStr - строка запроса
      */
+    @JavascriptInterface
     public void getBrouser(String UrlStr){
         if( (UrlStr.toLowerCase().indexOf("http://") == -1) &&(UrlStr.toLowerCase().indexOf("https://") == -1))
         {
@@ -57,6 +86,7 @@ public class Android {
      * @param Str
      * @param FileName
      */
+    @JavascriptInterface
     public void writeFile(String Str,String FileName){
         try {
             // отрываем поток для записи
@@ -78,6 +108,7 @@ public class Android {
      * @param FileName
      * @return
      */
+    @JavascriptInterface
     public String readFile(String FileName){
         StringBuffer sb = new StringBuffer();
         try {
@@ -100,6 +131,7 @@ public class Android {
      *  JS функция вывода сообщения во вст\плывающем окне
      * @param msg
      */
+    @JavascriptInterface
     public void alert(String msg){
         //  Toast.makeText(parentActivity, msg, Toast.LENGTH_LONG).show();
         new AlertDialog.Builder(parentActivity)
@@ -116,6 +148,7 @@ public class Android {
                         }).show();
     }
 
+    @JavascriptInterface
     public String getIP(){
         WifiManager wifiMgr1 = (WifiManager) parentActivity.getApplicationContext() .getSystemService(parentActivity .WIFI_SERVICE);
         WifiInfo wifiInfo1 = wifiMgr1.getConnectionInfo();

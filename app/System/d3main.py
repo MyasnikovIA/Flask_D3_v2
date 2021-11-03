@@ -69,6 +69,33 @@ def getSrc(session):
         res.append(f'\r var AGENT_INFO_PLATFORM = "{session["AgentInfo"]["platform"] }";')
     # ============================================
 
+    # Добавил функцию отладки (для Android)
+    res.append("""
+    /* Функция отладки */
+    var console_log = function(message){
+       if ((AGENT_INFO_PLATFORM == "android") && (Android)) {
+         msg="";
+         for (let args of arguments) {
+            if (typeof args === 'string') {
+               msg+="|"+args;
+            }
+            if (typeof args === 'object') {
+               try {
+                 msg+="|"+JSON.stringify(args);
+               } catch {
+                 msg+="|"+args;
+               }
+            }
+         }
+         Android.console_log(msg);
+       } else {
+         console.log(arguments);
+       }
+    }
+    var log = console_log; 
+    """)
+
+
     res.append(readfile(session,'System/js/main.js'))
     res.append(readfile(session,'System/js/dataset.js'))
     res.append(readfile(session,'System/js/action.js'))

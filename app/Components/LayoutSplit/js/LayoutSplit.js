@@ -32,6 +32,9 @@ D3Api.LayoutSplitCtrl = new function ()
     var new_y = 0;
 
     this.touchSplit=function(evt,direction) {
+          log("touchSplit",evt.changedTouches[0].target);
+
+
 
            if ((typeof direction === 'undefined')||( direction == '')) {
               direction = "left";
@@ -71,7 +74,7 @@ D3Api.LayoutSplitCtrl = new function ()
            saveXY();
            // document.addEventListener('mouseup', clearXY, false);
            // document.addEventListener('mouseout', clearXY, false);
-      	   addEvent(document,'mouseup',clearXY);
+      	   addEvent(document,'touchend',clearXY);
       	   addEvent(document,'mouseout',clearXY);
 
            /* При нажатии кнопки мыши попадаем в эту функцию */
@@ -84,7 +87,7 @@ D3Api.LayoutSplitCtrl = new function ()
              delta_x = x_block - x;
              delta_y = y_block - y;
              if (op || ff) {
-   	    	     addEvent(document,'mousemove',moveBlock,false);
+   	    	     addEvent(document,'touchmove',moveBlock,false);
    	    	     // document.addEventListener('mousemove', saveXY, false);
                  // block.addEventListener("onmousemove", moveBlock, false);
              } else {
@@ -92,25 +95,24 @@ D3Api.LayoutSplitCtrl = new function ()
              }
            }
            function clearXY() {
-             if (op || ff) {
-                //block.removeEventListener("onmousedown", saveXY, false);
-                //removeEvent(document,'mousemove',moveBlock);
-             } else {
-               // document.onmousemove = null; // При отпускании мыши убираем обработку события движения мыши
-             }
+             removeEvent(document,'touchmove',moveBlock);
+             removeEvent(document,'touchend',clearXY);
            }
            function moveBlock(obj_event) {
+              log("obj_event",obj_event.buttons)
               if (obj_event.buttons !== 1){
                  if (op || ff) {
-                    removeEvent(document,'mousemove',moveBlock);
+                    removeEvent(document,'touchmove',moveBlock);
                  } else {
                     document.onmousemove = null; // При отпускании мыши убираем обработку события движения мыши
                  }
                  return false
               }
               /* Получаем новые координаты курсора мыши */
-              x = window.event.clientX;
-              y = window.event.clientY;
+              // x = window.event.clientX;
+              // y = window.event.clientY;
+              x = window.event.changedTouches[0].clientX;
+              y = window.event.changedTouches[0].clientY;
               /* Вычисляем новые координаты блока */
               if ((direction == "left")||(direction == "right")) {
                  new_x = delta_x + x;
