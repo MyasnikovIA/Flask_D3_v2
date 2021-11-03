@@ -19,5 +19,5 @@
      <cmpButton caption="Tree"  onclick="openD3Form('Tutorial/Tree/Tree',true,{width: 1200, height: 900})" />
      <cmpButton caption="EventTest"  onclick="openD3Form('Tutorial/EventTest/EventTest',true,{width: 1200, height: 900})" />
      <hr/>
-     <cmpButton caption="Android/alert"  onclick="openD3Form('Tutorial/Android/alert',true,{width: 1200, height: 900})" />
+     <cmpButton caption="Android D3extClient"  onclick="openD3Form('Tutorial/Android/alert',true,{width: 1200, height: 900})" />
 </div>
