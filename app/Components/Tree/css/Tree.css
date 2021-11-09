@@ -1,0 +1,191 @@
+
+/* The panes */
+
+.panel-group .panel > .content {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.panel .content {
+	padding: 0 0 10px;
+}
+
+.panel .content:focus {
+	outline: none;
+}
+
+.panel.tree-holder .content {
+	padding: 10px;
+}
+
+.panel.tree-holder .content .subtree{
+	position: relative;
+	padding-left: 10px;
+	display:none;
+}
+
+.panel.tree-holder .content .subtree.hidden {
+	color: #adafb0;
+}
+
+.panel.tree-holder .content .subtree:empty{
+	/* jQuery attempts to animate it even if it is empty,
+		which causes the element to jump with 1-2 pixels */
+	display:none !important;
+}
+
+.overview-panel.tree-holder .content .subtree {
+	padding-left: 6px;
+}
+
+.panel.tree-holder .content span{
+	display: block;
+	white-space: nowrap;
+	padding: 2px 5px;
+	border-radius: 2px;
+	transition: background-color .2s ease;
+}
+
+.panel.tree-holder .content span.hidden {
+	color: #adafb0;
+}
+
+.panel.tree-holder .content span.focused:not(.selected),
+.panel.tree-holder .content span:hover {
+	background-color: var(--list-item-highlight);
+}
+
+.panel.tree-holder .content span.dragged {
+	opacity: 0.5;
+}
+
+.panel.tree-holder .content span.disabled u,
+.panel.tree-holder .content span.cut b,
+.panel.tree-holder .content span.disabled:not(.editing) b {
+	opacity: 0.5;
+}
+
+.panel.tree-holder .content span b{
+	color: inherit;
+	font-size: 13px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: inline-block;
+	line-height: 14px;
+	vertical-align: middle;
+	margin: 0px 2px;
+	padding: 3px 4px;
+	border-radius: 2px;
+}
+
+.panel.tree-holder .content span b.highlighted {
+	box-shadow: 0 0 0 1px #4097D6;
+}
+
+.panel.tree-holder .content span b.forbidden {
+	box-shadow: 0 0 0 1px #e21111 !important;
+}
+
+.design-panel.tree-holder .content .asset-item.smart-editable.editing b {
+	text-overflow: initial;
+	padding: 0;
+}
+
+.design-panel.tree-holder .smart-editable.editing [contenteditable]{
+	display: inline-block;
+	max-width: 88%;
+	overflow: hidden;
+	vertical-align: middle;
+	position: relative;
+	border: 3px solid transparent;
+	background: var(--smarteditable-active);
+	border-radius: 3px;
+	border-width: 3px 4px;
+	cursor: text;
+}
+
+.design-panel.tree-holder .content .asset-item.smart-editable .name-container {
+	display: inline;
+}
+
+.design-panel.tree-holder .content .asset-item.smart-editable em {
+	font-style: normal;
+}
+
+.design-panel.tree-holder .content .asset-item.smart-editable.editing em {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.panel.tree-holder .content span.selected:not(.editing) b {
+	background-color: var(--active);
+	color: #fff;
+}
+
+.panel.tree-holder .content span b.highlighted{
+	box-shadow:0 0 0 1px #4097D6;
+}
+
+.panel.tree-holder .content span i{
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border: 6px solid transparent;
+	border-left-color: inherit;
+	border-width: 3px 0 3px 4px;
+	margin-right: 4px;
+	margin-left: 2px;
+	transform-origin: 3px 50%;
+	margin-bottom: 1px;
+	z-index: 1;
+	position: relative;
+}
+
+.panel.tree-holder .content span > b:first-child{
+	/* Compensate for missing arrow */
+	margin-left: 12px;
+}
+
+.panel.tree-holder .content span i.down{
+	transform:rotate(90deg);
+	margin-right: 4px;
+}
+
+.panel.tree-holder .content span u{
+	font-size: 13px;
+	color: #91999E;
+	vertical-align: middle;
+}
+
+.panel.tree-holder .content span u.link{
+	font-size: 15px;
+	margin: 0 0 0px -1px;
+	color: #A5ACB1;
+}
+
+.panel.tree-holder .content span u.star{
+	color: var(--pink);
+	margin: 0 2px 0 0;
+}
+
+.panel.tree-holder .content span u.visibility,
+.panel.tree-holder .content span u.icon-disabled{
+	color: var(--text-color);
+	margin: 0 2px 0 0;
+}
+
+.panel.tree-holder .content span u.custom-options {
+	color: var(--badge-custom-options);
+	font-size: 15px;
+}
+
+.panel.tree-holder .content line{
+	position: absolute;
+	height: 1px;
+	width: 100%;
+	left: 0;
+	background-color: #4097D6;
+	pointer-events: none;
+}

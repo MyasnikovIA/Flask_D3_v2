@@ -14,7 +14,6 @@ class Edit(Base):
 
     def __init__(self, attrs):
         super().__init__(attrs)
-        self.readonly = getBooleanAttr('readonly', self.attrs, 'false');
 
         if 'class' not in self.attrs:
             self.classCSS = ['ctrl_edit', 'editControl', 'box-sizing-force']

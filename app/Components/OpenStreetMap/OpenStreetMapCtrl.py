@@ -1,6 +1,6 @@
 from Components.Base.BaseCtrl import *
 
-
+# https://nuancesprog.ru/p/13737/
 class OpenStreetMap(Base):
 
     def __init__(self, attrs):

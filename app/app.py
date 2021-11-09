@@ -1,8 +1,9 @@
 import os
+import shelve
 
 from flask import Flask,redirect, session
 from flask import request, jsonify
-from Etc.conf import ConfigOptions,existTempPage,getTempPage
+from Etc.conf import ConfigOptions,existTempPage,getTempPage,GLOBAL_DICT,nameElementHeshMap
 
 
 import shutil
@@ -180,12 +181,20 @@ def getform_php_files(the_path):
                 # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
 
-
+    if the_path == "runScript":
+        scrArg=request.form.to_dict(flat=False)
+        funName = str(scrArg['WEVENT'])[2:-2]
+        args = json.loads(str(scrArg['ARGS'])[2:-2])
+        if funName in nameElementHeshMap:
+            return getform.runFormScript(nameElementHeshMap[funName],args,session), 200, {'content-type': 'application/json'}
+        else:
+            return f"""{{"error":"код с именем  '{funName}' не определено"}}""", 200, {'content-type': 'application/json'}
+    """ 
     if the_path == "upload":
         username = request.cookies.get('username')
         f = request.files['the_file']
         f.save('uploads' + secure_filename(f.filename))
-
+    """
     return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {'content-type': 'application/json'}
 
 
@@ -237,6 +246,5 @@ if __name__ == '__main__':
                     shutil.rmtree(os.path.join(root, d))
         else:
             os.mkdir(TEMP_DIR_PATH)
-
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host='0.0.0.0', port=port)

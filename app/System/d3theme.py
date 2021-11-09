@@ -5,7 +5,7 @@ import hashlib
 
 compList = ['Label','Form','Edit','Button' ,'Base','Window','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
             'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl','Tabs',
-            'OpenStreetMap',"OpenStreetMapLabel"]
+            'OpenStreetMap',"OpenStreetMapLabel",'Tree','Server']
 
 def readCmpCss(session,name, ext=''):
     ROOT_DIR = session["AgentInfo"]['ROOT_DIR']

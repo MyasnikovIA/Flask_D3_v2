@@ -1,4 +1,4 @@
-import os
+import os,shelve
 
 # ROOT_DIR = f"{Path(__file__).parent.parent}{os.sep}"
 
@@ -32,6 +32,7 @@ ConfigOptions = {
     'cache_ttl': 60 * 60 * 3,  # server
     'session_cache': 1,
     'cookie_lifetime': 900,
+    'shelve': 'temp/db.shelve',
     'proxy_auth': {'hostname': '',
                    'port': 8080,
                    'user': '',
@@ -165,3 +166,5 @@ def existTempPage(name):
 ###-----------------------------------------------------------------------------------------------
 ###-----------------------------------------------------------------------------------------------
 ###-----------------------------------------------------------------------------------------------
+nameElementHeshMap={}
+GLOBAL_DICT = shelve.open(ConfigOptions['shelve'])

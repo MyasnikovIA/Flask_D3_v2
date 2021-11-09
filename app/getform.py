@@ -5,8 +5,9 @@ import uuid
 import ast
 import json
 import sys
+import hashlib
 import re
-from Etc.conf import ConfigOptions,existTempPage,setTempPage,getTempPage
+from Etc.conf import ConfigOptions, existTempPage, setTempPage, getTempPage,GLOBAL_DICT,nameElementHeshMap
 
 try:
     import xml.etree.cElementTree as ET
@@ -14,7 +15,6 @@ except ImportError:
     import xml.etree.ElementTree as ET
 from xml.dom import minidom
 from app import getSession, setSession
-
 
 global COMPONENT_PATH
 COMPONENT_PATH = os.path.join(os.path.dirname(__file__), 'Components')
@@ -58,13 +58,14 @@ def exec_then_eval(vars, code, sessionObj):
     last = ast.Expression(block.body.pop().value)
     for ind in globals():
         if not ind[0:2] == '__' and not str(type(globals()[ind])) == "<class 'function'>" \
-                and not str(type(globals()[ind])) == "<class 'module'>" \
                 and not str(type(globals()[ind])) == "<class 'type'>" \
                 and not ind == "request":
+            # and not str(type(globals()[ind])) == "<class 'module'>"
             vars[ind] = globals()[ind]
     vars["session"] = sessionObj
     vars["getSession"] = getSession
     vars["setSession"] = setSession
+    vars["GLOBAL_DICT"] = GLOBAL_DICT
     _globals, _locals = vars, {}
     exec(compile(block, '<string>', mode='exec'), _globals, _locals)
     return eval(compile(last, '<string>', mode='eval'), _globals, _locals)
@@ -132,6 +133,8 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
         defName = os.path.join('Components', compName, f'{compName}Ctrl.{compName}').replace(os.sep, ".")
         if not "name" in attrib:
             attrib["name"] = str(uuid.uuid1()).replace("-", "")
+        key = hashlib.md5(f'{formName}.{attrib["name"]}'.encode('utf-8')).hexdigest()
+        nameElementHeshMap[key] = [formName, attrib["name"]]
     else:
         is_enyTag = 0
         defName = os.path.join('Components', "Html", f'HtmlCtrl.Html').replace(os.sep, ".")
@@ -232,13 +235,45 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
             elif hasattr(obj, 'SysInfoTag') and len(obj.SysInfoTag) > 0:
                 sysinfoBlock.append(f"</{obj.SysInfoTag}>")
             htmlContent.append(obj.tail)
-    return sysinfoBlock, "".join(htmlContent)
+    htmlContentText = replaceServerTag("".join(htmlContent), formName)
+    return sysinfoBlock, htmlContentText
+
+
+def replaceServerTag(htmlContent, formName):
+    """
+    Функция замены  тэга #server(  )# на вызов кэшированную JS функцию
+    :param htmlContent:
+    :return:
+    """
+    if "#server(" in htmlContent:
+        res = [""]
+        for frag in htmlContent.split("#server("):
+            if ")#" in frag:
+                args = frag.split(")#")[0]
+                endFrag = frag[len(args) + 2:]
+                funName = args[:args.find(",")]
+                bodyFun = args[args.find(",") + 1:]
+                res.append("runScript(")
+                if ".." in funName:
+                    funName = funName.replace("..", f"{formName}.")
+                res.append("'")
+                res.append(hashlib.md5(funName.encode('utf-8')).hexdigest())
+                res.append("'")
+                if len(bodyFun) > 0:
+                    res.append(",")
+                    res.append(bodyFun)
+                res.append(")")
+                res.append(endFrag)
+            else:
+                res.append(frag)
+        return "".join(res)
+    return htmlContent
 
 
 def getSrc(formName, cache, dataSetName="", session={}):
     # cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
     rootForm = getXMLObject(formName)
-    sysinfoBlock, text = parseFrm(rootForm, formName,{},0,session)  # парсим форму
+    sysinfoBlock, text = parseFrm(rootForm, formName, {}, 0, session)  # парсим форму
     resTxt = [text]
     resTxt.append('\n<div cmptype="sysinfo" style="display:none;">')
     for line in sysinfoBlock:
@@ -253,8 +288,9 @@ def getTemp(formName, cache, dataSetName, session):
     if ":" in formName:
         blockName = formName.split(":")[0]
         formName = formName.split(":")[1]
-    cmpDirSrc =  TEMP_DIR_PATH
-    cmpFiletmp =os.path.join(cmpDirSrc,session["AgentInfo"]['platform'],f"{formName.replace(os.sep, '_')}{blockName}.frm")   # f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
+    cmpDirSrc = TEMP_DIR_PATH
+    cmpFiletmp = os.path.join(cmpDirSrc, session["AgentInfo"]['platform'],
+                              f"{formName.replace(os.sep, '_')}{blockName}.frm")  # f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
@@ -340,7 +376,7 @@ def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
     return argsQuery, sessionVar
 
 
-def joinDfrm(formName,rootForm):
+def joinDfrm(formName, rootForm):
     """
     Обработать DFRM и FRM
     Необходимо дописать замену найденой ноды на ноду из DFRM
@@ -389,7 +425,7 @@ def joinDfrm(formName,rootForm):
             if pos == "replace":
                 fragArr = []
                 for appEl in nodeXml.findall("*"):
-                   fragArr.append((ET.tostring(appEl)).decode('UTF-8'))
+                    fragArr.append((ET.tostring(appEl)).decode('UTF-8'))
                 txt = " ".join(fragArr)
                 children = ET.fromstring(f'''<root>{txt}</root>''')
                 nodForm.clear()
@@ -422,6 +458,7 @@ def joinDfrm(formName,rootForm):
     # nodes.extend([attrXml for attrXml in rootDfrmForm.findall(f'attr')])
     return rootForm
 
+
 def readFile(pathForm):
     if not os.path.exists(pathForm):
         return f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{pathForm}" not found </error>'
@@ -444,7 +481,7 @@ def getXMLObject(formName):
         pathForm = pathUserForm
     xmlText = f'<?xml version="1.0" encoding="UTF-8" ?>\n{readFile(pathForm)}'
     rootForm = ET.fromstring(xmlText)
-    rootForm = joinDfrm(formName,rootForm)
+    rootForm = joinDfrm(formName, rootForm)
     if not blockName == "":  # получаем блок XML с именем blockName
         nodes = rootForm.findall(f"*[@name='{blockName}']")  # ишим фрагмент формы по атребуту имени
         if len(nodes) > 0:
@@ -454,11 +491,27 @@ def getXMLObject(formName):
                 f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{formName}" not found </error>')
     return rootForm
 
+def runFormScript(funName,args,session):
+    resObject={}
+    argsQuery = {}
+    dataSetXml = getXMLObject(f"{funName[0]}:{funName[1]}")
+    if "args" in dataSetXml.attrib:
+        nameArgs = dataSetXml.attrib.get("args").split(";")
+        for ind in range(len(nameArgs)):
+            argsQuery[nameArgs[ind]] = args[ind]
+    code = stripCode(dataSetXml.text)
+    try:
+      localVariableTemp = exec_then_eval(argsQuery, code, session)
+    except:
+      resObject["error"] = f"{funName[0]} : {funName[1]} :{sys.exc_info()}"
+    return json.dumps(localVariableTemp)
+
+
 def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     """
     Функция обработки запросов DataSet и Action с клиентских форм
     """
-    dataSetName=""
+    dataSetName = ""
     if ":" in formName:
         dataSetName = formName.split(":")[1]
     resObject = {dataSetName: {"type": typeQuery, "data": [], "locals": {}, "position": 0, "rowcount": 0}}
@@ -476,82 +529,82 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
         varsDebug = argsQuery.copy()
     # =============================================================================
     if typeQuery == "DataSet":
-       query_type = "sql"
-       if "query_type" in dataSetXml.attrib:
-           query_type = dataSetXml.attrib.get("query_type")
-       if query_type == "server_python":  # выполнить Python скрипт
-           code = stripCode(dataSetXml.text)
-           dataVarReturn = {}
-           localVariableTemp = {}
-           try:
-               localVariableTemp = exec_then_eval(argsQuery, code, sessionObj)
-           except:
-               resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
-           for elementDict in localVariableTemp:
-               if elementDict[:2] == '__' or elementDict == 'elementDict' \
-                       or elementDict == 'localVariableTemp' or elementDict == 'sys':
-                   continue
-               if elementDict in sessionVar:  # запоменаем переменные сессии
-                   sessionObj[elementDict] = localVariableTemp[elementDict]
-               else:
-                   dataVarReturn[elementDict] = localVariableTemp[elementDict]
-           del localVariableTemp
-           if "data" in dataVarReturn:
-               resObject[dataSetName]["data"] = dataVarReturn["data"]
-               resObject[dataSetName]["rowcount"] = len(dataVarReturn["data"])
-               del dataVarReturn["data"]
-           resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
-           if "position" in dataVarReturn:
-               resObject[dataSetName]["rowcount"] = dataVarReturn['position']
-               del dataVarReturn['position']
-           if "rowcount" in dataVarReturn:
-               resObject[dataSetName]["rowcount"] = dataVarReturn['rowcount']
-               del dataVarReturn['rowcount']
-           resObject[dataSetName]["locals"] = dataVarReturn
-           resObject[dataSetName]["uid"] = uid
-           resObject[dataSetName]["type"] = typeQuery
-           resObject[dataSetName]["position"] = 0
-           resObject[dataSetName]["page"] = 0
-           if not sessionObj["AgentInfo"]['debug'] == '0':
-               resObject[dataSetName]["var"] = varsDebug
-               resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
+        query_type = "sql"
+        if "query_type" in dataSetXml.attrib:
+            query_type = dataSetXml.attrib.get("query_type")
+        if query_type == "server_python":  # выполнить Python скрипт
+            code = stripCode(dataSetXml.text)
+            dataVarReturn = {}
+            localVariableTemp = {}
+            try:
+                localVariableTemp = exec_then_eval(argsQuery, code, sessionObj)
+            except:
+                resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
+            for elementDict in localVariableTemp:
+                if elementDict[:2] == '__' or elementDict == 'elementDict' \
+                        or elementDict == 'localVariableTemp' or elementDict == 'sys':
+                    continue
+                if elementDict in sessionVar:  # запоменаем переменные сессии
+                    sessionObj[elementDict] = localVariableTemp[elementDict]
+                else:
+                    dataVarReturn[elementDict] = localVariableTemp[elementDict]
+            del localVariableTemp
+            if "data" in dataVarReturn:
+                resObject[dataSetName]["data"] = dataVarReturn["data"]
+                resObject[dataSetName]["rowcount"] = len(dataVarReturn["data"])
+                del dataVarReturn["data"]
+            resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
+            if "position" in dataVarReturn:
+                resObject[dataSetName]["rowcount"] = dataVarReturn['position']
+                del dataVarReturn['position']
+            if "rowcount" in dataVarReturn:
+                resObject[dataSetName]["rowcount"] = dataVarReturn['rowcount']
+                del dataVarReturn['rowcount']
+            resObject[dataSetName]["locals"] = dataVarReturn
+            resObject[dataSetName]["uid"] = uid
+            resObject[dataSetName]["type"] = typeQuery
+            resObject[dataSetName]["position"] = 0
+            resObject[dataSetName]["page"] = 0
+            if not sessionObj["AgentInfo"]['debug'] == '0':
+                resObject[dataSetName]["var"] = varsDebug
+                resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
 
-           return json.dumps(resObject)
-       else:
-           # дописать обработку SQL запроса
-           s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {}, "position": 0, "rowcount": 0}}
-           return json.dumps(s)
+            return json.dumps(resObject)
+        else:
+            # дописать обработку SQL запроса
+            s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {},
+                               "position": 0, "rowcount": 0}}
+            return json.dumps(s)
     if typeQuery == "Action":
-       if "query_type" in dataSetXml.attrib:
-           query_type = dataSetXml.attrib.get("query_type")
-       if query_type == "server_python":  # выполнить Python скрипт
-           code = stripCode(dataSetXml.text)
-           dataVarReturn = {}
-           localVariableTemp = {}
-           try:
-               localVariableTemp = exec_then_eval(argsQuery, code, sessionObj)
-           except:
-               resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
-           for elementDict in localVariableTemp:
-               if elementDict[:2] == '__' or elementDict == 'elementDict' \
-                       or elementDict == 'localVariableTemp' or elementDict == 'sys':
-                   continue
-               if elementDict in sessionVar:  # запоменаем переменные сессии
-                   sessionObj[elementDict] = localVariableTemp[elementDict]
-               else:
-                   dataVarReturn[elementDict] = localVariableTemp[elementDict]
-           del localVariableTemp
-           resObject[dataSetName]["data"] = dataVarReturn
-           resObject[dataSetName]["type"] = typeQuery
-           resObject[dataSetName]["uid"] = uid
-           if not sessionObj["AgentInfo"]['debug'] == '0':
-               resObject[dataSetName]["var"] = varsDebug
-               resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
-           return json.dumps(resObject)
+        if "query_type" in dataSetXml.attrib:
+            query_type = dataSetXml.attrib.get("query_type")
+        if query_type == "server_python":  # выполнить Python скрипт
+            code = stripCode(dataSetXml.text)
+            dataVarReturn = {}
+            localVariableTemp = {}
+            try:
+                localVariableTemp = exec_then_eval(argsQuery, code, sessionObj)
+            except:
+                resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
+            for elementDict in localVariableTemp:
+                if elementDict[:2] == '__' or elementDict == 'elementDict' \
+                        or elementDict == 'localVariableTemp' or elementDict == 'sys':
+                    continue
+                if elementDict in sessionVar:  # запоменаем переменные сессии
+                    sessionObj[elementDict] = localVariableTemp[elementDict]
+                else:
+                    dataVarReturn[elementDict] = localVariableTemp[elementDict]
+            del localVariableTemp
+            resObject[dataSetName]["data"] = dataVarReturn
+            resObject[dataSetName]["type"] = typeQuery
+            resObject[dataSetName]["uid"] = uid
+            if not sessionObj["AgentInfo"]['debug'] == '0':
+                resObject[dataSetName]["var"] = varsDebug
+                resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
+            return json.dumps(resObject)
 
     # print(ET.tostring(dataSetXml).decode())
     return json.dumps(resObject)
-
 
 
 """

@@ -7,7 +7,7 @@ import hashlib
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
             'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl','Tabs',
-            'OpenStreetMap',"OpenStreetMapLabel"]
+            'OpenStreetMap',"OpenStreetMapLabel",'Tree','Server']
 
 def readfile(session,name):
     ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
