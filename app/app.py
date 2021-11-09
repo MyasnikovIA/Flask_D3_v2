@@ -86,12 +86,15 @@ def getSessionObject():
 def getAgentInfo(request):
     if not "AgentInfo" in session:
         session["AgentInfo"]={}
-    if not request.user_agent is None:
+    if hasattr(request, 'user_agent'):
         session["AgentInfo"]={}
         session["AgentInfo"]['User-Agent'] = request.headers.get('User-Agent')
-        session["AgentInfo"]['browser'] = request.user_agent.browser
-        session["AgentInfo"]['version'] = request.user_agent.version and int(request.user_agent.version.split('.')[0])
-        session["AgentInfo"]['platform'] = request.user_agent.platform
+        if hasattr(request.user_agent, 'browser'):
+            session["AgentInfo"]['browser'] = request.user_agent.browser
+        if hasattr(request.user_agent, 'version'):
+            session["AgentInfo"]['version'] = request.user_agent.version and int(request.user_agent.version.split('.')[0])
+        if hasattr(request.user_agent, 'platform'):
+            session["AgentInfo"]['platform'] = request.user_agent.platform
         if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
             session["AgentInfo"]['ip'] = request.environ['REMOTE_ADDR']
         else:
@@ -145,7 +148,8 @@ def example():
 
 @app.route('/~<name>', methods=['GET'])
 def d3theme_files(name):
-    getAgentInfo(request)
+    if hasattr(request, 'platform') :
+        getAgentInfo(request)
     if "d3theme" in name:
         # return app.send_static_file('external/d3/d3theme.css')
         # return app.send_static_file('external/d3/~d3theme'), 200, {'content-type': 'text/css'}
@@ -205,8 +209,11 @@ def js_files(name):
 
 @app.route('/<path:path>')
 def all_files(path):
-    if path[-3:].lower() in ["tml","css",".js"]:
-        getAgentInfo(request)
+    try:
+        if path[-3:].lower() in ["tml","css",".js"]:
+            getAgentInfo(request)
+    except:
+        pass
     ROOT_DIR = f"{os.path.dirname(Path(__file__))}{os.sep}"
     # {os.sep})}
     if '/~Cmp' in path and 'Components/' in path:

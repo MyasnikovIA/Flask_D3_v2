@@ -6,7 +6,6 @@ import ast
 import json
 import sys
 import hashlib
-import re
 from Etc.conf import ConfigOptions, existTempPage, setTempPage, getTempPage,GLOBAL_DICT,nameElementHeshMap
 
 try:
@@ -256,8 +255,14 @@ def replaceServerTag(htmlContent, formName):
                 res.append("runScript(")
                 if ".." in funName:
                     funName = funName.replace("..", f"{formName}.")
+                elif "." in funName:
+                    pass
+                else:
+                    funName = f"{formName}.{funName}"
                 res.append("'")
                 res.append(hashlib.md5(funName.encode('utf-8')).hexdigest())
+                key = hashlib.md5(funName.encode('utf-8')).hexdigest()
+                nameElementHeshMap[key] = [formName,funName[funName.rfind('.')+1:]]
                 res.append("'")
                 if len(bodyFun) > 0:
                     res.append(",")
@@ -317,7 +322,8 @@ def getParsedForm(formName, cache, dataSetName="", session={}):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
     """
-    if "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0":
+    if ("AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0")\
+            or ("TempDir" in ConfigOptions and "debug" in ConfigOptions and ConfigOptions['debug'] == "0"):
         return getTemp(formName, cache, dataSetName, session)
     else:
         return getSrc(formName, cache, dataSetName, session)

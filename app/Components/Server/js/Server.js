@@ -1,11 +1,20 @@
-window.runScript = function(MethodName) {
-       var IntervalRunJobMilSec=2000;
-       var GlobalIDString="";
-       var FunBegin=null;
-       var FunCallBack=null;
-       var FunProgress=null;
-       var async=false;
-       var arr=new Array();
+
+/**
+ *
+ * @component
+ */
+D3Api.ServerCtrl = new function() {
+    /**
+     *
+     * @param dom
+     */
+    this.init = function(dom) {
+
+    };
+    this.runScript = function(MethodName) {
+       var FunCallBack = null;
+       var async = false;
+       var arr = new Array();
        if ((''+window.runScript.arguments[1])=='[object Arguments]') {
           arr.push(window.runScript.arguments[0]);
           for (var ind in window.runScript.arguments[1]) { if (window.runScript.arguments[1][ind]==undefined){continue;} arr.push(window.runScript.arguments[1][ind]); }
@@ -13,7 +22,6 @@ window.runScript = function(MethodName) {
           for (var ind in window.runScript.arguments) { if (window.runScript.arguments[ind]==undefined){continue;} arr.push(window.runScript.arguments[ind]); }
        }
        var count=0;
-       var isCallQuery=false;
        if (arr.length>1) {
             for (ind in arr) {
                count++;
@@ -36,10 +44,10 @@ window.runScript = function(MethodName) {
        if (async==false) {
            requestRunJob.send(data);
            requestRunJob.ontimeout = function (e) {
-               alert('Время ожидания ответа вышло!!!!');
+              return {"error":'Время ожидания ответа вышло'};
            }
            if (requestRunJob.status !== 200) {
-              return {"error":requestRunJob.status}
+              return {"error":requestRunJob.status};
            }
            retObj=JSON.parse(requestRunJob.responseText);
            for(var  key in retObj) {
@@ -50,9 +58,9 @@ window.runScript = function(MethodName) {
            requestRunJob.onreadystatechange = function() {
              if (this.readyState == 4 && this.status == 200) {
                 if (typeof FunCallBack === 'function') {
-                   retObj=JSON.parse(this.responseText);
-                   for(var  key in retObj) {
-                       setVar(key, retObj[key]);
+                   retObj = JSON.parse(this.responseText);
+                   for (var  key in retObj) { 
+                      setVar(key, retObj[key]);
                    }
                    FunCallBack(retObj);
                 }
@@ -62,17 +70,6 @@ window.runScript = function(MethodName) {
            return requestRunJob;
        }
      }
-
-/**
- *
- * @component
- */
-D3Api.ServerCtrl = new function() {
-    /**
-     *
-     * @param dom
-     */
-    this.init = function(dom){ };
 };
-
 D3Api.controlsApi['Server'] = new D3Api.ControlBaseProperties(D3Api.ServerCtrl);
+window.runScript = D3Api.ServerCtrl.runScript;

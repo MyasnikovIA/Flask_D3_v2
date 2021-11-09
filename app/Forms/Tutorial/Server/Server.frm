@@ -11,14 +11,16 @@
        ]]>
     </cmpScript>
     <cmpServer name="testscript" args="testVar1;testvar2">
-        test = testVar1 + testvar2
+       <![CDATA[
+           test = testVar1 + testvar2
+       ]]>
     </cmpServer>
 
 
     <cmpButton  caption="выполнить" onclick="#server(..scriptColl,Form.MyColl,'Arg1','Arg2','Arg3')# "/>
     <cmpServer name="scriptColl" args="testVar1;testvar2;testvar3">
        <![CDATA[
-            test = {'test':1111, 'test2':3333, 'arg3':testVar1, 'arg4':testvar2, 'arg4':testvar3}
+           test = {'test':1111, 'test2':3333, 'arg3':testVar1, 'arg4':testvar2, 'arg4':testvar3}
        ]]>
     </cmpServer>
 
