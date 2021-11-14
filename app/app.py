@@ -1,10 +1,9 @@
 import os
 import shelve
 
-from flask import Flask,redirect, session
+from flask import Flask, redirect, session
 from flask import request, jsonify
-from Etc.conf import ConfigOptions,existTempPage,getTempPage,GLOBAL_DICT,nameElementHeshMap
-
+from Etc.conf import ConfigOptions, existTempPage, getTempPage, GLOBAL_DICT, nameElementHeshMap
 
 import shutil
 import json
@@ -68,53 +67,6 @@ def mimeType(pathFile):
                "asp": "text/asp"}
 
 
-# ====================================================================================================================
-# ====================================================================================================================
-# ====================================================================================================================
-def getSession(name, defoult):
-    if not name in session:
-        return defoult
-    return session[name]
-
-def setSession(name, value):
-    session[name] = value
-
-
-def getSessionObject():
-    return session
-
-def getAgentInfo(request):
-    if not "AgentInfo" in session:
-        session["AgentInfo"]={}
-    if hasattr(request, 'user_agent'):
-        session["AgentInfo"]={}
-        session["AgentInfo"]['User-Agent'] = request.headers.get('User-Agent')
-        if hasattr(request.user_agent, 'browser'):
-            session["AgentInfo"]['browser'] = request.user_agent.browser
-        if hasattr(request.user_agent, 'version'):
-            session["AgentInfo"]['version'] = request.user_agent.version and int(request.user_agent.version.split('.')[0])
-        if hasattr(request.user_agent, 'platform'):
-            session["AgentInfo"]['platform'] = request.user_agent.platform
-        if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-            session["AgentInfo"]['ip'] = request.environ['REMOTE_ADDR']
-        else:
-            session["AgentInfo"]['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
-    session["AgentInfo"]['Forms'] = ConfigOptions['Forms']
-    if not 'debug' in session["AgentInfo"] and request.args.get("debug") == None:
-        session["AgentInfo"]['debug'] = ConfigOptions['debug']
-    if not request.args.get("debug") == None:
-        session["AgentInfo"]['debug'] = request.args.get("debug")
-    if not 'UserForms' in session["AgentInfo"] and request.args.get("f") == None:
-        session["AgentInfo"]['UserForms'] = ConfigOptions['UserForms']
-    if not request.args.get("f") == None:
-        session["AgentInfo"]['UserForms'] = request.args.get("f")
-    session["AgentInfo"]['TempDir'] = ConfigOptions['TempDir']
-    session["AgentInfo"]['ROOT_DIR'] = f"{os.path.dirname(Path(__file__))}{os.sep}"
-    session["AgentInfo"]['TEMP_DIR_PATH'] = os.path.join(os.path.dirname(Path(__file__)),ConfigOptions['TempDir'])
-    return session["AgentInfo"]
-# ====================================================================================================================
-# ====================================================================================================================
-
 def sendCostumBin(pathFile):
     # костыль для docker
     txt = ""
@@ -125,9 +77,10 @@ def sendCostumBin(pathFile):
             with open(pathFile, "rb") as f:
                 return f.read(), mimeType(pathFile)
         else:
-            return f"File {pathFile} not found {os.path.dirname(Path(__file__))}{os.sep}"  , mimeType(".txt")
+            return f"File {pathFile} not found {os.path.dirname(Path(__file__))}{os.sep}", mimeType(".txt")
     else:
         return txt, mime
+
 
 @app.after_request
 def after_request(response):
@@ -139,26 +92,22 @@ def after_request(response):
     header['Server'] = 'D3apiServer'
     return response
 
+
 @app.route('/')
 def example():
-    #user_agent = request.headers.get('User-Agent')
-    #return app.send_static_file('index.html')
+    # user_agent = request.headers.get('User-Agent')
+    # return app.send_static_file('index.html')
     return redirect("/index.html")
 
 
 @app.route('/~<name>', methods=['GET'])
 def d3theme_files(name):
-    if hasattr(request, 'platform') :
-        getAgentInfo(request)
     if "d3theme" in name:
-        # return app.send_static_file('external/d3/d3theme.css')
-        # return app.send_static_file('external/d3/~d3theme'), 200, {'content-type': 'text/css'}
-        return d3theme_css(session), 200, {'content-type': 'text/css'}
-
+        return d3theme_css(request), 200, {'content-type': 'text/css'}
     if "d3main" in name:
-        # return app.send_static_file('external/d3/d3api.js')
-        # return app.send_static_file('System/d3main.py'), 200, {'content-type': 'application/json'}
-        return d3main_js(session), 200, {'content-type': 'application/x-javascript'}
+        return d3main_js(request), 200, {'content-type': 'application/x-javascript'}
+    return f"/* библиотека не найдена /~{name} */", 200, {'content-type': 'application/x-javascript'}
+
 
 def getParam(name, defoultValue=''):
     return request.args.get(name, default=defoultValue)
@@ -186,21 +135,23 @@ def getform_php_files(the_path):
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
 
     if the_path == "runScript":
-        scrArg=request.form.to_dict(flat=False)
+        scrArg = request.form.to_dict(flat=False)
         funName = str(scrArg['WEVENT'])[2:-2]
         args = json.loads(str(scrArg['ARGS'])[2:-2])
         if funName in nameElementHeshMap:
-            return getform.runFormScript(nameElementHeshMap[funName],args,session), 200, {'content-type': 'application/json'}
+            return getform.runFormScript(nameElementHeshMap[funName], args, session), 200, {
+                'content-type': 'application/json'}
         else:
-            return f"""{{"error":"код с именем  '{funName}' не определено"}}""", 200, {'content-type': 'application/json'}
+            return f"""{{"error":"код с именем  '{funName}' не определено"}}""", 200, {
+                'content-type': 'application/json'}
     """ 
     if the_path == "upload":
         username = request.cookies.get('username')
         f = request.files['the_file']
         f.save('uploads' + secure_filename(f.filename))
     """
-    return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {'content-type': 'application/json'}
-
+    return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {
+        'content-type': 'application/json'}
 
 @app.route('/<name>.js')
 def js_files(name):
@@ -210,8 +161,9 @@ def js_files(name):
 @app.route('/<path:path>')
 def all_files(path):
     try:
-        if path[-3:].lower() in ["tml","css",".js"]:
-            getAgentInfo(request)
+        # Инициализация информации об агенте()
+        if path[-3:].lower() in ["tml", "css", ".js"]:
+            getform.getAgentInfo(request)
     except:
         pass
     ROOT_DIR = f"{os.path.dirname(Path(__file__))}{os.sep}"
@@ -237,7 +189,6 @@ def all_files(path):
         pathImg = f"{ROOT_DIR}{path}"
         bin, mime = sendCostumBin(pathImg)
         return bin, 200, {'content-type': mime}
-
     print(path)
     return app.send_static_file(path)
 

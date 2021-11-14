@@ -4,12 +4,13 @@ import os
 import codecs
 from Etc.conf import getTempPage, setTempPage, existTempPage
 import hashlib
+from app import session
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
             'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl','Tabs',
             'OpenStreetMap',"OpenStreetMapLabel",'Tree','Server']
 
-def readfile(session,name):
+def readfile(name):
     ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{name}'
     if os.path.exists(cmpDirSrc):
@@ -31,10 +32,10 @@ def genCacheUid():
     hesh = random + hashlib.md5(f'{getIdClient()}'.encode('utf-8')).hexdigest()
     return hesh
 
-def getTemp(session):
+def getTemp(request):
     ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
     cmpDirSrc = session["AgentInfo"]['TEMP_DIR_PATH']
-    cmpFiletmp = f"{cmpDirSrc}{os.sep}{session['AgentInfo']['platform']}_d3main.js"
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{request.user_agent.platform}_d3main.js"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
@@ -55,24 +56,22 @@ def getTemp(session):
             return txt
 
 
-def getSrc(session):
+def getSrc(request):
     random = "c"
     hesh = random + hashlib.md5(f'{getIdClient()}'.encode('utf-8')).hexdigest()
-
-
     res = []
     res.append('(function(){')
-    res.append(readfile(session,'System/js/polyfill.js'))
-    res.append(readfile(session,'System/js/clipboard.min.js'))
+    res.append(readfile('System/js/polyfill.js'))
+    res.append(readfile('System/js/clipboard.min.js'))
 
     # Добавляем в фрэймворк информацию о платформе
     if "AgentInfo" in session:
-        res.append(f'\r var AGENT_INFO_PLATFORM = "{session["AgentInfo"]["platform"] }";')
+        res.append(f'\r var AGENT_INFO_PLATFORM = "{request.user_agent.platform}";')
     # ============================================
 
     # Добавил функцию отладки (для Android)
     res.append("""
-    /* Функция отладки */
+    /* Функция отладки ghbvty*/
     var console_log = function(message){
        if ((AGENT_INFO_PLATFORM == "android") && (Android)) {
          msg="";
@@ -97,20 +96,20 @@ def getSrc(session):
     """)
 
 
-    res.append(readfile(session,'System/js/main.js'))
-    res.append(readfile(session,'System/js/dataset.js'))
-    res.append(readfile(session,'System/js/action.js'))
-    res.append(readfile(session,'System/js/module.js'))
-    res.append(readfile(session,'System/js/repeater.js'))
-    res.append(readfile(session,'System/js/common.js'))
-    res.append(readfile(session,'System/js/md5.js'))
-    res.append(readfile(session,'System/js/notify.js'))
-    res.append(readfile(session,'System/js/crc32/crc32.js'))
+    res.append(readfile('System/js/main.js'))
+    res.append(readfile('System/js/dataset.js'))
+    res.append(readfile('System/js/action.js'))
+    res.append(readfile('System/js/module.js'))
+    res.append(readfile('System/js/repeater.js'))
+    res.append(readfile('System/js/common.js'))
+    res.append(readfile('System/js/md5.js'))
+    res.append(readfile('System/js/notify.js'))
+    res.append(readfile('System/js/crc32/crc32.js'))
     # подключаем компоненты
-    res.append(readfile(session,'System/js/Base.js'))
-    res.append(readfile(session,'Components/Window/common.js'))
-    res.append(readfile(session,'Components/Window/win_sys.js'))
-    res.append(readfile(session,'Components/Window/window.js'))
+    res.append(readfile('System/js/Base.js'))
+    res.append(readfile('Components/Window/common.js'))
+    res.append(readfile('Components/Window/win_sys.js'))
+    res.append(readfile('Components/Window/window.js'))
 
     # подключаем библиотеку OSM
     # res.append(readfile(session,'Components/OpenStreetMap/js/OpenLayers.js'))
@@ -119,61 +118,7 @@ def getSrc(session):
     #res.append(readfile('Components/LayoutSplit/js/LayoutSplit.js'))
     for cmp in compList:
         cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}.js'
-        res.append(readfile(session,cmpDirSrc))
-        # cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}_{session["platform"]}.js'
-        # res.append(readfile(cmpDirSrc))
-
-
-
-    #
-    # дописать инициализацию D3 в колбэк
-    # res.append("""
-    # document.addEventListener('DOMContentLoaded', function() {
-    #    var styleSheet = document.createElement("style");
-    #    var text = document.createTextNode("* {filter: none !important; } \n.hidden {visibility: hidden;}");
-    #    styleSheet.appendChild(text);
-    #    document.head.appendChild(styleSheet);
-    #
-    #    if (document.getElementById('D3MainContainer') == null){
-    #        var d3MainContainer = document.createElement('div');
-    #        d3MainContainer.id = 'D3MainContainer';
-    #        document.body.appendChild(d3MainContainer);
-    #    }
-    #
-    #    if (document.getElementsByClassName('MContent').length == 0){
-    #        var _mainContainer = document.createElement('div');
-    #        _mainContainer.id = '_mainContainer';
-    #        _mainContainer.classList.add('MContent')
-    #        document.getElementById('D3MainContainer').appendChild(_mainContainer);
-    #    }
-    #
-    #    // Инициализируем D3
-    #    if (typeof(D3Api.MULTI_REQUEST) === 'undefined'){
-    #       D3Api.MULTI_REQUEST = {"MAX_THREAD":"","MAX_REQUEST":""};
-    #       D3Api.cache_enabled = 0;
-    #       D3Api.startInit();
-    #       D3Api.init();
-    #       D3Api.MainDom = document.getElementById('D3MainContainer');
-    #       D3Api.D3MainContainer = D3Api.MainDom;
-    #       var dev_info_panel = D3Api.getOption('dev_info_panel', 'false');
-    #       if (dev_info_panel && dev_info_panel.show == 'true') {
-    #           var info_panel = document.createElement('div');
-    #           if (dev_info_panel.text) {
-    #               info_panel.innerHTML = dev_info_panel.text;
-    #           }
-    #           if (dev_info_panel.color) {
-    #               info_panel.style.borderColor = dev_info_panel.color;
-    #           }
-    #           D3Api.addClass(info_panel, 'dev_info_panel');
-    #           D3Api.insertBeforeDom(D3Api.D3MainContainer, info_panel);
-    #       }
-    #    }
-    #    if (D3Api.onload) {
-    #        D3Api.onload();
-    #    }
-    #    // D3Api.showForm('main', undefined, {history: false});
-    # }, true);
-    # """)
+        res.append(readfile(cmpDirSrc))
 
     res.append('})();\r')
     res.append(f'\rD3Api.SYS_CACHE_UID = "{genCacheUid()}";')
@@ -184,12 +129,13 @@ def getSrc(session):
     return "".join(res)
 
 
-def show(session):
+def show(request):
     if "AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0":
-        return getTemp(session)
-    return getSrc(session)
+        return getTemp(request)
+    return getSrc(request)
 
     #if get_option("TempDir") and (+get_option("debug"))<1:
     #    return getTemp(agent_info)
     #else:
     #    return getSrc(agent_info)
+

@@ -4,7 +4,7 @@
             Form.onShowForm = function() {
                if (typeof Android === 'undefined') {
                    getControl("alert_message").style.display='block';
-               }else{
+               } else {
                    getControl("alert_message").style.display='none';
                }
                 var canvas = getControl("canvas");

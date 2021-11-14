@@ -1,4 +1,4 @@
-<cmpForm class="Main ActiveDashBoard box-sizing-force"  oncreate="Form.onCreate()" caption="Радактор форм" >
+<cmpForm class="Main ActiveDashBoard box-sizing-force"  oncreate="Form.onCreate()" caption="Радактор форм (форма в разработке)" >
     <cmpScript name="MainScript">
        <![CDATA[
           Form.blankName = "Forms/FormDesugner/blank";

@@ -1,4 +1,4 @@
-<div cmptype="Form" caption="" width="60%" height="60%">
+<div cmptype="Form" width="60%" height="60%" caption="Компонент cmpOpenStreetMap в разработке">
    <cmpScript>
         <![CDATA[
            Form.setInfo = function(data){

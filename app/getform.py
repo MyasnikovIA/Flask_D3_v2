@@ -7,19 +7,24 @@ import json
 import sys
 import hashlib
 from Etc.conf import ConfigOptions, existTempPage, setTempPage, getTempPage,GLOBAL_DICT,nameElementHeshMap
+from app import session
+from pathlib import Path
+from app import request
 
 try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
 from xml.dom import minidom
-from app import getSession, setSession
+
 
 global COMPONENT_PATH
+ROOT_DIR = os.path.dirname(__file__)
 COMPONENT_PATH = os.path.join(os.path.dirname(__file__), 'Components')
 FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['Forms'][1:])
 USER_FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['UserForms'][1:])
 TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['TempDir'])
+
 
 
 def stripCode(srcCode=""):
@@ -288,14 +293,13 @@ def getSrc(formName, cache, dataSetName="", session={}):
 
 
 def getTemp(formName, cache, dataSetName, session):
-    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
     blockName = ""
     if ":" in formName:
         blockName = formName.split(":")[0]
         formName = formName.split(":")[1]
     cmpDirSrc = TEMP_DIR_PATH
-    cmpFiletmp = os.path.join(cmpDirSrc, session["AgentInfo"]['platform'],
-                              f"{formName.replace(os.sep, '_')}{blockName}.frm")  # f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
+    cmpFiletmp = os.path.join(cmpDirSrc, session["AgentInfo"]['platform'],f"{formName.replace(os.sep, '_')}{blockName}.frm")
+
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
@@ -611,6 +615,58 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
 
     # print(ET.tostring(dataSetXml).decode())
     return json.dumps(resObject)
+
+
+# ====================================================================================================================
+# ====================================================================================================================
+# ====================================================================================================================
+def getSession(name, defoult):
+    if not name in session:
+        return defoult
+    return session[name]
+
+def setSession(name, value):
+    session[name] = value
+
+
+def getSessionObject():
+    return session
+
+
+def getAgentInfo(request):
+    if not "AgentInfo" in session:
+        session["AgentInfo"] = {}
+    if hasattr(request, 'user_agent'):
+        session["AgentInfo"] = {}
+        session["AgentInfo"]['User-Agent'] = request.headers.get('User-Agent')
+        if hasattr(request.user_agent, 'browser'):
+            session["AgentInfo"]['browser'] = request.user_agent.browser
+        if hasattr(request.user_agent, 'version'):
+            session["AgentInfo"]['version'] = request.user_agent.version and int(
+                request.user_agent.version.split('.')[0])
+        if hasattr(request.user_agent, 'platform'):
+            session["AgentInfo"]['platform'] = request.user_agent.platform
+        if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
+            session["AgentInfo"]['ip'] = request.environ['REMOTE_ADDR']
+        else:
+            session["AgentInfo"]['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
+    session["AgentInfo"]['Forms'] = ConfigOptions['Forms']
+    if not 'debug' in session["AgentInfo"] and request.args.get("debug") == None:
+        session["AgentInfo"]['debug'] = ConfigOptions['debug']
+    if not request.args.get("debug") == None:
+        session["AgentInfo"]['debug'] = request.args.get("debug")
+    if not 'UserForms' in session["AgentInfo"] and request.args.get("f") == None:
+        session["AgentInfo"]['UserForms'] = ConfigOptions['UserForms']
+    if not request.args.get("f") == None:
+        session["AgentInfo"]['UserForms'] = request.args.get("f")
+    session["AgentInfo"]['TempDir'] = ConfigOptions['TempDir']
+    session["AgentInfo"]['ROOT_DIR'] = f"{os.path.dirname(Path(__file__))}{os.sep}"
+    session["AgentInfo"]['TEMP_DIR_PATH'] = os.path.join(os.path.dirname(Path(__file__)), ConfigOptions['TempDir'])
+    return session["AgentInfo"]
+
+
+# ====================================================================================================================
+# ====================================================================================================================
 
 
 """
