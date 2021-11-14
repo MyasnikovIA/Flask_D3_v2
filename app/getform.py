@@ -9,7 +9,6 @@ import hashlib
 from Etc.conf import ConfigOptions, existTempPage, setTempPage, getTempPage,GLOBAL_DICT,nameElementHeshMap
 from app import session
 from pathlib import Path
-from app import request
 
 try:
     import xml.etree.cElementTree as ET
@@ -281,6 +280,9 @@ def replaceServerTag(htmlContent, formName):
 
 
 def getSrc(formName, cache, dataSetName="", session={}):
+    """
+     Функция получения HTML кода из FRM
+    """
     # cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
     rootForm = getXMLObject(formName)
     sysinfoBlock, text = parseFrm(rootForm, formName, {}, 0, session)  # парсим форму
@@ -293,6 +295,9 @@ def getSrc(formName, cache, dataSetName="", session={}):
 
 
 def getTemp(formName, cache, dataSetName, session):
+    """
+    Функция получения кэшированной формы (в папке темп HTML)
+    """
     blockName = ""
     if ":" in formName:
         blockName = formName.split(":")[0]
@@ -389,7 +394,6 @@ def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
 def joinDfrm(formName, rootForm):
     """
     Обработать DFRM и FRM
-    Необходимо дописать замену найденой ноды на ноду из DFRM
     """
     pathUserFormDir = f"{USER_FORM_PATH}{os.sep}{formName}.d"
     if os.path.exists(pathUserFormDir):
@@ -699,6 +703,14 @@ def mimeType(pathFile):
                "au": "audio/basic", "arj": "application/arj", "art": "image/x-jg", "asf": "video/x-ms-asf",
                "asm": "text/x-asm",
                "asp": "text/asp"}
+    if "." in pathFile:
+        ext = pathFile[pathFile.rfind('.') + 1:]
+    else:
+        ext = pathFile
+    if ext in extList:
+        return extList[ext]
+    else:
+        return "text/plain"
 
 # ====================================================================================================================
 # ====================================================================================================================
