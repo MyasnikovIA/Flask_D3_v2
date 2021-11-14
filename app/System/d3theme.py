@@ -1,8 +1,8 @@
 import os
 import codecs
-from Etc.conf import getTempPage, setTempPage, existTempPage
 from app import session
 from pathlib import Path
+import getform
 
 import hashlib
 
@@ -47,14 +47,14 @@ def getTemp(request):
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
-    if existTempPage(cmpFiletmp):
-       txt,mime = getTempPage(cmpFiletmp,'')
+    if getform.existTempPage(cmpFiletmp):
+       txt,mime = getform.getTempPage(cmpFiletmp,'')
     if txt == "":
         if not os.path.exists(cmpFiletmp):
             with open(cmpFiletmp,"wb") as d3_css:
                 txt = getSrc(request)
                 d3_css.write(txt.encode())
-                setTempPage(cmpFiletmp,txt)
+                getform.setTempPage(cmpFiletmp,txt)
                 return txt
         else:
             with open(cmpFiletmp, "rb") as infile:

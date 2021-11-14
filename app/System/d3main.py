@@ -2,8 +2,8 @@ import json
 from flask import session, request, jsonify
 import os
 import codecs
-from Etc.conf import getTempPage, setTempPage, existTempPage
 import hashlib
+import getform
 from app import session
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
@@ -39,20 +39,20 @@ def getTemp(request):
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
-    if existTempPage(cmpFiletmp):
-        txt,mime  = getTempPage(cmpFiletmp,'')
+    if getform.existTempPage(cmpFiletmp):
+        txt,mime  = getform.getTempPage(cmpFiletmp,'')
     if not txt == "":
         return txt
     if not os.path.exists(cmpFiletmp):
         with open(cmpFiletmp,"wb") as d3_js:
             txt = getSrc(request)
             d3_js.write(txt.encode())
-            setTempPage(cmpFiletmp, txt)
+            getform.setTempPage(cmpFiletmp, txt)
             return txt
     else:
         with open(cmpFiletmp, "rb") as infile:
             txt = infile.read()
-            setTempPage(cmpFiletmp, txt)
+            getform.setTempPage(cmpFiletmp, txt)
             return txt
 
 

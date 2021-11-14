@@ -16,3 +16,4 @@ __pycache__
 /Components/Script/__pycache__
 /app/temp
 /app/.idea
+/app/db.shelve.dat

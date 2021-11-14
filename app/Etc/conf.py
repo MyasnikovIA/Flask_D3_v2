@@ -32,7 +32,7 @@ ConfigOptions = {
     'cache_ttl': 60 * 60 * 3,  # server
     'session_cache': 1,
     'cookie_lifetime': 900,
-    'shelve': 'temp/db.shelve',
+    'shelve': 'db.shelve', # параметр указывает название файла для хронений глобального словаря (папка для файла должна быть созданна на момент запуска Flask)
     'proxy_auth': {'hostname': '',
                    'port': 8080,
                    'user': '',
@@ -133,38 +133,5 @@ def getAgetntInfo():
     return res
 """
 
-###-----------------------------------------------------------------------------------------------
-###------ Механизм буфиризации контента, для ускорения продуктового сервета ----------------------
-###-----------------------------------------------------------------------------------------------
-global TMP_PAGE_CAHE
-TMP_PAGE_CAHE = {}
-
-
-def getTempPage(name, defoultValue=''):
-    global TMP_PAGE_CAHE
-    if TMP_PAGE_CAHE.get(name) == None:
-        return defoultValue, 'application/plain'
-    res = TMP_PAGE_CAHE.get(name)
-    return res.get("txt"), res.get("mime")
-
-
-def setTempPage(name, html='', mime='application/plain'):
-    global TMP_PAGE_CAHE
-    if TMP_PAGE_CAHE == None:
-        TMP_PAGE_CAHE = {}
-    TMP_PAGE_CAHE[f"{name}"] = {"txt": html, "mime": mime}
-
-
-def existTempPage(name):
-    global TMP_PAGE_CAHE
-    if TMP_PAGE_CAHE == None:
-        TMP_PAGE_CAHE = {}
-        return False
-    if name in TMP_PAGE_CAHE:
-        return True
-    return False
-###-----------------------------------------------------------------------------------------------
-###-----------------------------------------------------------------------------------------------
-###-----------------------------------------------------------------------------------------------
 nameElementHeshMap={}
 GLOBAL_DICT = shelve.open(ConfigOptions['shelve'])

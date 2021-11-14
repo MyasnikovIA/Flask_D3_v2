@@ -6,7 +6,7 @@ import ast
 import json
 import sys
 import hashlib
-from Etc.conf import ConfigOptions, existTempPage, setTempPage, getTempPage,GLOBAL_DICT,nameElementHeshMap
+from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap
 from app import session
 from pathlib import Path
 
@@ -621,9 +621,39 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     return json.dumps(resObject)
 
 
-# ====================================================================================================================
-# ====================================================================================================================
-# ====================================================================================================================
+
+###-----------------------------------------------------------------------------------------------
+###------ Механизм буфиризации контента, для ускорения продуктового сервета ----------------------
+###-----------------------------------------------------------------------------------------------
+global TMP_PAGE_CAHE
+TMP_PAGE_CAHE = {}
+
+
+def getTempPage(name, defoultValue=''):
+    global TMP_PAGE_CAHE
+    if TMP_PAGE_CAHE.get(name) == None:
+        return defoultValue, 'application/plain'
+    res = TMP_PAGE_CAHE.get(name)
+    return res.get("txt"), res.get("mime")
+
+
+def setTempPage(name, html='', mime='application/plain'):
+    global TMP_PAGE_CAHE
+    if TMP_PAGE_CAHE == None:
+        TMP_PAGE_CAHE = {}
+    TMP_PAGE_CAHE[f"{name}"] = {"txt": html, "mime": mime}
+
+
+def existTempPage(name):
+    global TMP_PAGE_CAHE
+    if TMP_PAGE_CAHE == None:
+        TMP_PAGE_CAHE = {}
+        return False
+    if name in TMP_PAGE_CAHE:
+        return True
+    return False
+
+
 def getSession(name, defoult):
     if not name in session:
         return defoult

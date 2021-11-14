@@ -3,7 +3,7 @@ import shelve
 
 from flask import Flask, redirect, session, render_template
 from flask import request, jsonify
-from Etc.conf import ConfigOptions, existTempPage, getTempPage, GLOBAL_DICT, nameElementHeshMap
+from Etc.conf import ConfigOptions, GLOBAL_DICT, nameElementHeshMap
 
 import shutil
 import json
@@ -30,8 +30,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 def sendCostumBin(pathFile):
     # костыль для docker
     txt = ""
-    if existTempPage(pathFile):
-        txt, mime = getTempPage(pathFile, '')
+    if getform.existTempPage(pathFile):
+        txt, mime = getform.getTempPage(pathFile, '')
     if txt == "":
         if os.path.isfile(pathFile):
             with open(pathFile, "rb") as f:
