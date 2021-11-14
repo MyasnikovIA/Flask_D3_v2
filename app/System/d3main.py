@@ -45,7 +45,7 @@ def getTemp(request):
         return txt
     if not os.path.exists(cmpFiletmp):
         with open(cmpFiletmp,"wb") as d3_js:
-            txt = getSrc(session)
+            txt = getSrc(request)
             d3_js.write(txt.encode())
             setTempPage(cmpFiletmp, txt)
             return txt
@@ -130,7 +130,7 @@ def getSrc(request):
 
 
 def show(request):
-    if "AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0":
+    if "AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0:
         return getTemp(request)
     return getSrc(request)
 

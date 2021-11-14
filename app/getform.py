@@ -326,8 +326,8 @@ def getParsedForm(formName, cache, dataSetName="", session={}):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
     """
-    if ("AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0")\
-            or ("TempDir" in ConfigOptions and "debug" in ConfigOptions and ConfigOptions['debug'] == "0"):
+    if ("AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0)\
+            or ("TempDir" in ConfigOptions and "debug" in ConfigOptions and int(ConfigOptions['debug']) == "0"):
         return getTemp(formName, cache, dataSetName, session)
     else:
         return getSrc(formName, cache, dataSetName, session)
@@ -535,7 +535,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     # =============== Вставляем инициализированые переменные =======================
     argsQuery, sessionVar = parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj)
     varsDebug = {}
-    if not sessionObj["AgentInfo"]['debug'] == '0':
+    if not int(sessionObj["AgentInfo"]['debug']) == 0:
         varsDebug = argsQuery.copy()
     # =============================================================================
     if typeQuery == "DataSet":
@@ -575,7 +575,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             resObject[dataSetName]["type"] = typeQuery
             resObject[dataSetName]["position"] = 0
             resObject[dataSetName]["page"] = 0
-            if not sessionObj["AgentInfo"]['debug'] == '0':
+            if not int(sessionObj["AgentInfo"]['debug']) == 0:
                 resObject[dataSetName]["var"] = varsDebug
                 resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
 
@@ -608,7 +608,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             resObject[dataSetName]["data"] = dataVarReturn
             resObject[dataSetName]["type"] = typeQuery
             resObject[dataSetName]["uid"] = uid
-            if not sessionObj["AgentInfo"]['debug'] == '0':
+            if not int(sessionObj["AgentInfo"]['debug']) == 0:
                 resObject[dataSetName]["var"] = varsDebug
                 resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
             return json.dumps(resObject)
@@ -652,9 +652,9 @@ def getAgentInfo(request):
             session["AgentInfo"]['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
     session["AgentInfo"]['Forms'] = ConfigOptions['Forms']
     if not 'debug' in session["AgentInfo"] and request.args.get("debug") == None:
-        session["AgentInfo"]['debug'] = ConfigOptions['debug']
+        session["AgentInfo"]['debug'] = int(ConfigOptions['debug'])
     if not request.args.get("debug") == None:
-        session["AgentInfo"]['debug'] = request.args.get("debug")
+        session["AgentInfo"]['debug'] = int(request.args.get("debug"))
     if not 'UserForms' in session["AgentInfo"] and request.args.get("f") == None:
         session["AgentInfo"]['UserForms'] = ConfigOptions['UserForms']
     if not request.args.get("f") == None:
@@ -664,6 +664,41 @@ def getAgentInfo(request):
     session["AgentInfo"]['TEMP_DIR_PATH'] = os.path.join(os.path.dirname(Path(__file__)), ConfigOptions['TempDir'])
     return session["AgentInfo"]
 
+def mimeType(pathFile):
+    extList = {"py": "text/html", "psp": "text/html", "css": "text/css", "js": "application/x-javascript",
+               "xml": "text/xml", "dtd": "text/xml", "txt": "text/plain", "inf": "text/plain",
+               "nfo": "text/plain",
+               "php": "text/plain", "html": "text/html", "csp": "text/html", "htm": "text/html",
+               "shtml": "text/html",
+               "shtm": "text/html", "stm": "text/html", "sht": "text/html", "sht": "text/html",
+               "csp": "text/html",
+               "mac": "text/html", "cls": "text/html", "jpg": "image/jpeg", "cos": "text/html",
+               "mpeg": "video/mpeg",
+               "mpg": "video/mpeg", "mpe": "video/mpeg", "ai": "application/postscript", "zip": "application/zip",
+               "zsh": "text/x-script.zsh", "x-png": "image/png", "xls": "application/x-excel",
+               "xlm": "application/excel",
+               "wav": "audio/x-wav", "txt": "text/plain", "tiff": "image/tiff", "tif": "image/x-tiff",
+               "text": "text/plain",
+               "swf": "application/x-shockwave-flash", "sprite": "application/x-sprite",
+               "smil": "application/smil",
+               "sh": "text/x-script.sh", "rtx": "text/richtext", "rtf": "text/richtext",
+               "pyc": "application/x-bytecode.python",
+               "png": "image/png", "pic": "image/pict", "mp3": "video/mpeg", "mp2": "video/mpeg",
+               "movie": "video/x-sgi-movie",
+               "mov": "video/quicktime", "mjpg": "video/x-motion-jpeg", "mime": "www/mime",
+               "mif": "application/x-mif",
+               "midi": "audio/midi", "js": "application/javascript", "jpeg": "image/jpeg", "jps": "image/x-jps",
+               "jam": "audio/x-jam",
+               "jav": "text/plain", "java": "text/x-java-source", "htm": "text/html", "html": "text/html",
+               "gzip": "application/x-gzip", "gif": "image/gif", "gl": "video/gl", "csh": "text/x-script.csh",
+               "css": "text/css", "bsh": "application/x-bsh", "bz": "application/x-bzip",
+               "bz2": "application/x-bzip2",
+               "c": "text/plain", "c++": "text/plain", "cat": "application/vnd.ms-pki.seccat", "cc": "text/plain",
+               "htmls": "text/html", "bmp": "image/bmp", "bm": "image/bmp", "avi": "video/avi",
+               "avs": "video/avs-video",
+               "au": "audio/basic", "arj": "application/arj", "art": "image/x-jg", "asf": "video/x-ms-asf",
+               "asm": "text/x-asm",
+               "asp": "text/asp"}
 
 # ====================================================================================================================
 # ====================================================================================================================

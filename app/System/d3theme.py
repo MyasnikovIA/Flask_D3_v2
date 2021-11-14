@@ -66,6 +66,6 @@ def getTemp(request):
 
 def show(request):
     # request.user_agent.platform
-    if "AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and session["AgentInfo"]['debug'] == "0":
+    if "AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0:
         return getTemp(request)
     return getSrc(request)
