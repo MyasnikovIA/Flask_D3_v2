@@ -37,7 +37,9 @@ def sendCostumBin(pathFile):
             with open(pathFile, "rb") as f:
                 return f.read(),getform.mimeType(pathFile)
         else:
-            return f"File {pathFile} not found {os.path.dirname(Path(__file__))}{os.sep}", getform.mimeType(".txt")
+            # fpath = Path(__file__).absolute()
+            fpath = os.path.dirname(Path(__file__).absolute())
+            return f"File {pathFile} not found {os.path.dirname(Path(__file__).absolute())}{os.sep}  --{fpath}---", getform.mimeType(".txt")
     else:
         return txt, mime
 
@@ -132,8 +134,7 @@ def all_files(path):
             getform.getAgentInfo(request)
     except:
         pass
-    ROOT_DIR = f"{os.path.dirname(Path(__file__))}{os.sep}"
-    # {os.sep})}
+    ROOT_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}"
     if '/~Cmp' in path and 'Components/' in path:
         cmp = path[path.find('Components/') + len('Components/'): path.find('/~Cmp') - len('/~Cmp') + 1]
         img = path[path.rfind("/"):]
@@ -155,13 +156,12 @@ def all_files(path):
         pathImg = f"{ROOT_DIR}{path}"
         bin, mime = sendCostumBin(pathImg)
         return bin, 200, {'content-type': mime}
-    print(path)
+    # print(path)
     return app.send_static_file(path)
-
 
 if __name__ == '__main__':
     if "debug" in ConfigOptions and not int(ConfigOptions["debug"]) == 0:
-        TEMP_DIR_PATH = os.path.join(os.path.dirname(Path(__file__)), ConfigOptions['TempDir'])
+        TEMP_DIR_PATH = os.path.join(os.path.dirname(Path(__file__).absolute()), ConfigOptions['TempDir'])
         if os.path.exists(TEMP_DIR_PATH):
             for root, dirs, files in os.walk(TEMP_DIR_PATH):
                 for f in files:

@@ -695,8 +695,8 @@ def getAgentInfo(request):
     if not request.args.get("f") == None:
         session["AgentInfo"]['UserForms'] = request.args.get("f")
     session["AgentInfo"]['TempDir'] = ConfigOptions['TempDir']
-    session["AgentInfo"]['ROOT_DIR'] = f"{os.path.dirname(Path(__file__))}{os.sep}"
-    session["AgentInfo"]['TEMP_DIR_PATH'] = os.path.join(os.path.dirname(Path(__file__)), ConfigOptions['TempDir'])
+    session["AgentInfo"]['ROOT_DIR'] = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}"
+    session["AgentInfo"]['TEMP_DIR_PATH'] = os.path.join(os.path.dirname(Path(__file__).absolute()), ConfigOptions['TempDir'])
     return session["AgentInfo"]
 
 def mimeType(pathFile):

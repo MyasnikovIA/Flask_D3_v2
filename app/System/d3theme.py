@@ -21,7 +21,7 @@ def readCmpCss(name, ext=''):
 
 def readfile(name):
     # request.user_agent.platform
-    ROOT_DIR = f"{Path(__file__).parent.parent}{os.sep}"
+    ROOT_DIR = f"{Path(__file__).absolute().parent.parent}{os.sep}"
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{name}'
     if os.path.exists(cmpDirSrc):
         with codecs.open(cmpDirSrc, encoding='utf-8') as f:

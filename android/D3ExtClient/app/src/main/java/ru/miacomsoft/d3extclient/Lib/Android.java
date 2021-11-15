@@ -7,18 +7,24 @@ import android.hardware.Sensor;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 import ru.miacomsoft.d3extclient.MainActivity;
@@ -156,9 +162,6 @@ public class Android {
         String ipAddress = Formatter.formatIpAddress(ip);
         return ipAddress;
     }
-
-
-
 
 
 }
