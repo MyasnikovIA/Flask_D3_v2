@@ -1782,11 +1782,13 @@ int drawable design_snackbar_background 0x7f070064
 int drawable ic_clock_black_24dp 0x7f070065
 int drawable ic_keyboard_black_24dp 0x7f070066
 int drawable ic_launcher_background 0x7f070067
+int drawable ic_launcher_background_old 0x7f070093
 int drawable ic_launcher_foreground 0x7f070068
 int drawable ic_mtrl_checked_circle 0x7f070069
 int drawable ic_mtrl_chip_checked_black 0x7f07006a
 int drawable ic_mtrl_chip_checked_circle 0x7f07006b
 int drawable ic_mtrl_chip_close_circle 0x7f07006c
+int drawable icon 0x7f070091
 int drawable material_cursor_drawable 0x7f07006d
 int drawable material_ic_calendar_black_24dp 0x7f07006e
 int drawable material_ic_clear_black_24dp 0x7f07006f

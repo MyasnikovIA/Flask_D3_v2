@@ -20,10 +20,18 @@ build.bat - скрипт для сборки Docker контейнера с пр
 run.bat - скрипт для запуска собранного Docker контейнера с проектом
 save_images.bat - скрипт для выгразки архива Docker контейнера
 commit_images.bat - скрипт для фиксации состояния работающего  Docker контейнера
+
 ```
+
+
+*D3extClient*
+android\D3ExtClient\app\build\outputs\apk\debug\app-debug.apk - браузер клинт D3 под андроид
+
 
 <img src="https://github.com/MyasnikovIA/Flask_D3_v2/blob/main/img/scr.png?raw=true"/>
 
+
+<img src="https://github.com/MyasnikovIA/Flask_D3_v2/blob/main/img/scrAndroid.png?raw=true"/>
 
 Команды для работы с докером
 ```

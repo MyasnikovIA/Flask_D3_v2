@@ -1,11 +1,11 @@
 ru/miacomsoft/d3extclient/Lib/UserWebClient.java
  ru.miacomsoft.d3extclient.Lib.UserWebClient
-ru/miacomsoft/d3extclient/BuildConfig.java
- ru.miacomsoft.d3extclient.BuildConfig
-ru/miacomsoft/d3extclient/Lib/UserWebChromeClient.java
- ru.miacomsoft.d3extclient.Lib.UserWebChromeClient
 ru/miacomsoft/d3extclient/MainActivity.java
  ru.miacomsoft.d3extclient.MainActivity
+ru/miacomsoft/d3extclient/Lib/UserWebChromeClient.java
+ ru.miacomsoft.d3extclient.Lib.UserWebChromeClient
 ru/miacomsoft/d3extclient/Lib/Android.java
  ru.miacomsoft.d3extclient.Lib.Android
  ru.miacomsoft.d3extclient.Lib.Android$1
+ru/miacomsoft/d3extclient/BuildConfig.java
+ ru.miacomsoft.d3extclient.BuildConfig
