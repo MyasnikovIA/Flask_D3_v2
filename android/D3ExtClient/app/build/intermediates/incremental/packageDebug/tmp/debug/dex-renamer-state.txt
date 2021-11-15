@@ -1,0 +1,4 @@
+#Mon Nov 15 16:18:05 NOVT 2021
+base.0=F\:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

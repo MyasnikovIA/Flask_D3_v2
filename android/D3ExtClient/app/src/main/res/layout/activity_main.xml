@@ -15,20 +15,20 @@
             android:id="@+id/textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Укажите пуить к серверу" />
+            android:text="Укажите URL путь к серверу" />
 
         <EditText
             android:id="@+id/editText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPersonName"
-            android:text="http://128.0.24.172:9091" />
+            android:inputType="textPersonName" />
 
         <Button
             android:id="@+id/button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="onClickButton"
             android:text="Сохранить" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
