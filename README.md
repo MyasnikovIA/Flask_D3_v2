@@ -24,9 +24,10 @@ commit_images.bat - скрипт для фиксации состояния ра
 ```
 
 
-*D3extClient* <br/>
+**D3extClient (Android)** <br/>
 android\D3ExtClient\app\build\outputs\apk\debug\app-debug.apk - браузер клинт D3 под андроид
 
+Если в JS коде присутствует объект  с именем Android значит в качестве браузера выступает **"D3extClient"** 
 
 <img src="https://github.com/MyasnikovIA/Flask_D3_v2/blob/main/img/scr.png?raw=true"/>
 
