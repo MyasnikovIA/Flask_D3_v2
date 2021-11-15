@@ -4,22 +4,18 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
-
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import ru.miacomsoft.d3extclient.Lib.Android;
 import ru.miacomsoft.d3extclient.Lib.UserWebChromeClient;
 import ru.miacomsoft.d3extclient.Lib.UserWebClient;

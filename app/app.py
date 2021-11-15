@@ -21,7 +21,7 @@ from System.d3theme import show as d3theme_css
 # https://www.py4u.net/discuss/183138
 # https://flask-russian-docs.readthedocs.io/ru/latest/quickstart.html
 
-app = Flask(__name__, static_folder='.')
+app = Flask(__name__, static_folder='templates')
 app.secret_key = str(uuid.uuid1()).replace("-", "")
 app.config['CORS_HEADERS'] = 'Content-Type'
 
@@ -121,11 +121,6 @@ def getform_php_files(the_path):
     return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {
         'content-type': 'application/json'}
 
-@app.route('/<name>.js')
-def js_files(name):
-    return app.send_static_file('js/' + name + '.js')
-
-
 @app.route('/<path:path>')
 def all_files(path):
     try:
@@ -157,7 +152,8 @@ def all_files(path):
         bin, mime = sendCostumBin(pathImg)
         return bin, 200, {'content-type': mime}
     # print(path)
-    return app.send_static_file(path)
+    return app.render_template(path)
+    # return app.send_static_file(path)
 
 if __name__ == '__main__':
     if "debug" in ConfigOptions and not int(ConfigOptions["debug"]) == 0:
