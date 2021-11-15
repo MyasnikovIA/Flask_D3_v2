@@ -35,6 +35,6 @@ COMMIT IMAGE
 -------------------------------------------------------------
 docker ps
 docker images
-docker commit d02a9d321c4b mis_med_xdebug:Centos_7_08-10-2020
+docker commit d02a9d321c4b python3.6_flask:flask_001
 -------------------------------------------------------------
 ```

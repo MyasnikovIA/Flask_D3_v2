@@ -23,16 +23,5 @@
      <cmpButton caption="Android D3extClient"  onclick="openD3Form('Tutorial/Android/alert',true,{width: 1200, height: 900})" />
      <hr/>
      <cmpButton caption="FormDesugner"  onclick="openD3Form('FormDesugner/main',true,{width: '100%', height: '100%'})" />
-     <br/>
-     <br/>
-     <br/>
-     <br/>
-
-    <cmpComboBox class="form-control" name="MySel" multiselect="true">
-        <cmpComboItem caption="" value=""/>
-        <cmpComboItem caption="2" value="2"/>
-        <cmpComboItem caption="3" value="3"/>
-        <cmpComboItem caption="4" value="4"/>
-    </cmpComboBox>
 
 </div>
