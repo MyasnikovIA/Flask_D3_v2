@@ -24,7 +24,7 @@ commit_images.bat - скрипт для фиксации состояния ра
 ```
 
 
-*D3extClient*
+*D3extClient* <br/>
 android\D3ExtClient\app\build\outputs\apk\debug\app-debug.apk - браузер клинт D3 под андроид
 
 
