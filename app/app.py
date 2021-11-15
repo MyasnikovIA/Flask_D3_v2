@@ -3,7 +3,7 @@ import shelve
 
 from flask import Flask, redirect, session, render_template
 from flask import request, jsonify
-from Etc.conf import ConfigOptions, GLOBAL_DICT, nameElementHeshMap
+from Etc.conf import ConfigOptions, GLOBAL_DICT, nameElementHeshMap,nameElementMap
 
 import shutil
 import json
@@ -103,6 +103,9 @@ def getform_php_files(the_path):
         args = json.loads(str(scrArg['ARGS'])[2:-2])
         if funName in nameElementHeshMap:
             return getform.runFormScript(nameElementHeshMap[funName], args, session), 200, {
+                'content-type': 'application/json'}
+        elif funName in nameElementMap:
+            return getform.runFormScript(nameElementMap[funName], args, session), 200, {
                 'content-type': 'application/json'}
         else:
             return f"""{{"error":"код с именем  '{funName}' не определено"}}""", 200, {

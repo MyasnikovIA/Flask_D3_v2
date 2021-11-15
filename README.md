@@ -1,15 +1,32 @@
 # Flask_D3_v2
 Трансляция фреймворка D3 от компании Bars-груп с PHP на Python(вариант2)
 
+```
+app\getform.py - Парсер Frm в HTML
+app\Etc\conf.py - Распологается словарь с настройками проекта
+app\Components - Содержит описание компонентов, стилей и библиотек для работы с этими компонентами
+app\Forms      - Собержит формы для преобразования парсером
+app\UserForms  - Содержит фрагменты XML для переопределения основных форм
+app\db.shelve.dat - (создается при старте сервера) - Глобальный справочник в формате "ключ/значение"
+
+build.bat - скрипт для сборки Docker контейнера с проектом
+run.bat - скрипт для запуска собранного Docker контейнера с проектом
+save_images.bat - скрипт для выгразки архива Docker контейнера
+commit_images.bat - скрипт для фиксации состояния работающего  Docker контейнера
+
+```
 
 
-```txt
-   Установить ширину окна в зависимости от родительского - 275px
-   <div  class="profcard-edit" >
-        <cmpGrid   name="PROF_CARD_SERVICES_GRID"
-                   dataset="DS_PROF_CARD_SERVICES_GRID"
-                   calc_height="#.profcard-edit#-275">
-                   
-        </cmpGrid>   
-    <div>               
+Команды для работы с докером
+```
+docker save -o F:\DockerProject\Flask_Python_3.6\Flask_001(13.10.2020).tar python3.6_flask:flask_001     - выгразить контейнер в файл 
+docker load -i F:\DockerProject\Flask_Python_3.6\Flask_001(13.10.2020).tar
+
+-------------------------------------------------------------
+COMMIT IMAGE
+-------------------------------------------------------------
+docker ps
+docker images
+docker commit d02a9d321c4b mis_med_xdebug:Centos_7_08-10-2020
+-------------------------------------------------------------
 ```

@@ -6,7 +6,7 @@ import ast
 import json
 import sys
 import hashlib
-from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap
+from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap,nameElementMap
 from app import session
 from pathlib import Path
 
@@ -138,6 +138,7 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
             attrib["name"] = str(uuid.uuid1()).replace("-", "")
         key = hashlib.md5(f'{formName}.{attrib["name"]}'.encode('utf-8')).hexdigest()
         nameElementHeshMap[key] = [formName, attrib["name"]]
+        nameElementMap[f'{formName}.{attrib["name"]}'] = [formName, attrib["name"]]
     else:
         is_enyTag = 0
         defName = os.path.join('Components', "Html", f'HtmlCtrl.Html').replace(os.sep, ".")
