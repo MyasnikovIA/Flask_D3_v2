@@ -1,12 +1,16 @@
 import codecs
 import importlib
 import os.path
+import sqlite3
 import uuid
 import ast
 import json
 import sys
 import hashlib
+import app
 from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap,nameElementMap
+from DataBase.connect import SQL, SQLconnect
+
 from app import session
 from pathlib import Path
 
@@ -586,6 +590,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
 
             return json.dumps(resObject)
         else:
+
+            # SQLconnect
+
             # дописать обработку SQL запроса
             s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {},
                                "position": 0, "rowcount": 0}}
@@ -621,6 +628,16 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     # print(ET.tostring(dataSetXml).decode())
     return json.dumps(resObject)
 
+def connect_db():
+    conn = sqlite3.connect(app.config['DATABASE'])
+    conn.row_factory = sqlite3.Row
+    return conn
+
+def create_db():
+    dbLoc = connect_db()
+    dbLoc.cursor().executescript("");
+    dbLoc.commit()
+    dbLoc.close()
 
 
 ###-----------------------------------------------------------------------------------------------

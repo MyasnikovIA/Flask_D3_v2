@@ -1,30 +1,27 @@
+import datetime
 import os
-import shelve
-
-from flask import Flask, redirect, session, render_template
-from flask import request, jsonify
-from Etc.conf import ConfigOptions, GLOBAL_DICT, nameElementHeshMap,nameElementMap
-
 import shutil
 import json
-from pathlib import Path
 import uuid
-import getform
 import hashlib
+import shelve
+import pandas as pd
+import pandas.io.sql as psql
 from inspect import getfullargspec
+from pathlib import Path
+from flask import Flask, redirect, session, render_template, g
+from flask import request, jsonify
+from Etc.conf import ConfigOptions, nameElementHeshMap, nameElementMap
+import getform
 
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
-
-# https://habr.com/ru/post/222983/
-# https://programtalk.com/python-examples/sys.__stdout__/
-# https://www.py4u.net/discuss/183138
-# https://flask-russian-docs.readthedocs.io/ru/latest/quickstart.html
+from DataBase.connect import SQL, SQLconnect
 
 app = Flask(__name__, static_folder='templates')
 app.secret_key = str(uuid.uuid1()).replace("-", "")
 app.config['CORS_HEADERS'] = 'Content-Type'
-
+app.permanent_session_lifetime = datetime.timedelta(days=10)  # период хронений сессии составляет 10 дней
 
 
 def sendCostumBin(pathFile):
@@ -35,13 +32,23 @@ def sendCostumBin(pathFile):
     if txt == "":
         if os.path.isfile(pathFile):
             with open(pathFile, "rb") as f:
-                return f.read(),getform.mimeType(pathFile)
+                return f.read(), getform.mimeType(pathFile)
         else:
             # fpath = Path(__file__).absolute()
             fpath = os.path.dirname(Path(__file__).absolute())
-            return f"File {pathFile} not found {os.path.dirname(Path(__file__).absolute())}{os.sep}  --{fpath}---", getform.mimeType(".txt")
+            return f"File {pathFile} not found {os.path.dirname(Path(__file__).absolute())}{os.sep}  --{fpath}---", getform.mimeType(
+                ".txt")
     else:
         return txt, mime
+
+
+@app.before_request
+def before_request():
+    """
+    Функция запускается перед запросом
+    Добавляет соединение к БД
+    """
+    pass
 
 
 @app.after_request
@@ -54,8 +61,10 @@ def after_request(response):
     header['Server'] = 'D3apiServer'
     return response
 
+
 #@app.errorhandler(404)
 #def not_found(error):
+#   return app.send_static_file('/templates/404.html'), 404
 #    return render_template('404.html', **locals()), 404
 
 @app.route('/')
@@ -77,8 +86,11 @@ def d3theme_files(name):
 def getParam(name, defoultValue=''):
     return request.args.get(name, default=defoultValue)
 
+
 @app.route('/<the_path>.php', methods=['GET', 'POST'])
 def getform_php_files(the_path):
+    session.permanent = True  # Включить сохранение сессии после закрытия браузера
+    # print(url_for("getform_php_files"))
     if the_path == 'getform':
         formName = getParam('Form')
         cache = getParam('cache')
@@ -121,6 +133,7 @@ def getform_php_files(the_path):
     return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {
         'content-type': 'application/json'}
 
+
 @app.route('/<path:path>')
 def all_files(path):
     try:
@@ -151,8 +164,11 @@ def all_files(path):
         pathImg = f"{ROOT_DIR}{path}"
         bin, mime = sendCostumBin(pathImg)
         return bin, 200, {'content-type': mime}
-    # print(path)
-    return app.render_template(path)
+    print(path)
+    if path[-3:].lower() in ["tml", "htm"]:
+        return redirect("/index.html")
+    return render_template('404.html', **locals()), 404
+    # return app.render_template(path)
     # return app.send_static_file(path)
 
 if __name__ == '__main__':

@@ -37,4 +37,11 @@
     </node>
 
 
+
+    <node target="MyDfrmBlock" pos="before">
+        <br/>
+        <H9>Включена юзерформа "UserForms" в каталоге /UserForms/Tutorial/main.d/view.dfrm </H9>
+    </node>
+
+
 </div>

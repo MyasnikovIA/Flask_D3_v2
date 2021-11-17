@@ -23,5 +23,5 @@
      <cmpButton caption="Android D3extClient"  onclick="openD3Form('Tutorial/Android/alert',true,{width: 1200, height: 900})" />
      <hr/>
      <cmpButton caption="FormDesugner"  onclick="openD3Form('FormDesugner/main',true,{width: '100%', height: '100%'})" />
-
+     <div name="MyDfrmBlock">-----------------</div>
 </div>
