@@ -5,8 +5,8 @@ import os,shelve
 global ConfigOptions
 ConfigOptions = {
     # 'DatabaseName': 'sqlite:////sqllite.db',
-    # 'DatabaseName': 'postgres://postgres:postgres@127.0.0.1:5432/flask_db',
-    'DatabaseName': 'oracle://dev:def@192.168.228.41:1521/med2dev',
+    'DatabaseName': 'postgres://postgres:postgres@127.0.0.1:5432/flask_db',
+    # 'DatabaseName': 'oracle://dev:dev@192.168.228.41:1521/med2dev',
     #'DatabaseName': 'mysql+pymysql://admin:12345678@192.168.1.20:5155/myDB',
     'OutCodePage': 'UTF-8',
     'FormEncoding': 'UTF8',
