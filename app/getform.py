@@ -600,22 +600,34 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
 
             return json.dumps(resObject)
         else:
+            # Если есть подключение к БД тогда выполняем SQL запрос
             if not SQLconnect == None:
+
+                resObject[dataSetName]["type"] = typeQuery
                 ext = argsQuery["_ext_"]
                 del argsQuery["_ext_"] # странная переменная
                 sqlText = dataSetXml.text
                 if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
                     # Дописать обработку вставок
                     pass
+                if not int(sessionObj["AgentInfo"]['debug']) == 0:
+                   resObject[dataSetName]["var"] = varsDebug
+                   resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
                 # получение данных через pandas
                 try:
                     df1 = psql.read_sql(sqlText, con=SQLconnect,params=argsQuery)
-                    resObjArr = json.loads(df1.to_json(orient="records"))
-                    s = {dataSetName: {"type": typeQuery, "data":resObjArr, "locals": {},"position": 0, "rowcount":len(resObjArr)}}
-                    return json.dumps(s)
+                    resObject[dataSetName]["data"] = json.loads(df1.to_json(orient="records"))
+                    resObject[dataSetName]["locals"] = {}
+                    resObject[dataSetName]["position"] = 0
+                    resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
+                    return json.dumps(resObject)
                 except Exception as e:
-                    s = {dataSetName: {"type": typeQuery, "data":[], "locals": {},"position": 0, "rowcount":0, "error":f"An error occurred. Error number {e.args}.".split("\\n")}}
-                    return json.dumps(s)
+                    resObject[dataSetName]["rowcount"] = 0
+                    resObject[dataSetName]["position"] = 0
+                    resObject[dataSetName]["locals"] = {}
+                    resObject[dataSetName]["data"] = []
+                    resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
+                    return json.dumps(resObject)
                 s = {dataSetName: {"type": typeQuery, "data":[], "locals": {},"position": 0, "rowcount":0}}
                 return json.dumps(s)
 
@@ -650,6 +662,28 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 resObject[dataSetName]["var"] = varsDebug
                 resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
             return json.dumps(resObject)
+        else:
+            # Если есть подключение к БД тогда выполняем SQL запрос (Возвращаем именованные переменные)
+            if not SQLconnect == None:
+                ext = argsQuery["_ext_"]
+                del argsQuery["_ext_"] # странная переменная
+                sqlText = dataSetXml.text
+                if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
+                    # Дописать обработку вставок
+                    pass
+                # получение данных через pandas
+                """
+                try:
+                    df1 = psql.read_sql(sqlText, con=SQLconnect,params=argsQuery)
+                    resObjArr = json.loads(df1.to_json(orient="records"))
+                    s = {dataSetName: {"type": typeQuery, "data":resObjArr, "locals": {},"position": 0, "rowcount":len(resObjArr)}}
+                    return json.dumps(s)
+                except Exception as e:
+                    s = {dataSetName: {"type": typeQuery, "data":[], "locals": {},"position": 0, "rowcount":0, "error":f"An error occurred. Error number {e.args}.".split("\\n")}}
+                    return json.dumps(s)
+                """
+                s = {dataSetName: {"type": typeQuery, "data":[], "locals": {},"position": 0, "rowcount":0}}
+                return json.dumps(s)
 
     # print(ET.tostring(dataSetXml).decode())
     return json.dumps(resObject)
