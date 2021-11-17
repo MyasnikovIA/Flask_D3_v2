@@ -10,7 +10,7 @@ class DataSet(Base):
         if "get" in self.attrs:
             self.get = self.attrs.get
         else:
-            self.get ="v{self.name}"
+            self.get = f"v{self.name}"
         if "Range" in self.attrs:
             self.Range = self.attrs.Range
         else:

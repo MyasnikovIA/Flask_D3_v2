@@ -20,6 +20,7 @@
      <cmpButton caption="OpenStreetMap"  onclick="openD3Form('Tutorial/OpenStreetMap/OpenStreetMap',true,{width: 1200, height: 900})" />
      <cmpButton caption="Server"  onclick="openD3Form('Tutorial/Server/Server',true,{width: 1200, height: 900})" />
      <cmpButton caption="DataSet"  onclick="openD3Form('Tutorial/DataSet/DataSet',true,{width: 1200, height: 900})" />
+     <cmpButton caption="Action"  onclick="openD3Form('Tutorial/Action/Action',true,{width: 1200, height: 900})" />
      <hr/>
      <cmpButton caption="Android D3extClient"  onclick="openD3Form('Tutorial/Android/alert',true,{width: 1200, height: 900})" />
      <hr/>

@@ -185,7 +185,6 @@ D3Api.D3Action = function(form,name,dom)
     {
         this.data = data;
         this.callEvent('onexecute');
-        
         for(var i = 0, c = this.datadest.length; i < c; i++)
         {
             var dest = this.datadest[i];

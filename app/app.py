@@ -14,7 +14,7 @@ import getform
 
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
-from DataBase.connect import SQL, SQLconnect
+
 
 app = Flask(__name__, static_folder='templates')
 app.secret_key = str(uuid.uuid1()).replace("-", "")

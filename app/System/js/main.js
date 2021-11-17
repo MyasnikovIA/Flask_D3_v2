@@ -2558,7 +2558,8 @@ D3Api.D3Form = function (name, xml) {
                         if (shnot !== false)
                         {
                             isError.push(name);
-                            D3Api.alert_msg(resObj[name].error);
+                            console.log(resObj[name].error);
+                            // D3Api.alert_msg(resObj[name].error);
                         }
                         D3Api.debug_msg(resObj[name].error);
                         break;

@@ -7,11 +7,15 @@ import ast
 import json
 import sys
 import hashlib
+import psycopg2
+
+import cx_Oracle
+
 import app
 from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap,nameElementMap
-from DataBase.connect import SQL, SQLconnect
+from DataBase.connect import DB
 
-import pandas
+import code
 import pandas.io.sql as psql
 
 from app import session
@@ -353,8 +357,10 @@ def getParsedForm(formName, cache, dataSetName="", session={}):
 def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
     """
     Инициализируем объекта переменных из входных параметров запросов , сессии и значений по умолчанию
+    !!!! НЕОБХОДИМО ОПТИМИЗИРОВАТЬ !!!!
     """
     argsQuery = {}
+    argsPutQuery = {}
     sessionVar = []
     for dataSetVarXml in dataSetXml.findall(f'cmp{typeQuery}Var'):
         key = dataSetVarXml.attrib.get("name")
@@ -387,6 +393,12 @@ def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
                 argsQuery[key] = paramsQuery.get(subKey)
                 del paramsQuery[subKey]
         elif not dataSetVarXml.attrib.get("put") == None:
+            if not dataSetVarXml.attrib.get("srctype") == None:
+                key = dataSetVarXml.attrib.get("name")
+                argsPutQuery[key] = dataSetVarXml.attrib.get("srctype")
+            else:
+                key = dataSetVarXml.attrib.get("name")
+                argsPutQuery[key] = "var"
             if dataSetVarXml.attrib.get("get") == None or len(dataSetVarXml.attrib.get("get")) == 0:
                 subKey = dataSetVarXml.attrib.get("name")
                 if paramsQuery.get(subKey) == None:
@@ -398,9 +410,10 @@ def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
                 subKey = dataSetVarXml.attrib.get("get")
                 argsQuery[key] = paramsQuery.get(subKey)
                 del paramsQuery[subKey]
+
     for key in paramsQuery:
         argsQuery[key] = paramsQuery[key]
-    return argsQuery, sessionVar
+    return argsQuery, sessionVar, argsPutQuery
 
 
 def joinDfrm(formName, rootForm):
@@ -552,7 +565,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     resObject[dataSetName]["type"] = typeQuery
     dataSetXml = getXMLObject(formName)
     # =============== Вставляем инициализированые переменные =======================
-    argsQuery, sessionVar = parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj)
+    argsQuery, sessionVar, argsPutQuery = parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj)
     varsDebug = {}
     if not int(sessionObj["AgentInfo"]['debug']) == 0:
         varsDebug = argsQuery.copy()
@@ -597,11 +610,10 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             if not int(sessionObj["AgentInfo"]['debug']) == 0:
                 resObject[dataSetName]["var"] = varsDebug
                 resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
-
             return json.dumps(resObject)
         else:
             # Если есть подключение к БД тогда выполняем SQL запрос
-            if not SQLconnect == None:
+            if not DB["SQLconnect"] == '':
                 resObject[dataSetName]["type"] = typeQuery
                 ext = argsQuery["_ext_"]
                 del argsQuery["_ext_"] # странная переменная
@@ -614,7 +626,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                    resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
                 # получение данных через pandas
                 try:
-                    df1 = psql.read_sql(sqlText, con=SQLconnect,params=argsQuery)
+                    df1 = psql.read_sql(sqlText, con=DB["SQLconnect"],params=argsQuery)
                     resObject[dataSetName]["data"] = json.loads(df1.to_json(orient="records"))
                     resObject[dataSetName]["locals"] = {}
                     resObject[dataSetName]["position"] = 0
@@ -635,6 +647,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                                "position": 0, "rowcount": 0}}
             return json.dumps(s)
     if typeQuery == "Action":
+        query_type = "psql"
         if "query_type" in dataSetXml.attrib:
             query_type = dataSetXml.attrib.get("query_type")
         if query_type == "server_python":  # выполнить Python скрипт
@@ -665,8 +678,6 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
         else:
             # Если есть подключение к БД тогда выполняем SQL запрос (Возвращаем именованные переменные)
             resObject[dataSetName]["type"] = typeQuery
-            ext = argsQuery["_ext_"]
-            del argsQuery["_ext_"]  # странная переменная
             sqlText = dataSetXml.text
             if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
                 # Дописать обработку вставок
@@ -675,24 +686,28 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 resObject[dataSetName]["var"] = varsDebug
                 resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
                 resObject[dataSetName]["sql"] = sqlText
-            # получение данных через pandas
+                resObject[dataSetName]["vars"] = argsQuery
+                resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
+                resObject[dataSetName]["sql"] = sqlText
+            cur = DB["SQLconnect"].cursor()
+            argsQuerySrc = argsQuery.copy()
+            for nam in argsPutQuery:
+                if DB['type'] == 'postgres':
+                    argsQuerySrc[nam] = cur.var(psycopg2.STRING)
+                if DB['type'] == 'oracle':
+                    argsQuerySrc[nam] = cur.var(cx_Oracle.STRING)
             try:
-                df1 = psql.read_sql(sqlText, con=SQLconnect, params=argsQuery)
-                resObject[dataSetName]["data"] = json.loads(df1.to_json(orient="records"))
-                resObject[dataSetName]["locals"] = {}
-                resObject[dataSetName]["position"] = 0
-                resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
+                cur.execute(sqlText, argsQuerySrc)
+                outVar = {}
+                for nam in argsPutQuery:
+                    outVar[nam] = argsQuerySrc[nam].getvalue()
+                resObject[dataSetName]["data"] = outVar
                 return json.dumps(resObject)
             except Exception as e:
-                resObject[dataSetName]["rowcount"] = 0
-                resObject[dataSetName]["position"] = 0
-                resObject[dataSetName]["locals"] = {}
-                resObject[dataSetName]["data"] = {}
                 resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
-                return json.dumps(resObject)
-            s = {dataSetName: {"type": typeQuery, "data": [], "locals": {}, "position": 0, "rowcount": 0}}
-            return json.dumps(s)
-
+                return json.dumps({dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}})
+            # s = {dataSetName: {"type": typeQuery, "data": [], "locals": {}, "position": 0, "rowcount": 0}}
+            return json.dumps(resObject)
     # print(ET.tostring(dataSetXml).decode())
     return json.dumps(resObject)
 
