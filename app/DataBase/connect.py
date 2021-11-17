@@ -1,13 +1,14 @@
 from Etc.conf import ConfigOptions
-from app import pd,psql
 
 # 'DatabaseName': 'sqlite:////sqllite.db',
 # 'DatabaseName': 'postgres://postgres:postgres@127.0.0.1:5432/flask_db',
 # 'DatabaseName': 'oracle://dev:dev@127.0.0.1:5432/flask_db',
 # 'DatabaseName': 'mysql+pymysql://admin:12345678@192.168.1.20:5155/myDB',
+import cx_Oracle
 
 SQL = None
 SQLconnect = None
+
 try:
     if 'DatabaseName' in ConfigOptions and len(ConfigOptions['DatabaseName'])>0:
         DatabaseName = ConfigOptions['DatabaseName']
@@ -40,14 +41,13 @@ try:
 
         if ConfigOptions['DatabaseName'].split(":")[0] == 'oracle':
             import cx_Oracle
-            SQLconnect = psycopg2.connect(database=SID, user=userName, password=userPass, host=ip, port=port)
             dsn_tns = cx_Oracle.makedsn(ip, port, SID)
             SQLconnect = cx_Oracle.connect(userName, userPass, dsn_tns)
             SQL = SQLconnect.cursor()
-
-            SQL.execute('''select ID,FULLNAME from D_V_LPU''');
-            for test in SQL:
-                print(test)
+            # ====================================================================
+            #SQL.execute('''select ID,FULLNAME from D_V_LPU''');
+            #for test in SQL:
+            #    print(test)
             # ====================================================================
             #import pandas as pd
             #import pandas.io.sql as psql

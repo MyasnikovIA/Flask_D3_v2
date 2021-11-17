@@ -5,8 +5,6 @@ import json
 import uuid
 import hashlib
 import shelve
-import pandas as pd
-import pandas.io.sql as psql
 from inspect import getfullargspec
 from pathlib import Path
 from flask import Flask, redirect, session, render_template, g

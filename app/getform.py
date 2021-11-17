@@ -11,6 +11,9 @@ import app
 from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap,nameElementMap
 from DataBase.connect import SQL, SQLconnect
 
+import pandas
+import pandas.io.sql as psql
+
 from app import session
 from pathlib import Path
 
@@ -73,6 +76,10 @@ def exec_then_eval(vars, code, sessionObj):
     vars["getSession"] = getSession
     vars["setSession"] = setSession
     vars["GLOBAL_DICT"] = GLOBAL_DICT
+    vars["SQLconnect"] = SQLconnect
+    vars["SQL"] = SQL
+    vars["PD"] = pandas
+    vars["PDSQL"] = psql
     _globals, _locals = vars, {}
     exec(compile(block, '<string>', mode='exec'), _globals, _locals)
     return eval(compile(last, '<string>', mode='eval'), _globals, _locals)
@@ -511,6 +518,9 @@ def getXMLObject(formName):
     return rootForm
 
 def runFormScript(funName,args,session):
+    """
+    обработка вызова компонента cmpServer
+    """
     resObject={}
     argsQuery = {}
     dataSetXml = getXMLObject(f"{funName[0]}:{funName[1]}")
@@ -590,8 +600,24 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
 
             return json.dumps(resObject)
         else:
-
-            # SQLconnect
+            if not SQLconnect == None:
+                ext = argsQuery["_ext_"]
+                del argsQuery["_ext_"] # странная переменная
+                sqlText = dataSetXml.text
+                if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
+                    # Дописать обработку вставок
+                    pass
+                # получение данных через pandas
+                try:
+                    df1 = psql.read_sql(sqlText, con=SQLconnect,params=argsQuery)
+                    resObjArr = json.loads(df1.to_json(orient="records"))
+                    s = {dataSetName: {"type": typeQuery, "data":resObjArr, "locals": {},"position": 0, "rowcount":len(resObjArr)}}
+                    return json.dumps(s)
+                except Exception as e:
+                    s = {dataSetName: {"type": typeQuery, "data":[], "locals": {},"position": 0, "rowcount":0, "error":f"An error occurred. Error number {e.args}.".split("\\n")}}
+                    return json.dumps(s)
+                s = {dataSetName: {"type": typeQuery, "data":[], "locals": {},"position": 0, "rowcount":0}}
+                return json.dumps(s)
 
             # дописать обработку SQL запроса
             s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {},
