@@ -15,7 +15,7 @@
         <![CDATA[
             select ID,FULLNAME
               from D_V_LPU
-             where  (id > :form_params)
+             where (id > :form_params)
         ]]>
         <cmpDataSetVar name="form_params" src="form_params" srctype="var"/>
     </cmpDataSet>

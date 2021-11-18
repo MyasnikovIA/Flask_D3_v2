@@ -8,12 +8,15 @@ import json
 import sys
 import hashlib
 import psycopg2
-
+import pandas as pd
 import cx_Oracle
+
+from sqlalchemy import  String, Numeric, Float, Boolean
 
 import app
 from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap,nameElementMap
 from DataBase.connect import DB
+# from System.serializer import serializer
 
 import code
 import pandas.io.sql as psql
@@ -80,10 +83,7 @@ def exec_then_eval(vars, code, sessionObj):
     vars["getSession"] = getSession
     vars["setSession"] = setSession
     vars["GLOBAL_DICT"] = GLOBAL_DICT
-    vars["SQLconnect"] = SQLconnect
-    vars["SQL"] = SQL
-    vars["PD"] = pandas
-    vars["PDSQL"] = psql
+    vars["SQL"] = DB['SQL']
     _globals, _locals = vars, {}
     exec(compile(block, '<string>', mode='exec'), _globals, _locals)
     return eval(compile(last, '<string>', mode='eval'), _globals, _locals)
@@ -613,7 +613,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             return json.dumps(resObject)
         else:
             # Если есть подключение к БД тогда выполняем SQL запрос
-            if not DB["SQLconnect"] == '':
+            if not DB["SQL"] == '':
                 resObject[dataSetName]["type"] = typeQuery
                 ext = argsQuery["_ext_"]
                 del argsQuery["_ext_"] # странная переменная
@@ -626,8 +626,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                    resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
                 # получение данных через pandas
                 try:
-                    df1 = psql.read_sql(sqlText, con=DB["SQLconnect"],params=argsQuery)
-                    resObject[dataSetName]["data"] = json.loads(df1.to_json(orient="records"))
+                    rows = DB['SQL'].execute(sqlText,argsQuery)
+                    resObject[dataSetName]["data"] = [dict(r) for r in rows] # переписать
+                    # resObject[dataSetName]["data"] = serializer(rows.instance, 'sqlalchemy')
                     resObject[dataSetName]["locals"] = {}
                     resObject[dataSetName]["position"] = 0
                     resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
@@ -676,7 +677,6 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 resObject[dataSetName]["sql"] = code
             return json.dumps(resObject)
         else:
-            # Если есть подключение к БД тогда выполняем SQL запрос (Возвращаем именованные переменные)
             resObject[dataSetName]["type"] = typeQuery
             sqlText = dataSetXml.text
             if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
@@ -686,27 +686,25 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 resObject[dataSetName]["var"] = varsDebug
                 resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
                 resObject[dataSetName]["sql"] = sqlText
-                resObject[dataSetName]["vars"] = argsQuery
-                resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
-                resObject[dataSetName]["sql"] = sqlText
-            cur = DB["SQLconnect"].cursor()
             argsQuerySrc = argsQuery.copy()
             for nam in argsPutQuery:
-                if DB['type'] == 'postgres':
-                    argsQuerySrc[nam] = cur.var(psycopg2.STRING)
-                if DB['type'] == 'oracle':
-                    argsQuerySrc[nam] = cur.var(cx_Oracle.STRING)
+                argsQuerySrc[nam] = String
+            print("argsQuerySrc",argsQuerySrc)
+            DB['SQL'].execute(sqlText, argsQuerySrc)
+
             try:
-                cur.execute(sqlText, argsQuerySrc)
+                DB["SQL"].commit()
+                print("argsQuerySrc",argsQuerySrc)
                 outVar = {}
                 for nam in argsPutQuery:
                     outVar[nam] = argsQuerySrc[nam].getvalue()
+                print("outVar", outVar)
                 resObject[dataSetName]["data"] = outVar
                 return json.dumps(resObject)
             except Exception as e:
                 resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
                 return json.dumps({dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}})
-            # s = {dataSetName: {"type": typeQuery, "data": [], "locals": {}, "position": 0, "rowcount": 0}}
+            s = {dataSetName: {"type": typeQuery, "data": [], "locals": {}, "position": 0, "rowcount": 0}}
             return json.dumps(resObject)
     # print(ET.tostring(dataSetXml).decode())
     return json.dumps(resObject)

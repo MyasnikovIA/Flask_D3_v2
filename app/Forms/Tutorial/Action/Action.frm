@@ -10,7 +10,7 @@
             }
        ]]>
    </cmpScript>
-   <cmpAction name="getMyDataSet" activateoncreate="true">
+   <cmpAction name="getMyDataSet22" activateoncreate="true">
         <![CDATA[
           begin
             :DIR_NUMB := '111111111111'||:form_params;
@@ -21,6 +21,14 @@
         <cmpActionVar name="DIR_NUMB"    src="DIR_NUMB"    srctype="var"  put="" />
         <cmpActionVar name="CTRL_NUMB"   src="CTRL_NUMB:caption"   srctype="ctrl" put="" />
         <cmpActionVar name="CTRL_INP"    src="CTRL_INP"    srctype="ctrl" />
+   </cmpAction>
+    <cmpAction name="getMyDataSet" activateoncreate="true">
+        <![CDATA[
+          begin
+            :CTRL_NUMB := '435345345';
+          end;
+        ]]>
+        <cmpActionVar name="CTRL_NUMB"   src="CTRL_NUMB:caption"   srctype="ctrl" put="" />
    </cmpAction>
    <cmpButton caption="Запуск запроса" onclick="Form.onExecDS()" />
    <cmpLabel name="CTRL_NUMB" caption="-----" />
