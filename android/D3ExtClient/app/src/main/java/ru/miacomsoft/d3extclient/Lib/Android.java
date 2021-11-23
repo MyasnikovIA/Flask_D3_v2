@@ -13,6 +13,7 @@ import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
@@ -44,6 +45,7 @@ public class Android {
     private long lastUpdate;
     private WebView webView;
     List<Sensor> mList;
+    public Voisee vois;
 //       webView.loadUrl("javascript: Accel="+jsonObject.toString()   );
 
 
@@ -62,9 +64,31 @@ public class Android {
 
             }
         });
-
+        webView.loadUrl("javascript: window.RecognizerText = function(text){ console.log('RecognizerText',text); };"  );
+        // распознование текста
+        vois = new Voisee((Context)activity) {
+            @Override
+            public void getRecognizerText(String text) {
+                // Выполнить
+                //mEdit.setText(text);
+                webView.loadUrl("javascript: window.RecognizerText(\""+text+"\");"  );
+            }
+            public void getRecognizerError(String text) {
+                // mEdit.setText(text);
+            }
+        };
+        vois.checkVoiceCommandPermission((Context)activity);
+        vois.start();
     }
 
+    /***
+     * Озвучить текст
+     * @param text
+     */
+    @JavascriptInterface
+    public void speech(String text) {
+        vois.send(text);
+    }
 
     /** Show a toast from the web page */
     @JavascriptInterface

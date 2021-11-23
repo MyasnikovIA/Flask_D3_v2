@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //android.voice.onDestroy(); // Остановить синтезатор речи tts!
+        android.vois.onDestroy(); // Остановить синтезатор речи tts!
     }
 
 
