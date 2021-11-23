@@ -1,6 +1,8 @@
 package ru.miacomsoft.d3extclient.Lib;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.Sensor;
@@ -8,9 +10,11 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.speech.tts.TextToSpeech;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -25,7 +29,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import ru.miacomsoft.d3extclient.MainActivity;
 
@@ -42,10 +48,21 @@ public class Android {
 
 
     private MainActivity parentActivity;
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public Android(MainActivity activity, WebView webViewPar)  {
         webView=webViewPar;
         parentActivity = activity;
         lastUpdate = System.currentTimeMillis();
+        /**
+         * This is an approved way to pass data back to the html page
+         */
+        webView.evaluateJavascript("alert('pass here some ...')", new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String s) {
+
+            }
+        });
+
     }
 
 
@@ -163,5 +180,36 @@ public class Android {
         return ipAddress;
     }
 
+
+    /**
+     * Включить распознование речи
+     */
+    @JavascriptInterface
+    public void SpeechRecognitionStart() {
+
+    }
+
+    /**
+     * Выключить распознование речи
+     */
+    @JavascriptInterface
+    public void SpeechRecognitionStop() {
+
+    }
+    /**
+     * Загрушка для JS функции
+     * Обработка результата распознования
+     */
+    @JavascriptInterface
+    public void SpeechRecognition(String text) {}
+
+    /**
+     * Проговорить  текстовое сообщение
+     * @param text
+     */
+    @JavascriptInterface
+    public void speak(String text) {
+
+    }
 
 }

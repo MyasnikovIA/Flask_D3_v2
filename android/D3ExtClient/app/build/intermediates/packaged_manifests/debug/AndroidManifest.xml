@@ -2,29 +2,30 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ru.miacomsoft.d3extclient"
     android:versionCode="1"
-    android:versionName="1.0" >
-
+    android:versionName="1.0" > <!-- Определить состояние подключения к интернету -->
+    <!-- uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" / -->
+    <!-- Отключить спящий режим при включенной программе -->
+    <!-- uses-permission android:name="android.permission.WAKE_LOCK"/ -->
+    <!-- Запуск при перезагрузки -->
+    <!-- uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/ -->
+    <!-- работа с внешней памятью -->
+    <!-- uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/ -->
+    <!-- uses-permission android:name="android.permission.WRITE_SETTINGS"/ -->
+    <!-- Чтение настроек телефона -->
+    <!-- uses-permission android:name="android.permission.READ_PHONE_STATE"/ -->
     <uses-sdk
         android:minSdkVersion="16"
         android:targetSdkVersion="30" />
 
-    <!-- Определить состояние подключения к интернету -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- Работа с микрофоном -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-    <!-- Отключить спящий режим при включенной программе -->
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Работа с сетью -->
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <!-- Запуск при перезагрузки -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <!-- работа с внешней памятью -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!-- uses-permission android:name="android.permission.WRITE_SETTINGS"/ -->
-    <!-- Чтение настроек телефона -->
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"

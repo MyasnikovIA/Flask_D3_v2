@@ -20,12 +20,12 @@
         "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\generated\\res\\pngs\\debug\\drawable-mdpi\\ic_launcher_background.png"
     },
     {
-        "merged": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\merged_res\\debug\\drawable-anydpi-v24_ic_launcher_foreground.xml.flat",
-        "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v24\\ic_launcher_foreground.xml"
-    },
-    {
         "merged": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\merged_res\\debug\\drawable-xhdpi_ic_launcher_background_old.png.flat",
         "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\generated\\res\\pngs\\debug\\drawable-xhdpi\\ic_launcher_background_old.png"
+    },
+    {
+        "merged": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\merged_res\\debug\\drawable-anydpi-v24_ic_launcher_foreground.xml.flat",
+        "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v24\\ic_launcher_foreground.xml"
     },
     {
         "merged": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\merged_res\\debug\\drawable-xxxhdpi_ic_launcher_background.png.flat",
@@ -36,12 +36,12 @@
         "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher.webp"
     },
     {
-        "merged": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\merged_res\\debug\\drawable_icon.png.flat",
-        "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\src\\main\\res\\drawable\\icon.png"
-    },
-    {
         "merged": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\merged_res\\debug\\drawable-xxxhdpi_ic_launcher_background_old.png.flat",
         "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\generated\\res\\pngs\\debug\\drawable-xxxhdpi\\ic_launcher_background_old.png"
+    },
+    {
+        "merged": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\merged_res\\debug\\drawable_icon.png.flat",
+        "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\src\\main\\res\\drawable\\icon.png"
     },
     {
         "merged": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\merged_res\\debug\\mipmap-xhdpi_ic_launcher_round.webp.flat",

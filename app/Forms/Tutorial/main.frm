@@ -26,4 +26,10 @@
      <hr/>
      <cmpButton caption="FormDesugner"  onclick="openD3Form('FormDesugner/main',true,{width: '100%', height: '100%'})" />
      <div name="MyDfrmBlock">-----------------</div>
+
+
+     <cmpButton caption="send" onclick=" Android.speech(' сообщение от системы '); " />
+
+
+
 </div>
