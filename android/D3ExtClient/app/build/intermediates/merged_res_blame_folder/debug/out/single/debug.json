@@ -100,6 +100,10 @@
         "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\generated\\res\\pngs\\debug\\drawable-ldpi\\ic_launcher_background.png"
     },
     {
+        "merged": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\merged_res\\debug\\layout_web_layout.xml.flat",
+        "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\src\\main\\res\\layout\\web_layout.xml"
+    },
+    {
         "merged": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\build\\intermediates\\merged_res\\debug\\mipmap-xhdpi_ic_launcher.webp.flat",
         "source": "F:\\AppServ\\var\\www\\Flask_D3_v2\\android\\D3ExtClient\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher.webp"
     },

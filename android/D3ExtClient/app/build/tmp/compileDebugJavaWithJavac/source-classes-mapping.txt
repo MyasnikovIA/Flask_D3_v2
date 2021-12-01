@@ -1,18 +1,15 @@
-ru/miacomsoft/d3extclient/Lib/UserWebClient.java
- ru.miacomsoft.d3extclient.Lib.UserWebClient
 ru/miacomsoft/d3extclient/BuildConfig.java
  ru.miacomsoft.d3extclient.BuildConfig
 ru/miacomsoft/d3extclient/Lib/UserWebChromeClient.java
  ru.miacomsoft.d3extclient.Lib.UserWebChromeClient
-ru/miacomsoft/d3extclient/Lib/Voisee.java
- ru.miacomsoft.d3extclient.Lib.Voisee
- ru.miacomsoft.d3extclient.Lib.Voisee$1
- ru.miacomsoft.d3extclient.Lib.Voisee$utteranceProgressListener
- ru.miacomsoft.d3extclient.Lib.Voisee$utteranceProgressListener$1
+ru/miacomsoft/d3extclient/Lib/UserWebClient.java
+ ru.miacomsoft.d3extclient.Lib.UserWebClient
+ru/miacomsoft/d3extclient/Lib/SQLLiteORM.java
+ ru.miacomsoft.d3extclient.Lib.SQLLiteORM
 ru/miacomsoft/d3extclient/MainActivity.java
  ru.miacomsoft.d3extclient.MainActivity
+ ru.miacomsoft.d3extclient.MainActivity$WebViewClient
 ru/miacomsoft/d3extclient/Lib/Android.java
  ru.miacomsoft.d3extclient.Lib.Android
  ru.miacomsoft.d3extclient.Lib.Android$1
  ru.miacomsoft.d3extclient.Lib.Android$2
- ru.miacomsoft.d3extclient.Lib.Android$3

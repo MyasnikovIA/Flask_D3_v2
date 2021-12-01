@@ -3,7 +3,9 @@ package ru.miacomsoft.d3extclient;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -11,8 +13,10 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.util.Locale;
 
 import ru.miacomsoft.d3extclient.Lib.Android;
+import ru.miacomsoft.d3extclient.Lib.SQLLiteORM;
 import ru.miacomsoft.d3extclient.Lib.UserWebChromeClient;
 import ru.miacomsoft.d3extclient.Lib.UserWebClient;
 
@@ -33,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
     public static WebView webView ;
     private Button button;
     private Android android; // JS библиотека обращения к модулям устройства Андроид
-
+    private ProgressBar progressBar;
+    SQLLiteORM sqlLocal;
     TextToSpeech tts;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -42,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        webView = new WebView(this);
+        //  webView = new WebView(this);
         button = (Button) findViewById(R.id.button);
         String urlText = loadConfig();
         if (urlText.length()==0){
@@ -70,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        android.vois.onDestroy(); // Остановить синтезатор речи tts!
+
     }
 
 
@@ -84,12 +90,18 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void runWebClient(String urlText) {
-        setContentView(webView);
-        webView.setWebViewClient(new UserWebClient());
-        webView.setWebChromeClient(new UserWebChromeClient());
+        setContentView(R.layout.web_layout);
+        sqlLocal = new SQLLiteORM(this);
+
+        webView = (WebView) findViewById(R.id.webview);
+        progressBar = findViewById(R.id.progressBar);
+        //webView = new WebView(this);
+        //setContentView(webView);
+        webView.setWebViewClient(new WebViewClient());
+        // webView.setWebChromeClient(new UserWebChromeClient());
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);  // Включить обработчик JS
-        android = new Android(this,webView);
+        android = new Android(this,webView,sqlLocal);
         webView.addJavascriptInterface(android, "Android");
         webView.loadUrl(urlText);
     }
@@ -102,6 +114,24 @@ public class MainActivity extends AppCompatActivity {
         EditText infoEdit = (EditText) findViewById(R.id.editText);
         infoEdit.setText(loadConfig());
     }
+
+    public class WebViewClient extends android.webkit.WebViewClient {
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            super.onPageStarted(view, url, favicon);
+        }
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
 
     /*
     //метод для сохранение строки json в файл (создание локальной базы)

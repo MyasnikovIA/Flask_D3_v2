@@ -15,6 +15,11 @@
                 canvas.addEventListener('touchleave', Form.touchleaveListener, false);
                 canvas.addEventListener('touchcancel', Form.touchcancelListener, false);
             }
+
+            window.RecognizerText = function(text) {
+               setValue('sendText',text);
+            }
+
             // обработка тачпада
             Form.touchstartListener = function(event){
                 var msg="touchstart - >";
@@ -76,6 +81,8 @@
      <div cmptype="tmp" name="alert_message">
           <h1>Функционал работать не будет , так как вы запустили форму не из  D3extClient (Android) </h1>
      </div>
+     <cmpEdit name="sendText" /> <cmpButton onclick=" Android.speech( getValue('sendText') ); " caption="проговорить текст" />
+
      <cmpButton caption="Alert"  onclick=" Android.alert('Tutorial/Android/alert')" />
      <cmpButton caption="Console.log"  onclick=" log('Tutorial/Android/alert',{'sdfsafsadf':'222222222'})" />
      <cmpButton caption="Console.log 2"  onclick=" console_log('Tutorial/Android/alert',{'sdfsafsadf':'32423423'})" />
@@ -92,5 +99,4 @@
      <h1>
           <cmpLabel name="info" caption="События тачпада"/>
      </h1>
-
 </div>

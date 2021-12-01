@@ -21,6 +21,9 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -44,17 +47,18 @@ import ru.miacomsoft.d3extclient.MainActivity;
 public class Android {
     private long lastUpdate;
     private WebView webView;
+    private SQLLiteORM sqlLocal;
     List<Sensor> mList;
-    public Voisee vois;
 //       webView.loadUrl("javascript: Accel="+jsonObject.toString()   );
 
-
     private MainActivity parentActivity;
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public Android(MainActivity activity, WebView webViewPar)  {
-        webView=webViewPar;
+    public Android(MainActivity activity, WebView webViewPar,SQLLiteORM sqlLocal) {
+        webView = webViewPar;
         parentActivity = activity;
         lastUpdate = System.currentTimeMillis();
+        this.sqlLocal =sqlLocal;
         /**
          * This is an approved way to pass data back to the html page
          */
@@ -64,31 +68,9 @@ public class Android {
 
             }
         });
-        webView.loadUrl("javascript: window.RecognizerText = function(text){ console.log('RecognizerText',text); };"  );
-        // распознование текста
-        vois = new Voisee((Context)activity) {
-            @Override
-            public void getRecognizerText(String text) {
-                // Выполнить
-                //mEdit.setText(text);
-                webView.loadUrl("javascript: window.RecognizerText(\""+text+"\");"  );
-            }
-            public void getRecognizerError(String text) {
-                // mEdit.setText(text);
-            }
-        };
-        vois.checkVoiceCommandPermission((Context)activity);
-        vois.start();
+        // webView.loadUrl("javascript: window.RecognizerText = function(text){ console.log('RecognizerText',text); };");
     }
 
-    /***
-     * Озвучить текст
-     * @param text
-     */
-    @JavascriptInterface
-    public void speech(String text) {
-        vois.send(text);
-    }
 
     /** Show a toast from the web page */
     @JavascriptInterface
@@ -203,37 +185,85 @@ public class Android {
         String ipAddress = Formatter.formatIpAddress(ip);
         return ipAddress;
     }
-
-
-    /**
-     * Включить распознование речи
+/// ===============================================================
+/// ----------------------------SQL lite --------------------------
+/// ===============================================================
+    /***
+     * Провенрка наличия таблицы в локальной SQLlite БД
+     * @param tableName
+     * @return
      */
     @JavascriptInterface
-    public void SpeechRecognitionStart() {
-
+    public boolean getIsExistTab(String tableName) {
+        return sqlLocal.getIsExistTab(tableName);
     }
 
     /**
-     * Выключить распознование речи
+     *  Получить запись с указанным ID номером из Таблицы
+     * @param tableName - имя таблицы
+     * @param id - идентификатор записи
+     * @return - JSON объект
      */
     @JavascriptInterface
-    public void SpeechRecognitionStop() {
-
+    public JSONObject getLocalSQL(String tableName,long id) {
+       return sqlLocal.getJson(tableName, id);
     }
-    /**
-     * Загрушка для JS функции
-     * Обработка результата распознования
+
+    /***
+     * Вставить JSON объект в таблицу
+     * @param tableName
+     * @param json
+     * @return
      */
     @JavascriptInterface
-    public void SpeechRecognition(String text) {}
-
-    /**
-     * Проговорить  текстовое сообщение
-     * @param text
-     */
-    @JavascriptInterface
-    public void speak(String text) {
-
+    public long insertJsonSQL(String tableName, JSONObject json) {
+        return sqlLocal.insertJsonSQL(tableName, json);
     }
+
+    /***
+     * Обновить JSON объект в таблицу ( если записи с ID нет, или таблицы, тогда  создастся таблица и добавиться запись
+     * @param tableName
+     * @param json
+     * @return
+     */
+    @JavascriptInterface
+    public long updateJsonSQL(String tableName, JSONObject json) {
+        return sqlLocal.updateJsonSQL(tableName, json);
+    }
+
+    /***
+     * Удаление таблицы
+     * @param tableName
+     */
+    @JavascriptInterface
+    public void dropTable(String tableName) {
+        sqlLocal.dropTable(tableName);
+    }
+
+    /***
+     *  Получить массив объектов  из таблици по условию
+     * @param tableName - Имя таблицы
+     * @param where - SQL условие
+     * @return
+     */
+    @JavascriptInterface
+    public JSONArray getJsonArray(String tableName , String where) {
+        return sqlLocal.getJsonArray(tableName,where);
+    }
+
+    /***
+     *  Получить массив объектов из SQL запроса
+     * @param SQLtext - SQL запрос
+     * @return
+     */
+    @JavascriptInterface
+    public JSONArray SQL(String SQLtext) {
+        return sqlLocal.sql(SQLtext,null);
+    }
+
+/// ===============================================================
+/// ===============================================================
+/// ===============================================================
+
 
 }
