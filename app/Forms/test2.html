@@ -4,15 +4,40 @@
         <title>Title</title>
     </head>
     <body name="eeeee">
-      adadada
+      1111111111111
       <cmpButton caption="test" onclick = "Form.onBtnTest2();"/>
-      <cmpScript>
-        <![CDATA[
-            Form.onBtnTest2 = function() {
-               alert(1)
-            }
-        ]]>
-    </cmpScript>
+      <cmpButton caption="getMyActionPython" onclick = "Form.onBtnTest3();"/>
+          <cmpScript>
+            <![CDATA[
+                Form.onBtnTest2 = function() {
+                   setVar("CTRL_NUMB","-----111----");
+                   executeAction('getMyDataSet', function(){
+                        console.log(  getVar("CTRL_NUMB") );
+                   });
+                }
+              Form.onBtnTest3 = function() {
+                   setVar("CTRL_NUMB","-------------------");
+                   executeAction('getMyActionPython', function(){
+                        console.log(  getVar("CTRL_NUMB") );
+                   });
+                }
+            ]]>
+        </cmpScript>
+        <cmpAction name="getMyDataSet" activateoncreate="true">
+            <![CDATA[
+              begin
+                 :CTRL_NUMB := 'zxfsadfsdf';
+              end;
+            ]]>
+            <cmpActionVar name="CTRL_NUMB"   src="CTRL_NUMB"   srctype="var" put="" />
+       </cmpAction>
+      <cmpAction name="getMyActionPython" activateoncreate="true" query_type="server_python">
+            <![CDATA[
+                CTRL_NUMB = f'sdgfgsd.fg?>sdfg?.sdfg.sd/f.gSDF.gSD?.fg?SD>fg  {CTRL_NUMB2}';
+            ]]>
+            <cmpActionVar name="CTRL_NUMB2"  src="CTRL_NUMB"  srctype="var" get="" />
+            <cmpActionVar name="CTRL_NUMB"   src="CTRL_NUMB"   srctype="var" put="" />
+       </cmpAction>
     </body>
 </html>
 

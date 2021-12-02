@@ -630,6 +630,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     #if not int(sessionObj["AgentInfo"]['debug']) == 0:
     #    varsDebug = argsQuery.copy()
     # =============================================================================
+    action_sql=""
+    if "action" in dataSetXml.attrib:
+        action_sql = dataSetXml.attrib.get("action")
     if typeQuery == "DataSet":
         query_type = "sql"
         if "query_type" in dataSetXml.attrib:
@@ -737,6 +740,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             #    resObject[dataSetName]["sql"] = code
             return json.dumps(resObject)
         else:
+            resObject[dataSetName]["data"]={}
             if not DB["SQL"] == '':
                 resObject[dataSetName]["type"] = typeQuery
                 sqlText = dataSetXml.text
@@ -747,27 +751,45 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 #    resObject[dataSetName]["var"] = varsDebug
                 #    resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
                 #    resObject[dataSetName]["sql"] = sqlText
-                argsQuerySrc = argsQuery.copy()
-                for nam in argsPutQuery:
-                    argsQuerySrc[nam] = String
-                #print("argsQuerySrc",argsQuerySrc)
-                print("sqlText, argsQuerySrc",sqlText, argsQuerySrc)
-                print("DB",DB)
-                DB['SQL'].execute(sqlText, argsQuerySrc)
 
-                try:
-                    DB["SQL"].commit()
-                    #print("argsQuerySrc",argsQuerySrc)
-                    outVar = {}
+                if DB['type'] == 'oracle':
+                    cur = DB["SQLconnect"].cursor()
+                    argsQuerySrc = argsQuery.copy()
+                    print("argsQuery",argsQuery)
                     for nam in argsPutQuery:
-                        outVar[nam] = argsQuerySrc[nam].getvalue()
-                    #print("outVar", outVar)
-                    resObject[dataSetName]["data"] = outVar
-                    return json.dumps(resObject)
-                except Exception as e:
-                    resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
-                    return json.dumps({dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}})
+                        argsQuerySrc[nam] = cur.var(cx_Oracle.STRING)
+                    try:
+                        cur.execute(sqlText, argsQuerySrc)
+                        outVar = {}
+                        for nam in argsPutQuery:
+                            outVar[nam] = argsQuerySrc[nam].getvalue()
+                        resObject[dataSetName]["data"] = outVar
+                        res = json.dumps(resObject)
+                    except Exception as e:
+                        resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
+                        res = json.dumps( {dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}})
+                    DB["SQLconnect"].commit()
+                    cur.close()
+                    return res
 
+                if DB['type'] == 'sqlite':
+                    # дописать поведение для SQL lite
+                    pass
+
+                if DB['type'] == 'postgres':
+                    # https://wiki.postgresql.org/wiki/Using_psycopg2_with_PostgreSQL
+                    cur = DB["SQLconnect"].cursor()
+                    if len(action_sql)>0:
+                        # https://www.postgresqltutorial.com/postgresql-python/postgresql-python-call-postgresql-functions/
+                        cur.callproc(action_sql,argsQuery )
+                        resObject[dataSetName]["data"] = cur.fetchone()[0]
+                    else:
+                        # Дописать проброс переменных в запрос
+                        cur.execute('SELECT version()')
+                        resObject[dataSetName]["data"] = cur.fetchone()[0]
+                    DB["SQLconnect"].commit()
+                    cur.close()
+                    return json.dumps(resObject)
             s = {dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}}
             return json.dumps(resObject)
     # print(ET.tostring(dataSetXml).decode())
