@@ -11,7 +11,8 @@ compList = ['Label','Form','Edit','Button' ,'Base','Window','ComboBox','CheckBox
             'OpenStreetMap',"OpenStreetMapLabel",'Tree','Server']
 
 def readCmpCss(name, ext=''):
-    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
+    # ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
+    ROOT_DIR = f"{os.path.dirname(Path(__file__).parent.absolute())}{os.sep}"
     cmpDirSrc = f'{ROOT_DIR}Components{os.sep}{name}{os.sep}css{os.sep}{name}.css'
     if os.path.exists(cmpDirSrc):
         with codecs.open(cmpDirSrc, encoding='utf-8') as f:

@@ -15,7 +15,6 @@ import getform
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
 
-
 app = Flask(__name__, static_folder='templates')
 app.secret_key = str(uuid.uuid1()).replace("-", "")
 app.config['CORS_HEADERS'] = 'Content-Type'
@@ -59,11 +58,10 @@ def after_request(response):
     header['Server'] = 'D3apiServer'
     return response
 
-
-#@app.errorhandler(404)
-#def not_found(error):
+# @app.errorhandler(404)
+# def not_found(error):
 #   return app.send_static_file('/templates/404.html'), 404
-#    return render_template('404.html', **locals()), 404
+#   return render_template('404.html', **locals()), 404
 
 @app.route('/')
 def example():
@@ -71,45 +69,55 @@ def example():
     # return app.send_static_file('index.html')
     return redirect("/index.html")
 
-
-@app.route('/~<name>', methods=['GET'])
-def d3theme_files(name):
-    if "d3theme" in name:
-        return d3theme_css(request), 200, {'content-type': 'text/css'}
-    if "d3main" in name:
-        return d3main_js(request), 200, {'content-type': 'application/x-javascript'}
-    return f"/* библиотека не найдена /~{name} */", 200, {'content-type': 'application/x-javascript'}
-
-
 def getParam(name, defoultValue=''):
     return request.args.get(name, default=defoultValue)
 
 
-@app.route('/<the_path>.php', methods=['GET', 'POST'])
-def getform_php_files(the_path):
-    session.permanent = True  # Включить сохранение сессии после закрытия браузера
-    # print(url_for("getform_php_files"))
-    if the_path == 'getform':
+@app.route('/<path:path>', methods=['GET', 'POST'])
+def all_files(path):
+    ext = path[path.rfind('.') + 1:].lower()
+    print(ext,path)
+    """
+    try:
+        # Инициализация информации об агенте()
+        if ext in ["html", "css", ".js"]:
+            getform.getAgentInfo(request)
+    except:
+        pass
+    """
+    ROOT_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}"
+    ROOT_FORM_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}Forms{os.sep}"
+    if '/~Cmp' in path and 'Components/' in path:
+        cmp = path[path.find('Components/') + len('Components/'): path.find('/~Cmp') - len('/~Cmp') + 1]
+        img = path[path.rfind("/"):]
+        pathImg = f"{ROOT_DIR}Components/{cmp}/images/default{img}.png"
+        bin, mime = sendCostumBin(pathImg)
+        return bin, 200, {'content-type': mime}
+
+    if 'Components/' in path:
+        pathImg = f"{ROOT_DIR}{path[path.find('Components/'):]}"
+        bin, mime = sendCostumBin(pathImg)
+        return bin, 200, {'content-type': mime}
+
+    if 'favicon.ico' in path:
+        pathImg = f"{ROOT_DIR}{path}"
+        bin, mime = sendCostumBin(pathImg)
+        return bin, 200, {'content-type': mime}
+
+    if "~d3theme" in path:
+        return d3theme_css(request), 200, {'content-type': 'text/css'}
+
+    if "~d3main" in path:
+        return d3main_js(request), 200, {'content-type': 'application/x-javascript'}
+
+    if "getform.php" in path:
         formName = getParam('Form')
         cache = getParam('cache')
         dataSetName = getParam('DataSet', "")
         frm = getform.getParsedForm(formName, cache, dataSetName, session)
         return frm, 200, {'content-type': 'application/plain'}
 
-    if the_path == "request":
-        resultTxt = "{}"
-        formName = getParam('Form')
-        cache = getParam('cache')
-        if request.method == 'POST':
-            dataSet = json.loads(request.form.get('request'))
-            for dataSetName in dataSet:
-                typeQuery = dataSet[dataSetName]["type"]
-                paramsQuery = dataSet[dataSetName]["params"]
-                resultTxt = getform.dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
-                # getRunAction(formName, cache, name, queryActionObject[name])
-        return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
-
-    if the_path == "runScript":
+    if "runScript.php" in path:
         scrArg = request.form.to_dict(flat=False)
         funName = str(scrArg['WEVENT'])[2:-2]
         args = json.loads(str(scrArg['ARGS'])[2:-2])
@@ -122,63 +130,38 @@ def getform_php_files(the_path):
         else:
             return f"""{{"error":"код с именем  '{funName}' не определено"}}""", 200, {
                 'content-type': 'application/json'}
-    """ 
-    if the_path == "upload":
-        username = request.cookies.get('username')
-        f = request.files['the_file']
-        f.save('uploads' + secure_filename(f.filename))
-    """
-    return f"""{{"error":"поведение для команды '{the_path}' не определено в app.py"}}""", 200, {
-        'content-type': 'application/json'}
 
-
-@app.route('/<path:path>')
-def all_files(path):
-    print(path)
-    try:
-        # Инициализация информации об агенте()
-        if path[-3:].lower() in ["tml", "css", ".js"]:
-            getform.getAgentInfo(request)
-    except:
-        pass
-    ROOT_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}"
-    ROOT_FORM_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}Forms{os.sep}"
-    if '/~Cmp' in path and 'Components/' in path:
-        cmp = path[path.find('Components/') + len('Components/'): path.find('/~Cmp') - len('/~Cmp') + 1]
-        img = path[path.rfind("/"):]
-        pathImg = f"{ROOT_DIR}Components/{cmp}/images/default{img}.png"
-        bin, mime = sendCostumBin(pathImg)
-        return bin, 200, {'content-type': mime}
-
-    if path == "System/js/sub_main.js":
-        pathHtml = f"{ROOT_DIR}{path.replace('/',os.sep)}"
-        print(pathHtml)
-        bin, mime = sendCostumBin(pathHtml)
-        return bin, 200, {'content-type': 'text/html'}
-
-    if 'favicon.ico' in path:
-        pathImg = f"{ROOT_DIR}{path}"
-        bin, mime = sendCostumBin(pathImg)
-        return bin, 200, {'content-type': mime}
-
-    if 'Components/' in path:
-        pathImg = f"{ROOT_DIR}{path}"
-        bin, mime = sendCostumBin(pathImg)
-        return bin, 200, {'content-type': mime}
+    if "request.php" in path:
+        resultTxt = "{}"
+        formName = getParam('Form')
+        cache = getParam('cache')
+        if request.method == 'POST':
+            dataSet = json.loads(request.form.get('request'))
+            for dataSetName in dataSet:
+                typeQuery = dataSet[dataSetName]["type"]
+                paramsQuery = dataSet[dataSetName]["params"]
+                resultTxt = getform.dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
+                # getRunAction(formName, cache, name, queryActionObject[name])
+        return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
 
     # Поиск запроса в каталоге форм
     pathHtmlFromForm = f"{ROOT_FORM_DIR}{path}"
     if os.path.isfile(pathHtmlFromForm):
         cache = getParam('cache')
         dataSetName = getParam('DataSet', "")
-        frm = getform.getParsedForm(path, cache, dataSetName, session)
-        return frm, 200, {'content-type': 'text/html'}
+        if ext == "frm":
+            frm = getform.getParsedForm(path, cache, dataSetName, session)
+            return frm, 200, {'content-type': 'text/html'}
+        else:
+            frm = getform.getParsedForm(path, cache, dataSetName, session)
+            return frm, 200, {'content-type': 'text/html'}
 
     if path[-3:].lower() in ["tml", "htm"]:
         return redirect("/index.html")
     return render_template('404.html', **locals()), 404
     # return app.render_template(path)
     # return app.send_static_file(path)
+
 
 if __name__ == '__main__':
     if "debug" in ConfigOptions and not int(ConfigOptions["debug"]) == 0:

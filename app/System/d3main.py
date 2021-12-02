@@ -4,6 +4,7 @@ import os
 import codecs
 import hashlib
 import getform
+from pathlib import Path
 from app import session
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
@@ -11,7 +12,7 @@ compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','Chec
             'OpenStreetMap',"OpenStreetMapLabel",'Tree','Server']
 
 def readfile(name):
-    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
+    ROOT_DIR = f"{os.path.dirname(Path(__file__).parent.absolute())}{os.sep}"
     cmpDirSrc = f'{ROOT_DIR}{os.sep}{name}'
     if os.path.exists(cmpDirSrc):
         with codecs.open(cmpDirSrc, encoding='utf-8') as f:
@@ -66,6 +67,8 @@ def getSrc(request):
 
     # Добавляем в фрэймворк информацию о платформе
     if "AgentInfo" in session:
+        res.append(f'\r var AGENT_INFO_PLATFORM = "{request.user_agent.platform}";')
+    elif request.user_agent:
         res.append(f'\r var AGENT_INFO_PLATFORM = "{request.user_agent.platform}";')
     # ============================================
 

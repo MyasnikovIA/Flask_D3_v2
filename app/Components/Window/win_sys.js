@@ -7854,6 +7854,7 @@ function showConfirm(message, title, width, height, confirmedCallback, cancelled
 }
 
 function openD3Form(name,modal,data) {
+    // Основная логика (почистить дубликаты функций app/Components/Window/system.js )
     if (!window['D3Api']) {
         alert('Не установлен D3.');
         return;
@@ -8113,7 +8114,11 @@ function openD3Form(name,modal,data) {
     if (modal) {
         D3Api.showForm(name, cont.getContainer(), data);
     } else {
-        D3Api.showForm(name, undefined, data);
+        // D3Api.showForm(name, undefined, data);
+        // D3Api.showForm(name, document.body, data);
+        // D3Api.showForm(name, document.getElementById('D3MainContainer'), data);
+        document.body.innerHTML = '';
+        D3Api.showForm(name, document.body, data);
     }
     return _page;
 }

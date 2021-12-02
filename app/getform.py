@@ -310,10 +310,24 @@ def getSrc(formName, cache, dataSetName="", session={}):
     """
     # cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
     ext = formName[formName.rfind('.') + 1:].lower()
-
     rootForm = getXMLObject(formName)
     sysinfoBlock, text = parseFrm(rootForm, formName, {}, 0, session)  # парсим форму
-    resTxt = [text]
+    resTxt = []
+    if ext=="frm":
+        resTxt.append("""
+        <html  lang="en"  ><head>
+            <meta charset="UTF-8"/>
+            <title>Title</title>
+            <link rel="stylesheet"  type="text/css"  href="./~d3theme"/>
+            <script src="./~d3main"></script></head>
+            <body>
+        """)
+        #if text[:4] == "<div":
+        #    text = f"<body {text[4:-6]}</body>"
+        resTxt.append(text)
+        resTxt.append("""</body></html>""")
+    else:
+        resTxt.append(text)
     resTxt.append('\n<div cmptype="sysinfo" style="display:none;">')
     for line in sysinfoBlock:
         resTxt.append(line)
@@ -529,16 +543,14 @@ def readFile(pathForm):
         if not "./~d3main" in xmlContentSrc and "</head>" in xmlContentSrc:
             arrTmp = xmlContentSrc.split("</head>")
             xmlContentSrc = f'{arrTmp[0]} <script type="text/javascript"  src="./~d3main"></script>\r\n</head>{arrTmp[1]}'
-
     # '<meta charset="UTF-8">'
     # https://tproger.ru/translations/regular-expression-python/
-    result = re.findall(r'/<meta[^<>]+>/g', xmlContentSrc)
-    print(result)
+    # result = re.findall(r'/<meta[^<>]+>/g', xmlContentSrc)
+    # print(result)
     if "</script>" in xmlContentSrc:
           #  Вставить <![CDATA[ ]] > в тэги  script  cmpScript
           #  желательно через регулярные вырожения
           pass
-
     return xmlContentSrc
 
 
@@ -551,7 +563,7 @@ def getXMLObject(formName):
         formName = formName.split(":")[0]
     formName = formName.replace("/", os.sep)
     ext = formName[formName.rfind('.') + 1:].lower()
-    if ext == "html":
+    if ext == "html" or ext == "frm":
         pathForm = f"{FORM_PATH}{os.sep}{formName}"
         pathUserForm = f"{USER_FORM_PATH}{os.sep}{formName}"
     else:
@@ -609,8 +621,8 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     # =============== Вставляем инициализированые переменные =======================
     argsQuery, sessionVar, argsPutQuery = parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj)
     varsDebug = {}
-    if not int(sessionObj["AgentInfo"]['debug']) == 0:
-        varsDebug = argsQuery.copy()
+    #if not int(sessionObj["AgentInfo"]['debug']) == 0:
+    #    varsDebug = argsQuery.copy()
     # =============================================================================
     if typeQuery == "DataSet":
         query_type = "sql"
@@ -649,9 +661,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             resObject[dataSetName]["type"] = typeQuery
             resObject[dataSetName]["position"] = 0
             resObject[dataSetName]["page"] = 0
-            if not int(sessionObj["AgentInfo"]['debug']) == 0:
-                resObject[dataSetName]["var"] = varsDebug
-                resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
+            #if not int(sessionObj["AgentInfo"]['debug']) == 0:
+            #    resObject[dataSetName]["var"] = varsDebug
+            #    resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
             return json.dumps(resObject)
         else:
             # Если есть подключение к БД тогда выполняем SQL запрос
@@ -663,9 +675,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
                     # Дописать обработку вставок
                     pass
-                if not int(sessionObj["AgentInfo"]['debug']) == 0:
-                   resObject[dataSetName]["var"] = varsDebug
-                   resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
+                #if not int(sessionObj["AgentInfo"]['debug']) == 0:
+                #   resObject[dataSetName]["var"] = varsDebug
+                #   resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
                 # получение данных через pandas
                 try:
                     rows = DB['SQL'].execute(sqlText,argsQuery)
@@ -713,10 +725,10 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             resObject[dataSetName]["data"] = dataVarReturn
             resObject[dataSetName]["type"] = typeQuery
             resObject[dataSetName]["uid"] = uid
-            if not int(sessionObj["AgentInfo"]['debug']) == 0:
-                resObject[dataSetName]["var"] = varsDebug
-                resObject[dataSetName]["sqlArr"] = [line for line in code.split("\n")]
-                resObject[dataSetName]["sql"] = code
+            #if not int(sessionObj["AgentInfo"]['debug']) == 0:
+            #    resObject[dataSetName]["var"] = varsDebug
+            #    resObject[dataSetName]["sqlArr"] = [line for line in code.split("\n")]
+            #    resObject[dataSetName]["sql"] = code
             return json.dumps(resObject)
         else:
             resObject[dataSetName]["type"] = typeQuery
@@ -724,10 +736,10 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
                 # Дописать обработку вставок
                 pass
-            if not int(sessionObj["AgentInfo"]['debug']) == 0:
-                resObject[dataSetName]["var"] = varsDebug
-                resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
-                resObject[dataSetName]["sql"] = sqlText
+            #if not int(sessionObj["AgentInfo"]['debug']) == 0:
+            #    resObject[dataSetName]["var"] = varsDebug
+            #    resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
+            #    resObject[dataSetName]["sql"] = sqlText
             argsQuerySrc = argsQuery.copy()
             for nam in argsPutQuery:
                 argsQuerySrc[nam] = String
