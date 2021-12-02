@@ -7,6 +7,7 @@ import ast
 import json
 import sys
 import hashlib
+import re
 import psycopg2
 import pandas as pd
 import cx_Oracle
@@ -125,8 +126,16 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
         data = " ".join(f' {k}="{v}"' for k, v in root.attrib.items())
     else:
         data = ""
-
     sysinfoBlock = []
+    # ====== костыль, элемент из списка, тогда выводим его и вложение без обработки =====
+    skipTag = ["script"]
+    if (root.tag in skipTag):
+        if root.text == None:
+            text = ""
+        else:
+            text = root.text
+        return sysinfoBlock, f"<{root.tag}{data}>{text}</{root.tag}>"
+    # ===================================================================================
     if 'cmptype' in root.keys():
         compName = root.attrib['cmptype']
     else:
@@ -146,7 +155,7 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
     attrib["session"] = session
     # дописать проверку наличия компонента файла
     compFileName = os.path.join(COMPONENT_PATH, compName, f'{compName}Ctrl.py')
-    if os.path.isfile(compFileName):
+    if os.path.isfile(compFileName) and not root.tag in skipTag:
         is_enyTag = 1
         defName = os.path.join('Components', compName, f'{compName}Ctrl.{compName}').replace(os.sep, ".")
         if not "name" in attrib:
@@ -156,7 +165,7 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
         nameElementMap[f'{formName}.{attrib["name"]}'] = [formName, attrib["name"]]
     else:
         is_enyTag = 0
-        defName = os.path.join('Components', "Html", f'HtmlCtrl.Html').replace(os.sep, ".")
+        defName = "Components.html.htmlCtrl.html"
     obj = getObjctClass(defName, attrs=attrib)
     if not root.text == None and root.tail == None:
         if is_enyTag == 0:
@@ -300,6 +309,8 @@ def getSrc(formName, cache, dataSetName="", session={}):
      Функция получения HTML кода из FRM
     """
     # cmpFiletmp = f"{cmpDirSrc}{os.sep}{agent_info['platform']}_{formName.replace(os.sep, '_')}{blockName}.frm"
+    ext = formName[formName.rfind('.') + 1:].lower()
+
     rootForm = getXMLObject(formName)
     sysinfoBlock, text = parseFrm(rootForm, formName, {}, 0, session)  # парсим форму
     resTxt = [text]
@@ -319,8 +330,11 @@ def getTemp(formName, cache, dataSetName, session):
         blockName = formName.split(":")[0]
         formName = formName.split(":")[1]
     cmpDirSrc = TEMP_DIR_PATH
-    cmpFiletmp = os.path.join(cmpDirSrc, session["AgentInfo"]['platform'],f"{formName.replace(os.sep, '_')}{blockName}.frm")
-
+    ext = formName[formName.rfind('.') + 1:].lower()
+    if ext == "html":
+       cmpFiletmp = os.path.join(cmpDirSrc, session["AgentInfo"]['platform'], f"{formName[:-5].replace(os.sep, '_')}{blockName}."+ext)
+    else:
+       cmpFiletmp = os.path.join(cmpDirSrc, session["AgentInfo"]['platform'], f"{formName.replace(os.sep, '_')}{blockName}.frm")
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
     txt = ""
@@ -503,6 +517,28 @@ def readFile(pathForm):
         return f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{pathForm}" not found </error>'
     with codecs.open(pathForm, 'r', encoding='utf8') as f:
         xmlContentSrc = f.read()
+    # нормализовать код  Вставить <![CDATA[ ]] > в тэги  script  cmpScript
+    ext = pathForm[pathForm.rfind('.') + 1:].lower()
+    if ext == "html":
+        # Добавляем CSS библиотеку, если её не указали на форме
+        if not "./~d3theme" in xmlContentSrc and "</head>" in xmlContentSrc:
+            arrTmp = xmlContentSrc.split("</head>")
+            xmlContentSrc = f'{arrTmp[0]} <link rel="stylesheet" type="text/css" href="./~d3theme"/>\r\n</head>{arrTmp[1]}'
+
+        # Добавляем js библиотеку, если её не указали на форме
+        if not "./~d3main" in xmlContentSrc and "</head>" in xmlContentSrc:
+            arrTmp = xmlContentSrc.split("</head>")
+            xmlContentSrc = f'{arrTmp[0]} <script type="text/javascript"  src="./~d3main"></script>\r\n</head>{arrTmp[1]}'
+
+    # '<meta charset="UTF-8">'
+    # https://tproger.ru/translations/regular-expression-python/
+    result = re.findall(r'/<meta[^<>]+>/g', xmlContentSrc)
+    print(result)
+    if "</script>" in xmlContentSrc:
+          #  Вставить <![CDATA[ ]] > в тэги  script  cmpScript
+          #  желательно через регулярные вырожения
+          pass
+
     return xmlContentSrc
 
 
@@ -514,10 +550,16 @@ def getXMLObject(formName):
         blockName = formName.split(":")[1]
         formName = formName.split(":")[0]
     formName = formName.replace("/", os.sep)
-    pathForm = f"{FORM_PATH}{os.sep}{formName}.frm"
-    pathUserForm = f"{USER_FORM_PATH}{os.sep}{formName}.frm"
+    ext = formName[formName.rfind('.') + 1:].lower()
+    if ext == "html":
+        pathForm = f"{FORM_PATH}{os.sep}{formName}"
+        pathUserForm = f"{USER_FORM_PATH}{os.sep}{formName}"
+    else:
+        pathForm = f"{FORM_PATH}{os.sep}{formName}.frm"
+        pathUserForm = f"{USER_FORM_PATH}{os.sep}{formName}.frm"
     if os.path.exists(pathUserForm):
         pathForm = pathUserForm
+
     xmlText = f'<?xml version="1.0" encoding="UTF-8" ?>\n{readFile(pathForm)}'
     rootForm = ET.fromstring(xmlText)
     rootForm = joinDfrm(formName, rootForm)
@@ -689,16 +731,16 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             argsQuerySrc = argsQuery.copy()
             for nam in argsPutQuery:
                 argsQuerySrc[nam] = String
-            print("argsQuerySrc",argsQuerySrc)
+            #print("argsQuerySrc",argsQuerySrc)
             DB['SQL'].execute(sqlText, argsQuerySrc)
 
             try:
                 DB["SQL"].commit()
-                print("argsQuerySrc",argsQuerySrc)
+                #print("argsQuerySrc",argsQuerySrc)
                 outVar = {}
                 for nam in argsPutQuery:
                     outVar[nam] = argsQuerySrc[nam].getvalue()
-                print("outVar", outVar)
+                #print("outVar", outVar)
                 resObject[dataSetName]["data"] = outVar
                 return json.dumps(resObject)
             except Exception as e:

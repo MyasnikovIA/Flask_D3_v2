@@ -5031,7 +5031,9 @@ function DDocument(dom) {
         if(window.SYS_current_theme == 'bars'){
             this.setVisible(false);
             maindom.style.height = '';
-            body.innerHTML = '';
+            if (body) {
+                body.innerHTML = ''; //2
+            }
         }
     }
     this.refresh = function () {

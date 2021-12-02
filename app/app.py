@@ -134,6 +134,7 @@ def getform_php_files(the_path):
 
 @app.route('/<path:path>')
 def all_files(path):
+    print(path)
     try:
         # Инициализация информации об агенте()
         if path[-3:].lower() in ["tml", "css", ".js"]:
@@ -141,6 +142,7 @@ def all_files(path):
     except:
         pass
     ROOT_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}"
+    ROOT_FORM_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}Forms{os.sep}"
     if '/~Cmp' in path and 'Components/' in path:
         cmp = path[path.find('Components/') + len('Components/'): path.find('/~Cmp') - len('/~Cmp') + 1]
         img = path[path.rfind("/"):]
@@ -148,10 +150,11 @@ def all_files(path):
         bin, mime = sendCostumBin(pathImg)
         return bin, 200, {'content-type': mime}
 
-    if path == "index.html" or path == "index.html/":
-        pathImg = f"{ROOT_DIR}index.html"
-        bin, mime = sendCostumBin(pathImg)
-        return bin, 200, {'content-type': mime}
+    if path == "System/js/sub_main.js":
+        pathHtml = f"{ROOT_DIR}{path.replace('/',os.sep)}"
+        print(pathHtml)
+        bin, mime = sendCostumBin(pathHtml)
+        return bin, 200, {'content-type': 'text/html'}
 
     if 'favicon.ico' in path:
         pathImg = f"{ROOT_DIR}{path}"
@@ -162,7 +165,15 @@ def all_files(path):
         pathImg = f"{ROOT_DIR}{path}"
         bin, mime = sendCostumBin(pathImg)
         return bin, 200, {'content-type': mime}
-    print(path)
+
+    # Поиск запроса в каталоге форм
+    pathHtmlFromForm = f"{ROOT_FORM_DIR}{path}"
+    if os.path.isfile(pathHtmlFromForm):
+        cache = getParam('cache')
+        dataSetName = getParam('DataSet', "")
+        frm = getform.getParsedForm(path, cache, dataSetName, session)
+        return frm, 200, {'content-type': 'text/html'}
+
     if path[-3:].lower() in ["tml", "htm"]:
         return redirect("/index.html")
     return render_template('404.html', **locals()), 404

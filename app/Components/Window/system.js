@@ -4,7 +4,7 @@ if (!window.SYS_current_theme) {
 if (typeof(window.SYS_is_theme_nochange) !=='boolean'){
      window.SYS_is_theme_nochange = true;
 }
-
+/*
 document.addEventListener('DOMContentLoaded', function() {
    var styleSheet = document.createElement("style");
    var text = document.createTextNode("* {filter: none !important; } \n.hidden {visibility: hidden;}");
@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
    }
    // D3Api.showForm('main', undefined, {history: false});
 }, true);
+*/
 
 var SYS_ROOTDOM =
     window.addEventListener || window.attachEvent
@@ -5078,7 +5079,9 @@ function DDocument(dom) {
         if(window.SYS_current_theme == 'bars'){
             this.setVisible(false);
             maindom.style.height = '';
-            body.innerHTML = '';
+            if (body) {
+                body.innerHTML = ''; //1
+            }
         }
     }
     this.refresh = function () {

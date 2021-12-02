@@ -113,9 +113,8 @@ def getSrc(request):
 
     # подключаем библиотеку OSM
     # res.append(readfile(session,'Components/OpenStreetMap/js/OpenLayers.js'))
-
-    #res.append(readfile('Components/Layout/js/Layout.js'))
-    #res.append(readfile('Components/LayoutSplit/js/LayoutSplit.js'))
+    # res.append(readfile('Components/Layout/js/Layout.js'))
+    # res.append(readfile('Components/LayoutSplit/js/LayoutSplit.js'))
     for cmp in compList:
         cmpDirSrc = f'Components{os.sep}{cmp}{os.sep}js{os.sep}{cmp}.js'
         res.append(readfile(cmpDirSrc))
@@ -124,7 +123,35 @@ def getSrc(request):
     res.append(f'\rD3Api.SYS_CACHE_UID = "{genCacheUid()}";')
     res.append('\rD3Api.SYS_CONFIG = {"formCache":false,"showDependence":false};')
     res.append('\rD3Api.SYS_CONFIG.debug = 1;')
-    res.append('\rD3Api.startInit = function (){};')
+    res.append('\rD3Api.startInit = function (){};\r')
+    #--------------------------------------
+    res.append("""
+ D3Api.MULTI_REQUEST = {"MAX_THREAD":"","MAX_REQUEST":""};
+ D3Api.cache_enabled = 0;
+ D3Api.startInit();
+ D3Api.init();
+ 
+ // D3Api.showForm('Tutorial/main', undefined, {history: false});
+window.addEventListener('DOMContentLoaded', function() {
+  D3Api.MainDom = document.body;
+  D3Api.D3MainContainer = D3Api.MainDom;
+  document.oncontextmenu="return D3Api.onContextMenuBody(event);";
+  var formText = D3Api.MainDom.outerHTML.replace("</body"+">", "")
+       .replace('<div cmptype=\"sysinfo\" style=\"display:none;\">', '</div><div cmptype=\"sysinfo\" style=\"display:none;\">')
+       .replace("<body ", "<div cmptype='Form' ");
+  D3Api.MainDom.innerHTML = '';
+  D3Api.MainDom.removeAttribute("name");
+  D3Api.MainDom.removeAttribute("class");
+  D3Api.MainDom.setAttribute("id","D3MainContainer");
+  
+  data = {};                                 // дописать инициализацию переменных
+  form = new D3Api.D3Form("main", formText); // дописать инициализацию имени открываемой формы 
+  form.show(data, D3Api.MainDom);
+  // cmptype="Form"
+  D3Api.MainDom = D3Api.MainDom.firstChild;
+  D3Api.D3MainContainer = D3Api.MainDom;
+},true);
+    """)
     # res.append(f'\rD3Api.agent_info = { json.dumps(agent_info)};')
     return "".join(res)
 
@@ -133,7 +160,6 @@ def show(request):
     if "AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0:
         return getTemp(request)
     return getSrc(request)
-
     #if get_option("TempDir") and (+get_option("debug"))<1:
     #    return getTemp(agent_info)
     #else:

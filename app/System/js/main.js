@@ -387,7 +387,10 @@ D3Api = new function () {
      * @param _peq {XMLHttpRequest}
      */
     function parseForm(xml,_peq) {
-        var formCache = _peq.getResponseHeader('FormCache');
+        var formCache = "";
+        if(_peq) {
+           formCache = _peq.getResponseHeader('FormCache');
+        }
         var fobj = D3Api.forms[this.hash];
         fobj.content = xml;
         fobj.status = 'ready';
