@@ -571,7 +571,6 @@ def getXMLObject(formName):
         pathUserForm = f"{USER_FORM_PATH}{os.sep}{formName}.frm"
     if os.path.exists(pathUserForm):
         pathForm = pathUserForm
-
     xmlText = f'<?xml version="1.0" encoding="UTF-8" ?>\n{readFile(pathForm)}'
     rootForm = ET.fromstring(xmlText)
     rootForm = joinDfrm(formName, rootForm)
@@ -580,8 +579,15 @@ def getXMLObject(formName):
         if len(nodes) > 0:
             rootForm = nodes[0]
         else:
-            rootForm = ET.fromstring(
-                f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{formName}" not found </error>')
+            nodes = rootForm.findall(f'*[@name="{blockName}"]')  # ишим фрагмент формы по атребуту имени
+            if len(nodes) > 0:
+                rootForm = nodes[0]
+            else:
+                nodes = rootForm.findall(f"""body""")[0].findall(f"""*[@name="{blockName}"]""")
+                if len(nodes) > 0:
+                    rootForm = nodes[0]
+                else:
+                    rootForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{formName}" not found </error>')
     return rootForm
 
 def runFormScript(funName,args,session):
@@ -731,34 +737,38 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             #    resObject[dataSetName]["sql"] = code
             return json.dumps(resObject)
         else:
-            resObject[dataSetName]["type"] = typeQuery
-            sqlText = dataSetXml.text
-            if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
-                # Дописать обработку вставок
-                pass
-            #if not int(sessionObj["AgentInfo"]['debug']) == 0:
-            #    resObject[dataSetName]["var"] = varsDebug
-            #    resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
-            #    resObject[dataSetName]["sql"] = sqlText
-            argsQuerySrc = argsQuery.copy()
-            for nam in argsPutQuery:
-                argsQuerySrc[nam] = String
-            #print("argsQuerySrc",argsQuerySrc)
-            DB['SQL'].execute(sqlText, argsQuerySrc)
-
-            try:
-                DB["SQL"].commit()
-                #print("argsQuerySrc",argsQuerySrc)
-                outVar = {}
+            if not DB["SQL"] == '':
+                resObject[dataSetName]["type"] = typeQuery
+                sqlText = dataSetXml.text
+                if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
+                    # Дописать обработку вставок
+                    pass
+                # if not int(sessionObj["AgentInfo"]['debug']) == 0:
+                #    resObject[dataSetName]["var"] = varsDebug
+                #    resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
+                #    resObject[dataSetName]["sql"] = sqlText
+                argsQuerySrc = argsQuery.copy()
                 for nam in argsPutQuery:
-                    outVar[nam] = argsQuerySrc[nam].getvalue()
-                #print("outVar", outVar)
-                resObject[dataSetName]["data"] = outVar
-                return json.dumps(resObject)
-            except Exception as e:
-                resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
-                return json.dumps({dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}})
-            s = {dataSetName: {"type": typeQuery, "data": [], "locals": {}, "position": 0, "rowcount": 0}}
+                    argsQuerySrc[nam] = String
+                #print("argsQuerySrc",argsQuerySrc)
+                print("sqlText, argsQuerySrc",sqlText, argsQuerySrc)
+                print("DB",DB)
+                DB['SQL'].execute(sqlText, argsQuerySrc)
+
+                try:
+                    DB["SQL"].commit()
+                    #print("argsQuerySrc",argsQuerySrc)
+                    outVar = {}
+                    for nam in argsPutQuery:
+                        outVar[nam] = argsQuerySrc[nam].getvalue()
+                    #print("outVar", outVar)
+                    resObject[dataSetName]["data"] = outVar
+                    return json.dumps(resObject)
+                except Exception as e:
+                    resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
+                    return json.dumps({dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}})
+
+            s = {dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}}
             return json.dumps(resObject)
     # print(ET.tostring(dataSetXml).decode())
     return json.dumps(resObject)

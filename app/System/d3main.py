@@ -6,6 +6,7 @@ import hashlib
 import getform
 from pathlib import Path
 from app import session
+from werkzeug.urls import url_parse
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
             'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl','Tabs',
@@ -128,32 +129,30 @@ def getSrc(request):
     res.append('\rD3Api.SYS_CONFIG.debug = 1;')
     res.append('\rD3Api.startInit = function (){};\r')
     #--------------------------------------
-    res.append("""
- D3Api.MULTI_REQUEST = {"MAX_THREAD":"","MAX_REQUEST":""};
+    res.append(f"""
+ D3Api.MULTI_REQUEST = {{"MAX_THREAD":"","MAX_REQUEST":""}};
  D3Api.cache_enabled = 0;
  D3Api.startInit();
  D3Api.init();
- 
- // D3Api.showForm('Tutorial/main', undefined, {history: false});
-window.addEventListener('DOMContentLoaded', function() {
-  D3Api.MainDom = document.body;
-  D3Api.D3MainContainer = D3Api.MainDom;
-  document.oncontextmenu="return D3Api.onContextMenuBody(event);";
-  var formText = D3Api.MainDom.outerHTML.replace("</body"+">", "")
-       .replace('<div cmptype=\"sysinfo\" style=\"display:none;\">', '</div><div cmptype=\"sysinfo\" style=\"display:none;\">')
-       .replace("<body ", "<div cmptype='Form' ");
-  D3Api.MainDom.innerHTML = '';
-  D3Api.MainDom.removeAttribute("name");
-  D3Api.MainDom.removeAttribute("class");
-  D3Api.MainDom.setAttribute("id","D3MainContainer");
-  
-  data = {};                                 // дописать инициализацию переменных
-  form = new D3Api.D3Form("main", formText); // дописать инициализацию имени открываемой формы 
-  form.show(data, D3Api.MainDom);
-  // cmptype="Form"
-  D3Api.MainDom = D3Api.MainDom.firstChild;
-  D3Api.D3MainContainer = D3Api.MainDom;
-},true);
+ // D3Api.showForm('Tutorial/main', undefined, {{history: false}});
+ window.addEventListener('DOMContentLoaded', function() {{
+      D3Api.MainDom = document.body;
+      D3Api.D3MainContainer = D3Api.MainDom;
+      document.oncontextmenu="return D3Api.onContextMenuBody(event);";
+      var formText = D3Api.MainDom.outerHTML.replace("</body"+">", "")
+           .replace('<div cmptype=\"sysinfo\" style=\"display:none;\">', '</div><div cmptype=\"sysinfo\" style=\"display:none;\">')
+           .replace("<body ", "<div cmptype='Form' ");
+      D3Api.MainDom.innerHTML = '';
+      D3Api.MainDom.removeAttribute("name");
+      D3Api.MainDom.removeAttribute("class");
+      D3Api.MainDom.setAttribute("id","D3MainContainer");
+      data = {{}};                                 // дописать инициализацию переменных
+      form = new D3Api.D3Form("{url_parse(request.referrer).path[1:]}", formText); // дописать инициализацию имени открываемой формы 
+      form.show(data, D3Api.MainDom);
+      // cmptype="Form"
+      D3Api.MainDom = D3Api.MainDom.firstChild;
+      D3Api.D3MainContainer = D3Api.MainDom;
+ }},true);
     """)
     # res.append(f'\rD3Api.agent_info = { json.dumps(agent_info)};')
     return "".join(res)

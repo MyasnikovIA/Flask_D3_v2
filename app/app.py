@@ -10,6 +10,7 @@ from pathlib import Path
 from flask import Flask, redirect, session, render_template, g
 from flask import request, jsonify
 from Etc.conf import ConfigOptions, nameElementHeshMap, nameElementMap
+from werkzeug.urls import url_parse
 import getform
 
 from System.d3main import show as d3main_js
@@ -140,6 +141,8 @@ def all_files(path):
             for dataSetName in dataSet:
                 typeQuery = dataSet[dataSetName]["type"]
                 paramsQuery = dataSet[dataSetName]["params"]
+                if len(formName) == 0:
+                    formName = url_parse(request.referrer).path[1:]
                 resultTxt = getform.dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
                 # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
