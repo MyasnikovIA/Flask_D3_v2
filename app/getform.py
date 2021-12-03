@@ -757,7 +757,6 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 if DB['type'] == 'oracle':
                     cur = DB["SQLconnect"].cursor()
                     argsQuerySrc = argsQuery.copy()
-                    print("argsQuery",argsQuery)
                     for nam in argsPutQuery:
                         argsQuerySrc[nam] = cur.var(cx_Oracle.STRING)
                     try:
