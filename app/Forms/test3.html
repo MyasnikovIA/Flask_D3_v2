@@ -5,11 +5,16 @@
     </head>
     <body name="eeeee">
       1111111111111
-      <cmpButton caption="test" onclick = "Form.onBtnTest2();"/>
+      <cmpButton caption="открыть окно test4.html" onclick = "Form.onBtnTest4();"/>
+      <cmpButton caption="открыть окно test5.html (модально)" onclick = "Form.onBtnTest5();"/>
+
           <cmpScript>
             <![CDATA[
-                Form.onBtnTest2 = function() {
-                    win = openD3Form('test4.html',false,{width: 700, height: 300, vars: { test:"11111"}});
+                Form.onBtnTest4 = function() {
+                    win = openD3Form('test4.html', false, {width: 700, height: 300, vars: { test:"11111"}});
+                }
+                Form.onBtnTest5 = function() {
+                    win = openD3Form('test5.html', true, {width: 700, height: 300, vars: { test:"11111"}});
                 }
             ]]>
         </cmpScript>
