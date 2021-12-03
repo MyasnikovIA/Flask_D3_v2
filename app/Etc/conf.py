@@ -4,16 +4,19 @@ import os,shelve
 
 global ConfigOptions
 ConfigOptions = {
-    'DatabaseName': '',
+    #'DatabaseName': 'postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/flask_db',
+    'DatabaseName': 'oracle://dev:def@192.168.228.41:1521/med2dev',
+
+    # 'DatabaseName': '',
+    # 'DatabaseName': 'sqlite:///:memory:',
     # 'DatabaseName': 'sqlite:////sqllite.db',
     #'DatabaseName': 'postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/flask_db',
     # 'DatabaseName': 'oracle+cx_oracle://dev:dev@192.168.0.1:1521/MyBD',
-    # 'DatabaseName': 'oracle://dev:dev@192.168.228.41:1521/med2dev',
     # 'DatabaseName': 'mysql+pymysql://admin:12345678@192.168.1.20:5155/myDB',
     'OutCodePage': 'UTF-8',
     'FormEncoding': 'UTF8',
     'DatabaseCharset': 'UTF8',
-    'debug': "1",
+    'debug': "0",
     'Extensions': {'path': 'Extensions/', 'only': ['mis']},
     'TempDir': 'temp/',
     'fs_store_dir': f'../file_storage{os.sep}',
