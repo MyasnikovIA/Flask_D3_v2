@@ -1,5 +1,5 @@
 from Etc.conf import ConfigOptions
-
+# https://docs.peewee-orm.com/en/latest/peewee/database.html
 # https://www.pythonsheets.com/notes/python-sqlalchemy.html
 # ConfigOptions['DatabaseName'] = 'postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/flask_db'
 
@@ -96,3 +96,50 @@ try:
 except:
     print("ошибка подключения к БД", ConfigOptions['DatabaseName'])
     DB = {'SQL': '', 'SQLconnect': '', 'META': '', 'TABLE': {}}
+
+
+
+
+
+"""
+пример Oracle
+
+import cx_Oracle
+
+ip = '192.168.228.41'
+port = 1521
+SID = 'med2dev'
+dsn_tns = cx_Oracle.makedsn(ip, port, SID)
+
+
+SQL_BLOCK = '''
+                    DECLARE
+                      v_first   NUMBER;
+                      v_second  NUMBER;
+                      v_result  NUMBER;
+                    BEGIN
+                      v_first  := :i_first;   
+                      v_second := :i_second;  
+                      v_result := (v_first + v_second) / 2;
+                      :o_result := v_result;  
+                      :test := v_result;  
+                    END;
+'''
+
+
+SQLconnect = cx_Oracle.connect('dev', 'def', dsn_tns)
+cur = SQLconnect.cursor()
+
+param = {'i_first':23, 'i_second':55}
+param['o_result']= cur.var(cx_Oracle.STRING) # (2)
+param['test']= cur.var(cx_Oracle.STRING) # (2)
+
+# param = dict(i_first=23, i_second=55, o_result=o_result,test=test)
+
+cur.execute(SQL_BLOCK,param) # (3)
+res = param['o_result'].getvalue()
+test = param['test'].getvalue()
+
+print(f'Average of 23 and 55 is: {res} - {test} ')
+
+"""
