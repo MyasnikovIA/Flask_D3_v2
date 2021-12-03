@@ -12,33 +12,28 @@
                   console.log("DIR_NUMB", getVar("DIR_NUMB"));
                });
             }
-
        ]]>
    </cmpScript>
-    <cmpAction name="getMyAction" activateoncreate="true">
-        <![CDATA[
-          begin
-            :CTRL_NUMB := 'Запрос из getMyDataSet: 123456 ';
-          end;
-        ]]>
-        <cmpActionVar name="CTRL_NUMB"   src="CTRL_NUMB:caption"   srctype="ctrl" put="" />
+   <cmpAction name="getMyAction" activateoncreate="true">
+       <![CDATA[
+          select 'Запрос из getMyDataSet: 123456 ' as CTRL_NUMB
+       ]]>
+       <cmpActionVar name="ctrl_numb"   src="CTRL_NUMB:caption"   srctype="ctrl" put="" />
    </cmpAction>
-
    <cmpButton caption="Запуск запроса getMyAction" onclick="Form.onExecAction()" />
    <cmpLabel name="CTRL_NUMB" caption="-----" />
    <br/>
    <br/>=============================================================================
    <cmpAction name="getMyActionV2" activateoncreate="true">
         <![CDATA[
-          begin
-            :DIR_NUMB     := 'Переменная измененая в Actio = '||:form_params;
-            :RESULT_LABEL := 'cmpEdit=' || :CTRL_INP ;
-          end;
+          select
+             'Переменная измененая в Actio = '||%(form_params)s as DIR_NUMB
+            ,'cmpEdit=' || %(CTRL_INP)s as RESULT_LABEL
         ]]>
         <cmpActionVar name="form_params"   src="form_params" srctype="var" />
         <cmpActionVar name="DIR_NUMB"      src="DIR_NUMB:caption"      put="" srctype="ctrl"/>
         <cmpActionVar name="DIR_NUMB"      src="DIR_NUMB"              put="" srctype="var" />
-        <cmpActionVar name="RESULT_LABEL"  src="RESULT_LABEL:caption"  put="" srctype="ctrl"/>
+        <cmpActionVar name="result_label"  src="RESULT_LABEL:caption"  put="" srctype="ctrl"/>
         <cmpActionVar name="CTRL_INP"      src="CTRL_INP"    srctype="ctrl" />
    </cmpAction>
 

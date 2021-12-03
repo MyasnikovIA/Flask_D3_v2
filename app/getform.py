@@ -620,6 +620,18 @@ def query_db(query, args=(), one=False):
     cur.close()
     return (r[0] if r else None) if one else r
 
+def query_function(function_name, args=(), one=False):
+    """
+     Получение JSON обьекта из SQL запроса
+    """
+    cur = DB["SQLconnect"].cursor()
+    cur.callproc('function_name', args)
+    r = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
+    #cur.connection.close()
+    DB["SQLconnect"].commit()
+    cur.close()
+    return (r[0] if r else None) if one else r
+
 def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     """
     Функция обработки запросов DataSet и Action с клиентских форм
@@ -768,7 +780,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                         res = json.dumps(resObject)
                     except Exception as e:
                         resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
-                        res = json.dumps( {dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}})
+                        res = json.dumps({dataSetName: {"type": typeQuery, "data": {}, "locals": {} }})
                     DB["SQLconnect"].commit()
                     cur.close()
                     return res
@@ -778,7 +790,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                     # https://stackoverflow.com/questions/3286525/return-sql-table-as-json-in-python
                     try:
                         # получем первую строку из  простого запроса (необходимо переписать на логику аналогично Oracle Begin End;)
-                        resObject[dataSetName]["data"] = query_db(action_sql, args=argsQuery, one=True)
+                        resObject[dataSetName]["data"] = query_db(sqlText, args=argsQuery, one=True)
                     except Exception as e:
                         resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
                     return json.dumps(resObject)
@@ -786,11 +798,31 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 if DB['type'] == 'postgres':
                     # https://wiki.postgresql.org/wiki/Using_psycopg2_with_PostgreSQL
                     # https://www.postgresqltutorial.com/postgresql-python/postgresql-python-call-postgresql-functions/
-                    try:
-                        # получем первую строку из  простого запроса (необходимо переписать на логику аналогично Oracle Begin End;)
-                        resObject[dataSetName]["data"] = query_db(action_sql, args=argsQuery, one=True)
-                    except Exception as e:
-                        resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
+                    if len(action_sql) > 0:
+                        try:
+                            # получем первую строку из  простого запроса (необходимо переписать на логику аналогично Oracle Begin End;)
+                            data = query_function(action_sql, args=argsQuery, one=True)
+                            resObj={}
+                            for key in argsQuery:
+                                if key.lower() in data:
+                                    resObj[key] = data[key.lower()]
+                                else:
+                                    resObj[key] = argsQuery[key]
+                            resObject[dataSetName]["data"] = resObj
+                        except Exception as e:
+                            resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
+                    else:
+                        try:
+                            data = query_db(sqlText, args=argsQuery, one=True)
+                            resObj={}
+                            for key in argsQuery:
+                                if key.lower() in data:
+                                    resObj[key] = data[key.lower()]
+                                else:
+                                    resObj[key] = argsQuery[key]
+                            resObject[dataSetName]["data"] = resObj
+                        except Exception as e:
+                            resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
                     return json.dumps(resObject)
 
             s = {dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}}
