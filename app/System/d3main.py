@@ -149,9 +149,19 @@ def getSrc(request):
       data = {{}};                                 // дописать инициализацию переменных
       form = new D3Api.D3Form("{url_parse(request.referrer).path[1:]}", formText); // дописать инициализацию имени открываемой формы 
       form.show(data, D3Api.MainDom);
-      // cmptype="Form"
       D3Api.MainDom = D3Api.MainDom.firstChild;
       D3Api.D3MainContainer = D3Api.MainDom;
+      // Получение переменных из родительского окна
+      var dataItemsName = "D3(tmp):/{url_parse(request.referrer).path[1:]}:history_state";
+      if (localStorage.getItem(dataItemsName)) {{
+         var formObj = JSON.parse(localStorage.getItem(dataItemsName));
+         localStorage.removeItem(dataItemsName);
+         if ( (formObj['data']) && (formObj['data']['vars']) ) {{
+            for (var key in formObj["data"]['vars']) {{
+               D3Api.setVar(key, formObj["data"]['vars'][key]);
+            }}
+         }}
+      }}
  }},true);
     """)
     # res.append(f'\rD3Api.agent_info = { json.dumps(agent_info)};')
