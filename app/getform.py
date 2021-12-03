@@ -608,6 +608,17 @@ def runFormScript(funName,args,session):
       resObject["error"] = f"{funName[0]} : {funName[1]} :{sys.exc_info()}"
     return json.dumps(localVariableTemp)
 
+def query_db(query, args=(), one=False):
+    """
+     Получение JSON обьекта из SQL запроса
+    """
+    cur = DB["SQLconnect"].cursor()
+    cur.execute(query, args)
+    r = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
+    #cur.connection.close()
+    DB["SQLconnect"].commit()
+    cur.close()
+    return (r[0] if r else None) if one else r
 
 def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     """
@@ -685,31 +696,23 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                     # Дописать обработку вставок
                     pass
                 #if not int(sessionObj["AgentInfo"]['debug']) == 0:
-                #   resObject[dataSetName]["var"] = varsDebug
-                #   resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
-                # получение данных через pandas
+                #resObject[dataSetName]["var"] = varsDebug
+                #resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
                 try:
-                    rows = DB['SQL'].execute(sqlText,argsQuery)
-                    resObject[dataSetName]["data"] = [dict(r) for r in rows] # переписать
-                    # resObject[dataSetName]["data"] = serializer(rows.instance, 'sqlalchemy')
-                    resObject[dataSetName]["locals"] = {}
-                    resObject[dataSetName]["position"] = 0
+                    resObject[dataSetName]["data"] = query_db(sqlText, argsQuery)
                     resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
-                    return json.dumps(resObject)
+                    resObject[dataSetName]["position"] = 0
                 except Exception as e:
                     resObject[dataSetName]["rowcount"] = 0
                     resObject[dataSetName]["position"] = 0
                     resObject[dataSetName]["locals"] = {}
                     resObject[dataSetName]["data"] = []
                     resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
-                    return json.dumps(resObject)
-                s = {dataSetName: {"type": typeQuery, "data":[], "locals": {},"position": 0, "rowcount":0}}
-                return json.dumps(s)
-
-            # дописать обработку SQL запроса
-            s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {},
-                               "position": 0, "rowcount": 0}}
-            return json.dumps(s)
+                return json.dumps(resObject)
+        # дописать обработку SQL запроса
+        s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {},
+                           "position": 0, "rowcount": 0}}
+        return json.dumps(s)
     if typeQuery == "Action":
         query_type = "psql"
         if "query_type" in dataSetXml.attrib:
@@ -751,7 +754,6 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 #    resObject[dataSetName]["var"] = varsDebug
                 #    resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
                 #    resObject[dataSetName]["sql"] = sqlText
-
                 if DB['type'] == 'oracle':
                     cur = DB["SQLconnect"].cursor()
                     argsQuerySrc = argsQuery.copy()
@@ -774,22 +776,24 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
 
                 if DB['type'] == 'sqlite':
                     # дописать поведение для SQL lite
-                    pass
+                    # https://stackoverflow.com/questions/3286525/return-sql-table-as-json-in-python
+                    try:
+                        # получем первую строку из  простого запроса (необходимо переписать на логику аналогично Oracle Begin End;)
+                        resObject[dataSetName]["data"] = query_db(action_sql, args=argsQuery, one=True)
+                    except Exception as e:
+                        resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
+                    return json.dumps(resObject)
 
                 if DB['type'] == 'postgres':
                     # https://wiki.postgresql.org/wiki/Using_psycopg2_with_PostgreSQL
-                    cur = DB["SQLconnect"].cursor()
-                    if len(action_sql)>0:
-                        # https://www.postgresqltutorial.com/postgresql-python/postgresql-python-call-postgresql-functions/
-                        cur.callproc(action_sql,argsQuery )
-                        resObject[dataSetName]["data"] = cur.fetchone()[0]
-                    else:
-                        # Дописать проброс переменных в запрос
-                        cur.execute('SELECT version()')
-                        resObject[dataSetName]["data"] = cur.fetchone()[0]
-                    DB["SQLconnect"].commit()
-                    cur.close()
+                    # https://www.postgresqltutorial.com/postgresql-python/postgresql-python-call-postgresql-functions/
+                    try:
+                        # получем первую строку из  простого запроса (необходимо переписать на логику аналогично Oracle Begin End;)
+                        resObject[dataSetName]["data"] = query_db(action_sql, args=argsQuery, one=True)
+                    except Exception as e:
+                        resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
                     return json.dumps(resObject)
+
             s = {dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}}
             return json.dumps(resObject)
     # print(ET.tostring(dataSetXml).decode())

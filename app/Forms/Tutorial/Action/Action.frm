@@ -25,11 +25,12 @@
     <cmpAction name="getMyDataSet" activateoncreate="true">
         <![CDATA[
           begin
-            :CTRL_NUMB := '435345345';
+            :CTRL_NUMB := '-*-*-*-*-*';
           end;
         ]]>
         <cmpActionVar name="CTRL_NUMB"   src="CTRL_NUMB:caption"   srctype="ctrl" put="" />
    </cmpAction>
+
    <cmpButton caption="Запуск запроса" onclick="Form.onExecDS()" />
    <cmpLabel name="CTRL_NUMB" caption="-----" />
    <cmpEdit name="CTRL_INP"  />

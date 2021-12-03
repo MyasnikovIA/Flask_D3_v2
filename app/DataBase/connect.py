@@ -51,6 +51,7 @@ try:
             DB['type'] = 'postgres'
             import psycopg2  # PostgreSQL
             DB['SQLconnect'] = psycopg2.connect(database=SID, user=userName, password=userPass, host=ip, port=port)
+            DB['SQLconnect'].autocommit = True
             DB['SQL'] = DB['SQLconnect'].cursor()
             DB['Type']['String'] = psycopg2.STRING
             DB['Type']['Number'] = psycopg2.NUMBER
@@ -59,6 +60,7 @@ try:
             # SQLconnect.close()
 
         if ConfigOptions['DatabaseName'].split(":")[0] == 'sqlite':
+            # https://stackoverflow.com/questions/3286525/return-sql-table-as-json-in-python
             DB['type'] = 'sqlite'
             import sqlite3  # SQLite
             DB['SQLconnect'] = sqlite3.connect(
