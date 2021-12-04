@@ -151,6 +151,10 @@ def getSrc(request):
       form.show(data, D3Api.MainDom);
       D3Api.MainDom = D3Api.MainDom.firstChild;
       D3Api.D3MainContainer = D3Api.MainDom;
+      D3Api.isFrameWindow = false; // окно открыто внутри IFRAME
+      if (window.frames.frameElement) {{
+         D3Api.isFrameWindow = true;
+      }}
       // Получение переменных из родительского окна
       var dataItemsName = "D3(tmp):/{url_parse(request.referrer).path[1:]}:history_state";
       if (localStorage.getItem(dataItemsName)) {{

@@ -7,6 +7,7 @@
       1111111111111
       <cmpButton caption="открыть окно test4.html" onclick = "Form.onBtnTest4();"/>
       <cmpButton caption="открыть окно test5.html (модально)" onclick = "Form.onBtnTest5();"/>
+      <cmpButton caption="открыть окно index.html (модально)" onclick = "Form.onBtnTest6();"/>
 
           <cmpScript>
             <![CDATA[
@@ -15,6 +16,9 @@
                 }
                 Form.onBtnTest5 = function() {
                     win = openD3Form('test5.html', true, {width: 700, height: 300, vars: { test:"11111"}});
+                }
+                Form.onBtnTest6 = function() {
+                    win = openD3Form('index.html', true, {width: 700, height: 300, vars: { test:"11111"}});
                 }
             ]]>
         </cmpScript>

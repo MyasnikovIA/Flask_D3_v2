@@ -7867,12 +7867,9 @@ function openD3Form(name,modal,data) {
     if (name.indexOf('.') != -1) {
          let fragArr = name.split('.');
          if ((fragArr[fragArr.length-1]).toLowerCase() == 'html') {
-             localStorage.setItem("D3(tmp):/"+name+":history_state",JSON.stringify({"form":name,"data":data}));
+             localStorage.setItem("D3(tmp):/"+name+":history_state", JSON.stringify({"form":name, "data":data}));
              if ((!modal)) {
                 document.location.href = name;
-             }
-             if (((fragArr[fragArr.length-1]).toLowerCase() == 'html') && (modal)) {
-                // дописать вывод HTML в модальном окне IFRAME
              }
          }
     }
