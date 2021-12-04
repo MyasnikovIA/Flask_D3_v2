@@ -387,6 +387,20 @@ D3Api = new function () {
      * @param _peq {XMLHttpRequest}
      */
     function parseForm(xml,_peq) {
+        if (this.name.indexOf('.') != -1) {
+             let fragArr = this.name.split('.');
+             // Модифицируем HTML в формат FRM
+             // Выредзаем содержимое <body> и вставляем в блоки <div>
+             // Необходимо написать полнноценный конвертор на  регулярных вырожениях
+             if ((fragArr[fragArr.length-1]).toLowerCase() == 'html') {
+                let sysinfo = xml.split("</html>")[1];
+                let bodyText = "<div"+xml.split("<body")[1];
+                bodyText = bodyText.split("</body>")[0]+"</div>"
+                xml = bodyText+sysinfo;
+             }
+        }
+        console.log("this.name",this.name)
+        console.log("xml,_peq",xml,_peq)
         var formCache = "";
         if(_peq) {
            formCache = _peq.getResponseHeader('FormCache');
@@ -772,7 +786,6 @@ D3Api = new function () {
             reqObj.onreadystatechange = func;
         D3Api.Base.callEvent('onRequestServerBegin', reqObj, reqUid, isSysRequest);
         reqObj.send(postData);
-
         if (!params.async) func();
         return reqObj;
     };
@@ -1225,9 +1238,11 @@ D3Api.D3Form = function (name, xml) {
     var div_first = document.createElement("div");
     div_first.innerHTML = '<div cmptype="Base" tabindex="0" name="firstControl" oncreate="D3Api.BaseCtrl.init_focus(this);"/>';
     this.DOM.insertBefore(div_first, this.DOM.children[0]);
-    var div_last = document.createElement("div");
-    div_last.innerHTML = '<div cmptype="Base" tabindex="0" name="lastControl" oncreate="D3Api.BaseCtrl.init_focus(this);"/>';
-    this.DOM.appendChild(div_last);
+
+    // Дубликат дива ()
+    //var div_last = document.createElement("div");
+    //div_last.innerHTML = '<div cmptype="Base" tabindex="0" name="lastControl" oncreate="D3Api.BaseCtrl.init_focus(this);"/>';
+    //this.DOM.appendChild(div_last);
 
     if (!this.DOM.getAttribute) {
         D3Api.notify('Информация', 'Ошибка синтаксиса при создании формы "' + name + '"', {modal: true});

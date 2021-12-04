@@ -7872,6 +7872,9 @@ function openD3Form(name,modal,data) {
                 document.location.href = name;
              }
          }
+         if ((fragArr[fragArr.length-1]).toLowerCase() == 'frm') {
+            name = name.substring(0, name.length - 4);
+         }
     }
     var funcCloseD3Form = function () {
         if (!empty(_page.d3Form)) {

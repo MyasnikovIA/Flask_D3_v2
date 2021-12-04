@@ -10,8 +10,9 @@ from pathlib import Path
 from flask import Flask, redirect, session, render_template, g
 from flask import request, jsonify
 from Etc.conf import ConfigOptions, nameElementHeshMap, nameElementMap
-from werkzeug.urls import url_parse
 import getform
+import requests as req
+import urllib.parse
 
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
@@ -77,7 +78,6 @@ def getParam(name, defoultValue=''):
 @app.route('/<path:path>', methods=['GET', 'POST'])
 def all_files(path):
     ext = path[path.rfind('.') + 1:].lower()
-    print(ext,path)
     """
     try:
         # Инициализация информации об агенте()
@@ -113,9 +113,18 @@ def all_files(path):
 
     if "getform.php" in path:
         formName = getParam('Form')
-        cache = getParam('cache')
-        dataSetName = getParam('DataSet', "")
-        frm = getform.getParsedForm(formName, cache, dataSetName, session)
+        if "http" in formName or  "https" in formName:
+            # Дописать авторизацию на удаленном сервере
+            o = urllib.parse.urlsplit(formName)
+            # o.hostname # адрес сервера
+            # o.path # путь к форме
+            # o.query # параметры ключ=значение  в URL строке
+            htmlResObj = req.get(formName)
+            frm = htmlResObj.content
+        else:
+            cache = getParam('cache')
+            dataSetName = getParam('DataSet', "")
+            frm = getform.getParsedForm(formName, cache, dataSetName, session)
         return frm, 200, {'content-type': 'application/plain'}
 
     if "runScript.php" in path:
@@ -142,7 +151,7 @@ def all_files(path):
                 typeQuery = dataSet[dataSetName]["type"]
                 paramsQuery = dataSet[dataSetName]["params"]
                 if len(formName) == 0:
-                    formName = url_parse(request.referrer).path[1:]
+                    formName = urllib.parse.urlsplit(request.referrer).path[1:]
                 resultTxt = getform.dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
                 # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
@@ -179,3 +188,29 @@ if __name__ == '__main__':
             os.mkdir(TEMP_DIR_PATH)
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
+
+
+"""
+заметки
+>>> import urllib.parse
+>>> o = urllib.parse.urlsplit('https://user:pass@www.example.com:8080/dir/page.html?q1=test&q2=a2#anchor1')
+>>> o.scheme
+'https'
+>>> o.netloc
+'user:pass@www.example.com:8080'
+>>> o.hostname
+'www.example.com'
+>>> o.port
+8080
+>>> o.path
+'/dir/page.html'
+>>> o.query
+'q1=test&q2=a2'
+>>> o.fragment
+'anchor1'
+>>> o.username
+'user'
+>>> o.password
+'pass'
+
+"""
