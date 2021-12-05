@@ -341,8 +341,7 @@ def getTemp(formName, cache, dataSetName, session):
     """
     blockName = ""
     if ":" in formName:
-        blockName = formName.split(":")[0]
-        formName = formName.split(":")[1]
+        blockName, formName = formName.split(":")
     cmpDirSrc = TEMP_DIR_PATH
     ext = formName[formName.rfind('.') + 1:].lower()
     if ext == "html":
@@ -536,13 +535,13 @@ def readFile(pathForm):
     if ext == "html":
         # Добавляем CSS библиотеку, если её не указали на форме
         if not "./~d3theme" in xmlContentSrc and "</head>" in xmlContentSrc:
-            arrTmp = xmlContentSrc.split("</head>")
-            xmlContentSrc = f'{arrTmp[0]} <link rel="stylesheet" type="text/css" href="./~d3theme"/>\r\n</head>{arrTmp[1]}'
+            fragBegin, fragEnd = xmlContentSrc.split("</head>")
+            xmlContentSrc = f'{fragBegin} <link rel="stylesheet" type="text/css" href="./~d3theme"/>\r\n</head>{fragEnd}'
 
         # Добавляем js библиотеку, если её не указали на форме
         if not "./~d3main" in xmlContentSrc and "</head>" in xmlContentSrc:
-            arrTmp = xmlContentSrc.split("</head>")
-            xmlContentSrc = f'{arrTmp[0]} <script type="text/javascript"  src="./~d3main"></script>\r\n</head>{arrTmp[1]}'
+            fragBegin, fragEnd = xmlContentSrc.split("</head>")
+            xmlContentSrc = f'{fragBegin} <script type="text/javascript"  src="./~d3main"></script>\r\n</head>{fragEnd}'
     # '<meta charset="UTF-8">'
     # https://tproger.ru/translations/regular-expression-python/
     # result = re.findall(r'/<meta[^<>]+>/g', xmlContentSrc)
