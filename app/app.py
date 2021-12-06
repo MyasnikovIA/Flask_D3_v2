@@ -3,20 +3,15 @@ import os
 import shutil
 import json
 import uuid
-import hashlib
-import shelve
-from inspect import getfullargspec
 from pathlib import Path
-from flask import Flask, redirect, session, render_template, g
-from flask import request, jsonify
-from Etc.conf import ConfigOptions, nameElementHeshMap, nameElementMap
+from flask import Flask, redirect, session, render_template, request, g
 import getform
 import requests as req
 import urllib.parse
 
+from Etc.conf import ConfigOptions, nameElementHeshMap, nameElementMap
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
-
 app = Flask(__name__, static_folder='templates')
 app.secret_key = str(uuid.uuid1()).replace("-", "")
 app.config['CORS_HEADERS'] = 'Content-Type'
