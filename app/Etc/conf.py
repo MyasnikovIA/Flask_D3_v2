@@ -4,8 +4,8 @@ import os,shelve
 
 global ConfigOptions
 ConfigOptions = {
-    #'DatabaseName': 'postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/flask_db',
-    'DatabaseName': 'oracle://dev:def@192.168.228.41:1521/med2dev',
+    'DatabaseName': 'postgresql+psycopg2://postgres:postgres@127.0.0.1:5432/flask_db',
+    # 'DatabaseName': 'oracle://dev:def@192.168.228.41:1521/med2dev',
 
     # 'DatabaseName': '',
     # 'DatabaseName': 'sqlite:///:memory:',
@@ -116,29 +116,6 @@ ConfigOptions = {
     'help_conf': './wiki/help.inc',
     'HIVCenter': '23619228',  # ID ЛПУ Центра СПИД
 }
-
-
-"""
-
-
-def get_option(name, defoultValue=""):
-    if name in ConfigOptions:
-        return ConfigOptions[name]
-    return defoultValue
-
-
-def is_design_mode():
-    return get_option('design_mode');
-
-def getAgetntInfo():
-    res = {}
-    if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-        res['ip'] = request.environ['REMOTE_ADDR']
-    else:
-        res['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
-    return res
-"""
-
 nameElementHeshMap={} # список ХЭШ названий элементов, для пеобразования
 nameElementMap={} # список названий элементов
 GLOBAL_DICT = shelve.open(ConfigOptions['shelve'])
