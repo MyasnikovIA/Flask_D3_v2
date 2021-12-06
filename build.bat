@@ -20,7 +20,7 @@ echo [!] Could not build docker image '%MIS_DOCKER_IMAGE%'
 
 :END
 rem Удалить исходный образ с которого собирался
-docker rmi python:3.6
+rem docker rmi python:3.6
 
 
 

@@ -399,8 +399,6 @@ D3Api = new function () {
                 xml = bodyText+sysinfo;
              }
         }
-        console.log("this.name",this.name)
-        console.log("xml,_peq",xml,_peq)
         var formCache = "";
         if(_peq) {
            formCache = _peq.getResponseHeader('FormCache');

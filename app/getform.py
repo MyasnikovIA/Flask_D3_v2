@@ -7,20 +7,12 @@ import ast
 import json
 import sys
 import hashlib
-import re
-import psycopg2
-import pandas as pd
 import cx_Oracle
-
-from sqlalchemy import  String, Numeric, Float, Boolean
 
 import app
 from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap,nameElementMap
 from DataBase.connect import DB
 # from System.serializer import serializer
-
-import code
-import pandas.io.sql as psql
 
 from app import session
 from pathlib import Path
@@ -29,7 +21,7 @@ try:
     import xml.etree.cElementTree as ET
 except ImportError:
     import xml.etree.ElementTree as ET
-from xml.dom import minidom
+
 
 
 global COMPONENT_PATH
