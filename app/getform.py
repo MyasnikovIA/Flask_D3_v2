@@ -7,10 +7,8 @@ import json
 import sys
 import hashlib
 import cx_Oracle
-import psycopg2
 import sqlite3
 import app
-from Etc.conf import ConfigOptions
 
 from app import session
 from pathlib import Path
@@ -26,6 +24,8 @@ COMPONENT_PATH = os.path.join(os.path.dirname(__file__), 'Components')  # Дир
 FORM_PATH = os.path.join(os.path.dirname(__file__), 'Forms')            # Директория  где хронятся формы
 USER_FORM_PATH = os.path.join(os.path.dirname(__file__), 'UserForms')   # Директория  ЮзерФорм
 TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), 'TempDir')      # Директория  хронения временных файлов
+DEBUGGER = 1                                                            # признак возможности включения режима отладки в URL строке
+
 nameElementHeshMap={} # список ХЭШ названий элементов, для пеобразования
 nameElementMap={} # список названий элементов
 
@@ -323,8 +323,7 @@ def getParsedForm(formName, cache, dataSetName="", session={}):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
     """
-    if ("AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0)\
-            or ("TempDir" in ConfigOptions and "debug" in ConfigOptions and int(ConfigOptions['debug']) == "0"):
+    if ("AgentInfo" in session and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0):
         return getTemp(formName, cache, dataSetName, session)
     else:
         return getSrc(formName, cache, dataSetName, session)
@@ -597,8 +596,8 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     # =============== Вставляем инициализированые переменные =======================
     argsQuery, sessionVar, argsPutQuery = parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj)
     varsDebug = {}
-    #if not int(sessionObj["AgentInfo"]['debug']) == 0:
-    #    varsDebug = argsQuery.copy()
+    if not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1:
+        varsDebug = argsQuery.copy()
     # =============================================================================
     argsQuery["DB_DICT"] = DB_DICT
     action_sql=""
@@ -655,9 +654,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             resObject[dataSetName]["type"] = typeQuery
             resObject[dataSetName]["position"] = 0
             resObject[dataSetName]["page"] = 0
-            #if not int(sessionObj["AgentInfo"]['debug']) == 0:
-            #    resObject[dataSetName]["var"] = varsDebug
-            #    resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
+            if not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1:
+                resObject[dataSetName]["var"] = varsDebug
+                resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
             return json.dumps(resObject)
         else:
             # Если есть подключение к БД тогда выполняем SQL запрос
@@ -669,9 +668,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
                     # Дописать обработку вставок
                     pass
-                #if not int(sessionObj["AgentInfo"]['debug']) == 0:
-                #resObject[dataSetName]["var"] = varsDebug
-                #resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
+                if not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1:
+                    resObject[dataSetName]["var"] = varsDebug
+                    resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
                 try:
                     resObject[dataSetName]["data"] = query_db(DB, sqlText, argsQuery)
                     resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
@@ -684,7 +683,11 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                     resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
                 return json.dumps(resObject)
         # дописать обработку SQL запроса
-        s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {},
+        if DB["SQLconnect"] == '':
+            s = {dataSetName: {"type": typeQuery, "data": [{'console': "необходимо подключится к БД"}], "locals": {},
+                               "position": 0, "rowcount": 0}}
+        else:
+            s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {},
                            "position": 0, "rowcount": 0}}
         return json.dumps(s)
     if typeQuery == "Action":
@@ -725,10 +728,10 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             del resObject[dataSetName]["locals"]
             del resObject[dataSetName]["position"]
             del resObject[dataSetName]["rowcount"]
-            #if not int(sessionObj["AgentInfo"]['debug']) == 0:
-            #    resObject[dataSetName]["var"] = varsDebug
-            #    resObject[dataSetName]["sqlArr"] = [line for line in code.split("\n")]
-            #    resObject[dataSetName]["sql"] = code
+            if not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1:
+                resObject[dataSetName]["var"] = varsDebug
+                resObject[dataSetName]["sqlArr"] = [line for line in code.split("\n")]
+                resObject[dataSetName]["sql"] = code
             return json.dumps(resObject)
         else:
             resObject[dataSetName]["data"]={}
@@ -739,10 +742,10 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
                     # Дописать обработку вставок
                     pass
-                # if not int(sessionObj["AgentInfo"]['debug']) == 0:
-                #    resObject[dataSetName]["var"] = varsDebug
-                #    resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
-                #    resObject[dataSetName]["sql"] = sqlText
+                if not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1:
+                    resObject[dataSetName]["var"] = varsDebug
+                    resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
+                    resObject[dataSetName]["sql"] = sqlText
                 if str(type(DB['SQLconnect']))=="<class 'cx_Oracle.Connection'>":
                     cur = DB["SQLconnect"].cursor()
                     argsQuerySrc = argsQuery.copy()
@@ -904,11 +907,12 @@ def getSessionObject():
     return session
 
 
-def getAgentInfo(request):
+def getAgentInfo(session,request):
     if not "AgentInfo" in session:
         session["AgentInfo"] = {}
     if hasattr(request, 'user_agent'):
         session["AgentInfo"] = {}
+        session["AgentInfo"]['debug'] = 0
         session["AgentInfo"]['User-Agent'] = request.headers.get('User-Agent')
         if hasattr(request.user_agent, 'browser'):
             session["AgentInfo"]['browser'] = request.user_agent.browser
@@ -921,18 +925,10 @@ def getAgentInfo(request):
             session["AgentInfo"]['ip'] = request.environ['REMOTE_ADDR']
         else:
             session["AgentInfo"]['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
-    session["AgentInfo"]['Forms'] = ConfigOptions['Forms']
-    if not 'debug' in session["AgentInfo"] and request.args.get("debug") == None:
-        session["AgentInfo"]['debug'] = int(ConfigOptions['debug'])
-    if not request.args.get("debug") == None:
+    if not request.args.get("debug") == None and DEBUGGER==1:
         session["AgentInfo"]['debug'] = int(request.args.get("debug"))
-    if not 'UserForms' in session["AgentInfo"] and request.args.get("f") == None:
-        session["AgentInfo"]['UserForms'] = ConfigOptions['UserForms']
     if not request.args.get("f") == None:
         session["AgentInfo"]['UserForms'] = request.args.get("f")
-    session["AgentInfo"]['TempDir'] = ConfigOptions['TempDir']
-    session["AgentInfo"]['ROOT_DIR'] = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}"
-    session["AgentInfo"]['TEMP_DIR_PATH'] = os.path.join(os.path.dirname(Path(__file__).absolute()), ConfigOptions['TempDir'])
     return session["AgentInfo"]
 
 def mimeType(pathFile):

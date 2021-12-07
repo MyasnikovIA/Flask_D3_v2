@@ -8,15 +8,14 @@ from flask import Flask, redirect, session, render_template, request, g
 import getform
 import requests as req
 import urllib.parse
-import random
 
-from Etc.conf import ConfigOptions
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
 app = Flask(__name__, static_folder='templates')
 app.secret_key = str(uuid.uuid1()).replace("-", "")
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.permanent_session_lifetime = datetime.timedelta(days=10)  # период хронений сессии составляет 10 дней
+
 
 
 def sendCostumBin(pathFile):
@@ -78,14 +77,7 @@ def all_files(path):
         countQuery += 1
         session["ID"] = f'{str(uuid.uuid1()).replace("-", "")}{countQuery}{datetime.datetime.now().microsecond}'
     ext = path[path.rfind('.') + 1:].lower()
-    """
-    try:
-        # Инициализация информации об агенте()
-        if ext in ["html", "css", ".js"]:
-            getform.getAgentInfo(request)
-    except:
-        pass
-    """
+    getform.getAgentInfo(session,request) # получить информацию о клиенте
     ROOT_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}"
     ROOT_FORM_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}Forms{os.sep}"
     if '/~Cmp' in path and 'Components/' in path:
@@ -162,16 +154,14 @@ def all_files(path):
 
 
 if __name__ == '__main__':
-    if "debug" in ConfigOptions and not int(ConfigOptions["debug"]) == 0:
-        TEMP_DIR_PATH = os.path.join(os.path.dirname(Path(__file__).absolute()), ConfigOptions['TempDir'])
-        if os.path.exists(TEMP_DIR_PATH):
-            for root, dirs, files in os.walk(TEMP_DIR_PATH):
-                for f in files:
-                    os.unlink(os.path.join(root, f))
-                for d in dirs:
-                    shutil.rmtree(os.path.join(root, d))
-        else:
-            os.mkdir(TEMP_DIR_PATH)
+    if os.path.exists(getform.TEMP_DIR_PATH):
+        for root, dirs, files in os.walk(getform.TEMP_DIR_PATH):
+            for f in files:
+                os.unlink(os.path.join(root, f))
+            for d in dirs:
+                shutil.rmtree(os.path.join(root, d))
+    else:
+        os.mkdir(getform.TEMP_DIR_PATH)
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=False, host='0.0.0.0', port=port)
 

@@ -13,8 +13,7 @@ compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','Chec
             'OpenStreetMap',"OpenStreetMapLabel",'Tree']
 
 def readfile(name):
-    ROOT_DIR = f"{os.path.dirname(Path(__file__).parent.absolute())}{os.sep}"
-    cmpDirSrc = f'{ROOT_DIR}{os.sep}{name}'
+    cmpDirSrc = f'{getform.ROOT_DIR}{os.sep}{name}'
     if os.path.exists(cmpDirSrc):
         with codecs.open(cmpDirSrc, encoding='utf-8') as f:
             file_text = f.read()
@@ -35,8 +34,7 @@ def genCacheUid():
     return hesh
 
 def getTemp(request):
-    ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
-    cmpDirSrc = session["AgentInfo"]['TEMP_DIR_PATH']
+    cmpDirSrc = getform.TEMP_DIR_PATH
     cmpFiletmp = f"{cmpDirSrc}{os.sep}{request.user_agent.platform}_d3main.js"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
@@ -173,11 +171,5 @@ def getSrc(request):
 
 
 def show(request):
-    if "AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0:
-        return getTemp(request)
-    return getSrc(request)
-    #if get_option("TempDir") and (+get_option("debug"))<1:
-    #    return getTemp(agent_info)
-    #else:
-    #    return getSrc(agent_info)
+    return getTemp(request)
 

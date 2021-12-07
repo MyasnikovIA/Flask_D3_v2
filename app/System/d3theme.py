@@ -12,8 +12,7 @@ compList = ['Label','Form','Edit','Button' ,'Base','Window','ComboBox','CheckBox
 
 def readCmpCss(name, ext=''):
     # ROOT_DIR = session["AgentInfo"]['ROOT_DIR']
-    ROOT_DIR = f"{os.path.dirname(Path(__file__).parent.absolute())}{os.sep}"
-    cmpDirSrc = f'{ROOT_DIR}Components{os.sep}{name}{os.sep}css{os.sep}{name}.css'
+    cmpDirSrc = f'{getform.COMPONENT_PATH}{os.sep}{name}{os.sep}css{os.sep}{name}.css'
     if os.path.exists(cmpDirSrc):
         with codecs.open(cmpDirSrc, encoding='utf-8') as f:
             file_text = f.read()
@@ -43,7 +42,7 @@ def getSrc(request):
     return "".join(res)
 
 def getTemp(request):
-    cmpDirSrc = session["AgentInfo"]['TEMP_DIR_PATH']
+    cmpDirSrc = getform.TEMP_DIR_PATH
     cmpFiletmp = f"{cmpDirSrc}{os.sep}{request.user_agent.platform}_d3theme.css"
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
@@ -60,13 +59,11 @@ def getTemp(request):
         else:
             with open(cmpFiletmp, "rb") as infile:
                 txt = infile.read()
-                setTempPage(cmpFiletmp, txt)
+                getform.setTempPage(cmpFiletmp, txt)
                 return txt
     else:
         return txt
 
 def show(request):
     # request.user_agent.platform
-    if "AgentInfo" in session and "TempDir" in session["AgentInfo"] and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0:
-        return getTemp(request)
-    return getSrc(request)
+    return getTemp(request)
