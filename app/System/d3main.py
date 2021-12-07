@@ -10,7 +10,7 @@ from werkzeug.urls import url_parse
 
 compList = ['Base','Edit','Button','Form','Label','LayoutSplit','ComboBox','CheckBox','Mask','Dependences','HyperLink','Expander',
             'TextArea','PopupMenu','PopupItem','AutoPopupMenu','ColorEdit','PopupMenu','PopupItem','Dialog','Image','Toolbar','PageControl','Tabs',
-            'OpenStreetMap',"OpenStreetMapLabel",'Tree','Server']
+            'OpenStreetMap',"OpenStreetMapLabel",'Tree']
 
 def readfile(name):
     ROOT_DIR = f"{os.path.dirname(Path(__file__).parent.absolute())}{os.sep}"

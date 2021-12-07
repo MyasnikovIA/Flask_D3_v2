@@ -10,7 +10,7 @@ import requests as req
 import urllib.parse
 import random
 
-from Etc.conf import ConfigOptions, nameElementHeshMap, nameElementMap
+from Etc.conf import ConfigOptions
 from System.d3main import show as d3main_js
 from System.d3theme import show as d3theme_css
 app = Flask(__name__, static_folder='templates')
@@ -126,20 +126,6 @@ def all_files(path):
             dataSetName = getParam('DataSet', "")
             frm = getform.getParsedForm(formName, cache, dataSetName, session)
         return frm, 200, {'content-type': 'application/plain'}
-
-    if "runScript.php" in path:
-        scrArg = request.form.to_dict(flat=False)
-        funName = str(scrArg['WEVENT'])[2:-2]
-        args = json.loads(str(scrArg['ARGS'])[2:-2])
-        if funName in nameElementHeshMap:
-            return getform.runFormScript(getform.DB_DICT[session['ID']],nameElementHeshMap[funName], args, session), 200, {
-                'content-type': 'application/json'}
-        elif funName in nameElementMap:
-            return getform.runFormScript(getform.DB_DICT[session['ID']],nameElementMap[funName], args, session), 200, {
-                'content-type': 'application/json'}
-        else:
-            return f"""{{"error":"код с именем  '{funName}' не определено"}}""", 200, {
-                'content-type': 'application/json'}
 
     if "request.php" in path:
         resultTxt = "{}"

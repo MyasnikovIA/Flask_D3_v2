@@ -9,10 +9,8 @@ import hashlib
 import cx_Oracle
 import psycopg2
 import sqlite3
-
 import app
-from Etc.conf import ConfigOptions, nameElementHeshMap,nameElementMap
-# from System.serializer import serializer
+from Etc.conf import ConfigOptions
 
 from app import session
 from pathlib import Path
@@ -22,16 +20,14 @@ try:
 except ImportError:
     import xml.etree.ElementTree as ET
 
-
-
 global COMPONENT_PATH
 ROOT_DIR = os.path.dirname(__file__)
-COMPONENT_PATH = os.path.join(os.path.dirname(__file__), 'Components')
-FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['Forms'][1:])
-USER_FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['UserForms'][1:])
-TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['TempDir'])
-
-
+COMPONENT_PATH = os.path.join(os.path.dirname(__file__), 'Components')  # Директория  где хронятся Компоненты
+FORM_PATH = os.path.join(os.path.dirname(__file__), 'Forms')            # Директория  где хронятся формы
+USER_FORM_PATH = os.path.join(os.path.dirname(__file__), 'UserForms')   # Директория  ЮзерФорм
+TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), 'TempDir')      # Директория  хронения временных файлов
+nameElementHeshMap={} # список ХЭШ названий элементов, для пеобразования
+nameElementMap={} # список названий элементов
 
 def stripCode(srcCode=""):
     """
@@ -254,45 +250,7 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
             elif hasattr(obj, 'SysInfoTag') and len(obj.SysInfoTag) > 0:
                 sysinfoBlock.append(f"</{obj.SysInfoTag}>")
             htmlContent.append(obj.tail)
-    htmlContentText = replaceServerTag("".join(htmlContent), formName)
-    return sysinfoBlock, htmlContentText
-
-
-def replaceServerTag(htmlContent, formName):
-    """
-    Функция замены  тэга #server(  )# на вызов кэшированную JS функцию
-    :param htmlContent:
-    :return:
-    """
-    if "#server(" in htmlContent:
-        res = [""]
-        for frag in htmlContent.split("#server("):
-            if ")#" in frag:
-                args = frag.split(")#")[0]
-                endFrag = frag[len(args) + 2:]
-                funName = args[:args.find(",")]
-                bodyFun = args[args.find(",") + 1:]
-                res.append("runScript(")
-                if ".." in funName:
-                    funName = funName.replace("..", f"{formName}.")
-                elif "." in funName:
-                    pass
-                else:
-                    funName = f"{formName}.{funName}"
-                res.append("'")
-                res.append(hashlib.md5(funName.encode('utf-8')).hexdigest())
-                key = hashlib.md5(funName.encode('utf-8')).hexdigest()
-                nameElementHeshMap[key] = [formName,funName[funName.rfind('.')+1:]]
-                res.append("'")
-                if len(bodyFun) > 0:
-                    res.append(",")
-                    res.append(bodyFun)
-                res.append(")")
-                res.append(endFrag)
-            else:
-                res.append(frag)
-        return "".join(res)
-    return htmlContent
+    return sysinfoBlock, "".join(htmlContent)
 
 
 def getSrc(formName, cache, dataSetName="", session={}):
@@ -583,24 +541,6 @@ def getXMLObject(formName):
                 else:
                     rootForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{formName}" not found </error>')
     return rootForm
-
-def runFormScript(DB_DICT,funName,args,session):
-    """
-    обработка вызова компонента cmpServer
-    """
-    resObject={}
-    argsQuery = {}
-    dataSetXml = getXMLObject(f"{funName[0]}:{funName[1]}")
-    if "args" in dataSetXml.attrib:
-        nameArgs = dataSetXml.attrib.get("args").split(";")
-        for ind in range(len(nameArgs)):
-            argsQuery[nameArgs[ind]] = args[ind]
-    code = stripCode(dataSetXml.text)
-    try:
-      localVariableTemp = exec_then_eval(DB_DICT,argsQuery, code, session)
-    except:
-      resObject["error"] = f"{funName[0]} : {funName[1]} :{sys.exc_info()}"
-    return json.dumps(localVariableTemp)
 
 def query_db(DB,query, args=(), one=False):
     """
