@@ -1,13 +1,14 @@
 import codecs
 import importlib
 import os.path
-import sqlite3
 import uuid
 import ast
 import json
 import sys
 import hashlib
 import cx_Oracle
+import psycopg2
+import sqlite3
 
 import app
 from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap,nameElementMap
@@ -744,6 +745,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             resObject[dataSetName]["data"] = dataVarReturn
             resObject[dataSetName]["type"] = typeQuery
             resObject[dataSetName]["uid"] = uid
+            del resObject[dataSetName]["locals"]
+            del resObject[dataSetName]["position"]
+            del resObject[dataSetName]["rowcount"]
             #if not int(sessionObj["AgentInfo"]['debug']) == 0:
             #    resObject[dataSetName]["var"] = varsDebug
             #    resObject[dataSetName]["sqlArr"] = [line for line in code.split("\n")]
@@ -818,6 +822,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                             resObject[dataSetName]["data"] = resObj
                         except Exception as e:
                             resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
+                    del resObject[dataSetName]["locals"]
+                    del resObject[dataSetName]["position"]
+                    del resObject[dataSetName]["rowcount"]
                     return json.dumps(resObject)
 
             s = {dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}}

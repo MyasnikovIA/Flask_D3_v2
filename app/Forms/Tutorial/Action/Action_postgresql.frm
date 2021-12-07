@@ -12,6 +12,11 @@
                   console.log("DIR_NUMB", getVar("DIR_NUMB"));
                });
             }
+            Form.onExecActionV3 = function() {
+               executeAction('getMyActionV3', function(){
+                  console.log("DIR_NUMB2", getValue("DIR_NUMB2"));
+               });
+            }
        ]]>
    </cmpScript>
    <cmpAction name="getMyAction" activateoncreate="true">
@@ -45,5 +50,13 @@
    <br/>
     <cmpLabel name="DIR_NUMB" caption="-----" />
    <br/>=============================================================================
+      <cmpAction name="getMyActionV3" activateoncreate="true" query_type="server_python">
+            <![CDATA[
+                DIR_NUMB2 = "dddddddddddddddddddddddd"
+            ]]>
+            <cmpActionVar name="DIR_NUMB2"      src="DIR_NUMB2"   put="" srctype="var" />
+      </cmpAction>
+      <cmpButton caption="Запуск запроса getMyActionV3" onclick="Form.onExecActionV3()" />
+      <cmpLabel name="DIR_NUMB2" caption="-----" />
 
 </div>
