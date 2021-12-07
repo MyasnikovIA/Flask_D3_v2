@@ -53,8 +53,6 @@ try:
             DB['SQLconnect'] = psycopg2.connect(database=SID, user=userName, password=userPass, host=ip, port=port)
             DB['SQLconnect'].autocommit = True
             DB['SQL'] = DB['SQLconnect'].cursor()
-            DB['Type']['String'] = psycopg2.STRING
-            DB['Type']['Number'] = psycopg2.NUMBER
             # SQL.execute("CREATE TABLE users (id SERIAL PRIMARY KEY, login VARCHAR(64), password VARCHAR(64))")
             # SQLconnect.commit()
             # SQLconnect.close()

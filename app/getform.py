@@ -628,10 +628,21 @@ def query_function(function_name, args=(), one=False):
     cur.close()
     return (r[0] if r else None) if one else r
 
+DB_DICT = {}
 def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     """
     Функция обработки запросов DataSet и Action с клиентских форм
     """
+
+    global DB_DICT
+    if 'ID' in sessionObj and not sessionObj['ID'] in DB_DICT:
+        sessionID = sessionObj['ID']
+        DB_DICT[sessionID] = {}
+        DB_DICT[sessionID]["oracle"] = {'SQL': '', 'SQLconnect': ''}
+        DB_DICT[sessionID]["postgre"] = {'SQL': '', 'SQLconnect': ''}
+        DB_DICT[sessionID]["sqlite"] = {'SQL': '', 'SQLconnect': ''}
+    else:
+        sessionID = sessionObj['ID']
     dataSetName = ""
     if ":" in formName:
         dataSetName = formName.split(":")[1]
@@ -649,6 +660,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     #if not int(sessionObj["AgentInfo"]['debug']) == 0:
     #    varsDebug = argsQuery.copy()
     # =============================================================================
+    argsQuery["DB_DICT"] = DB_DICT
     action_sql=""
     if "action" in dataSetXml.attrib:
         action_sql = dataSetXml.attrib.get("action")
@@ -846,6 +858,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             module_class_string = module.replace("/", ".")
             module = importlib.import_module(f"Forms.{module_class_string}")
             argsQuery['globals'] = globals()
+            argsQuery['session'] = sessionObj
             cls = getattr(module, class_name)
             if len(defName) > 0:
                 obj = cls()
@@ -858,6 +871,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             else:
                 cls(argsQuery)
                 del resObject[dataSetName]["data"]
+            del argsQuery['session']
             del resObject[dataSetName]["locals"]
             del resObject[dataSetName]["position"]
             del resObject[dataSetName]["rowcount"]

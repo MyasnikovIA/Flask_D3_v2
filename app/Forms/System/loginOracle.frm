@@ -48,7 +48,7 @@
                     <cmpLabel caption="Пароль пользователя"/>
                 </td>
                 <td>
-                    <cmpEdit name="DBPassword" value="dev"/>
+                    <cmpEdit name="DBPassword" value="def"/>
                 </td>
             </tr>
             <tr>

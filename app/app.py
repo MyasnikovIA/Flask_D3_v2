@@ -8,6 +8,7 @@ from flask import Flask, redirect, session, render_template, request, g
 import getform
 import requests as req
 import urllib.parse
+import random
 
 from Etc.conf import ConfigOptions, nameElementHeshMap, nameElementMap
 from System.d3main import show as d3main_js
@@ -69,9 +70,13 @@ def example():
 def getParam(name, defoultValue=''):
     return request.args.get(name, default=defoultValue)
 
-
+countQuery = 0
 @app.route('/<path:path>', methods=['GET', 'POST'])
 def all_files(path):
+    if session.get("ID") == None:
+        global countQuery
+        countQuery += 1
+        session["ID"] = f'{str(uuid.uuid1()).replace("-", "")}{countQuery}{datetime.datetime.now().microsecond}'
     ext = path[path.rfind('.') + 1:].lower()
     """
     try:
