@@ -406,11 +406,13 @@ def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
                     argsQuery[key] = ""
                 else:
                     argsQuery[key] = paramsQuery.get(subKey)
-                    del paramsQuery[subKey]
+                    if subKey in paramsQuery:
+                        del paramsQuery[subKey]
             else:
                 subKey = dataSetVarXml.attrib.get("get")
                 argsQuery[key] = paramsQuery.get(subKey)
-                del paramsQuery[subKey]
+                if subKey in paramsQuery:
+                    del paramsQuery[subKey]
         elif not dataSetVarXml.attrib.get("put") == None:
             if not dataSetVarXml.attrib.get("srctype") == None:
                 key = dataSetVarXml.attrib.get("name")
@@ -424,11 +426,13 @@ def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
                     argsQuery[key] = ""
                 else:
                     argsQuery[key] = paramsQuery.get(subKey)
-                    del paramsQuery[subKey]
+                    if subKey in paramsQuery:
+                        del paramsQuery[subKey]
             else:
                 subKey = dataSetVarXml.attrib.get("get")
                 argsQuery[key] = paramsQuery.get(subKey)
-                del paramsQuery[subKey]
+                if subKey in paramsQuery:
+                    del paramsQuery[subKey]
 
     for key in paramsQuery:
         argsQuery[key] = paramsQuery[key]
