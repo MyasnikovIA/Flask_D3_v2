@@ -25,26 +25,11 @@
                 executeModule('Authorization', function() {
 
                 })
-
-                //executeAction('Authorization', function() {
-                //  console.log("Result",getVar("Result"));
-                //})
-            };
-            Form.Submit2 = function() {
-                var login = getValue('DBLogin').split(/\[(.*?)\]/, 2);
-                setValue('DBLogin', (login[0] || "").toUpperCase());
-                setVar('DBLoginProxy', login[1]);
-                executeModule('Authorization2', function() {
-
-                })
             };
        ]]>
     </cmpScript>
-    <cmpModule  name="Authorization" mode="post" module="System/Authorization">
-        <cmpModuleVar  get="DBPassword"   srctype="ctrl" src="DBPassword"   name="DBPassword"/>
-        <cmpModuleVar  get="DBLogin"      srctype="ctrl" src="DBLogin"      name="DBLogin"/>
-    </cmpModule>
-    <cmpModule  name="Authorization2" mode="post" module="System/AuthorizationV2:ExecModuleEny.test">
+
+    <cmpModule  name="Authorization" mode="post" module="System/AuthorizationOracle">
         <cmpModuleVar  get="DBPassword"   srctype="ctrl" src="DBPassword"   name="DBPassword"/>
         <cmpModuleVar  get="DBLogin"      srctype="ctrl" src="DBLogin"      name="DBLogin"/>
     </cmpModule>
@@ -55,7 +40,7 @@
                     <cmpLabel caption="Имя пользователя"/>
                 </td>
                 <td>
-                    <cmpEdit name="DBLogin" value="postgres"/>
+                    <cmpEdit name="DBLogin" value="dev"/>
                 </td>
             </tr>
             <tr>
@@ -63,7 +48,7 @@
                     <cmpLabel caption="Пароль пользователя"/>
                 </td>
                 <td>
-                    <cmpEdit name="DBPassword" value="postgres"/>
+                    <cmpEdit name="DBPassword" value="dev"/>
                 </td>
             </tr>
             <tr>
@@ -71,12 +56,6 @@
 					<cmpButton onclick="Form.Submit();" caption="Войти" name="btnLogin"/>
                 </td>
             </tr>
-            <tr>
-                <td  colspan="2" >
-					<cmpButton onclick="Form.Submit2();" caption="Войти2" name="btnLogin"/>
-                </td>
-            </tr>
-
         </table>
     </center>
 </div>

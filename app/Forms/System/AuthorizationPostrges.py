@@ -9,8 +9,5 @@ class ExecModule:
         attrs.get('globals')["DB"]['SQLconnect'].autocommit = True
         attrs.get('globals')["DB"]['SQL'] = attrs.get('globals')["DB"]['SQLconnect'].cursor()
 
-        # attrs.get('globals')["DB"] = psycopg2.connect(database='flask_db', user=attrs.get('DBLogin').lower(), password=attrs.get('DBPassword'), host='127.0.0.1', port=5432)
-        pass
-
 
 

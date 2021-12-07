@@ -845,6 +845,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
         if os.path.exists(pathForm):
             module_class_string = module.replace("/", ".")
             module = importlib.import_module(f"Forms.{module_class_string}")
+            argsQuery['globals'] = globals()
             cls = getattr(module, class_name)
             if len(defName) > 0:
                 obj = cls()
@@ -857,7 +858,6 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             else:
                 cls(argsQuery)
                 del resObject[dataSetName]["data"]
-
             del resObject[dataSetName]["locals"]
             del resObject[dataSetName]["position"]
             del resObject[dataSetName]["rowcount"]
