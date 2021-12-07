@@ -12,7 +12,6 @@ import sqlite3
 
 import app
 from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap,nameElementMap
-from DataBase.connect import DB
 # from System.serializer import serializer
 
 from app import session
@@ -604,10 +603,12 @@ def runFormScript(funName,args,session):
       resObject["error"] = f"{funName[0]} : {funName[1]} :{sys.exc_info()}"
     return json.dumps(localVariableTemp)
 
-def query_db(query, args=(), one=False):
+def query_db(DB,query, args=(), one=False):
     """
      Получение JSON обьекта из SQL запроса
     """
+    if "DB_DICT" in args:
+        del args["DB_DICT"]
     cur = DB["SQLconnect"].cursor()
     cur.execute(query, args)
     r = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
@@ -664,6 +665,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     action_sql=""
     if "action" in dataSetXml.attrib:
         action_sql = dataSetXml.attrib.get("action")
+    database = ""  # имя базы данных к которой должен обратится запрос
+    if "database" in dataSetXml.attrib:
+        database = dataSetXml.attrib.get("database")
     if typeQuery == "DataSet":
         query_type = "sql"
         if "query_type" in dataSetXml.attrib:
@@ -706,8 +710,18 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             #    resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
             return json.dumps(resObject)
         else:
+            # Если указана БД, тогда выбираем подключение  по имени, или берем первое попавшееся подключение
+            DB={"SQLconnect":""}
+            if database == "":
+                for nam in DB_DICT[sessionID]:
+                    if not DB_DICT[sessionID][nam]["SQLconnect"] == "":
+                        DB = DB_DICT[sessionID][nam]
+                        break
+            else:
+               if database in  DB_DICT[sessionID]:
+                   DB = DB_DICT[sessionID][database]
             # Если есть подключение к БД тогда выполняем SQL запрос
-            if not DB["SQL"] == '':
+            if not DB["SQLconnect"] == '':
                 resObject[dataSetName]["type"] = typeQuery
                 ext = argsQuery["_ext_"]
                 del argsQuery["_ext_"] # странная переменная
@@ -719,7 +733,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 #resObject[dataSetName]["var"] = varsDebug
                 #resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
                 try:
-                    resObject[dataSetName]["data"] = query_db(sqlText, argsQuery)
+                    resObject[dataSetName]["data"] = query_db(DB, sqlText, argsQuery)
                     resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
                     resObject[dataSetName]["position"] = 0
                 except Exception as e:
@@ -767,8 +781,18 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             return json.dumps(resObject)
         else:
             resObject[dataSetName]["data"]={}
-            if not DB["SQL"] == '':
-                resObject[dataSetName]["type"] = typeQuery
+            resObject[dataSetName]["type"] = typeQuery
+            # Если указана БД, тогда выбираем подключение  по имени, или берем первое попавшееся подключение
+            DB={"SQLconnect":""}
+            if database == "":
+                for nam in DB_DICT[sessionID]:
+                    if not DB_DICT[sessionID][nam]["SQLconnect"] == "":
+                        DB = DB_DICT[sessionID][nam]
+                        break
+            else:
+               if database in  DB_DICT[sessionID]:
+                   DB = DB_DICT[sessionID][database]
+            if not DB["SQLconnect"] == '':
                 sqlText = dataSetXml.text
                 if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
                     # Дописать обработку вставок
@@ -777,7 +801,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 #    resObject[dataSetName]["var"] = varsDebug
                 #    resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
                 #    resObject[dataSetName]["sql"] = sqlText
-                if DB['type'] == 'oracle':
+                if str(type(DB['SQLconnect']))=="<class 'cx_Oracle.Connection'>":
                     cur = DB["SQLconnect"].cursor()
                     argsQuerySrc = argsQuery.copy()
                     for nam in argsPutQuery:
@@ -796,17 +820,17 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                     cur.close()
                     return res
 
-                if DB['type'] == 'sqlite':
+                if str(type(DB['SQLconnect'])) == "<class 'sqlite3.Connection'>":
                     # дописать поведение для SQL lite
                     # https://stackoverflow.com/questions/3286525/return-sql-table-as-json-in-python
                     try:
                         # получем первую строку из  простого запроса (необходимо переписать на логику аналогично Oracle Begin End;)
-                        resObject[dataSetName]["data"] = query_db(sqlText, args=argsQuery, one=True)
+                        resObject[dataSetName]["data"] = query_db(DB,sqlText, args=argsQuery, one=True)
                     except Exception as e:
                         resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
                     return json.dumps(resObject)
 
-                if DB['type'] == 'postgres':
+                if str(type(DB['SQLconnect'])) == "<class 'psycopg2.extensions.connection'>":
                     # https://wiki.postgresql.org/wiki/Using_psycopg2_with_PostgreSQL
                     # https://www.postgresqltutorial.com/postgresql-python/postgresql-python-call-postgresql-functions/
                     if len(action_sql) > 0:
@@ -824,7 +848,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                             resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
                     else:
                         try:
-                            data = query_db(sqlText, args=argsQuery, one=True)
+                            data = query_db(DB,sqlText, args=argsQuery, one=True)
                             resObj={}
                             for key in argsQuery:
                                 if key.lower() in data:

@@ -76,7 +76,6 @@
 					<cmpButton onclick="Form.Submit2();" caption="Войти2" name="btnLogin"/>
                 </td>
             </tr>
-
         </table>
     </center>
 </div>
