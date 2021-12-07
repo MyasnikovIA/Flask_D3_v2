@@ -11,7 +11,7 @@ import psycopg2
 import sqlite3
 
 import app
-from Etc.conf import ConfigOptions, GLOBAL_DICT,nameElementHeshMap,nameElementMap
+from Etc.conf import ConfigOptions, nameElementHeshMap,nameElementMap
 # from System.serializer import serializer
 
 from app import session
@@ -56,7 +56,7 @@ def stripCode(srcCode=""):
     return code
 
 
-def exec_then_eval(vars, code, sessionObj):
+def exec_then_eval(DB_DICT,vars, code, sessionObj):
     """
     Запуск многострочного текста кода  с кэшированием
     :param vars:  переменные для входных рагументов скрипта (инициализация) {"var1":111,"var2":333}
@@ -75,8 +75,7 @@ def exec_then_eval(vars, code, sessionObj):
     vars["session"] = sessionObj
     vars["getSession"] = getSession
     vars["setSession"] = setSession
-    vars["GLOBAL_DICT"] = GLOBAL_DICT
-    vars["SQL"] = DB['SQL']
+    vars["SQL"] = DB_DICT
     _globals, _locals = vars, {}
     exec(compile(block, '<string>', mode='exec'), _globals, _locals)
     return eval(compile(last, '<string>', mode='eval'), _globals, _locals)
@@ -585,7 +584,7 @@ def getXMLObject(formName):
                     rootForm = ET.fromstring(f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{formName}" not found </error>')
     return rootForm
 
-def runFormScript(funName,args,session):
+def runFormScript(DB_DICT,funName,args,session):
     """
     обработка вызова компонента cmpServer
     """
@@ -598,7 +597,7 @@ def runFormScript(funName,args,session):
             argsQuery[nameArgs[ind]] = args[ind]
     code = stripCode(dataSetXml.text)
     try:
-      localVariableTemp = exec_then_eval(argsQuery, code, session)
+      localVariableTemp = exec_then_eval(DB_DICT,argsQuery, code, session)
     except:
       resObject["error"] = f"{funName[0]} : {funName[1]} :{sys.exc_info()}"
     return json.dumps(localVariableTemp)
@@ -617,7 +616,7 @@ def query_db(DB,query, args=(), one=False):
     cur.close()
     return (r[0] if r else None) if one else r
 
-def query_function(function_name, args=(), one=False):
+def query_function(DB,function_name, args=(), one=False):
     """
      Получение JSON обьекта из SQL запроса
     """
@@ -672,12 +671,23 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
         query_type = "sql"
         if "query_type" in dataSetXml.attrib:
             query_type = dataSetXml.attrib.get("query_type")
+        # Если указана БД, тогда выбираем подключение  по имени, или берем первое попавшееся подключение
+        DB = {"SQLconnect": ""}
+        _DB_DICT = DB_DICT[sessionID]
+        if database == "":
+            for nam in DB_DICT[sessionID]:
+                if not DB_DICT[sessionID][nam]["SQLconnect"] == "":
+                    DB = DB_DICT[sessionID][nam]
+                    break
+        else:
+            if database in DB_DICT[sessionID]:
+                DB = DB_DICT[sessionID][database]
         if query_type == "server_python":  # выполнить Python скрипт
             code = stripCode(dataSetXml.text)
             dataVarReturn = {}
             localVariableTemp = {}
             try:
-                localVariableTemp = exec_then_eval(argsQuery, code, sessionObj)
+                localVariableTemp = exec_then_eval(_DB_DICT,argsQuery, code, sessionObj)
             except:
                 resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
             for elementDict in localVariableTemp:
@@ -710,16 +720,6 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             #    resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
             return json.dumps(resObject)
         else:
-            # Если указана БД, тогда выбираем подключение  по имени, или берем первое попавшееся подключение
-            DB={"SQLconnect":""}
-            if database == "":
-                for nam in DB_DICT[sessionID]:
-                    if not DB_DICT[sessionID][nam]["SQLconnect"] == "":
-                        DB = DB_DICT[sessionID][nam]
-                        break
-            else:
-               if database in  DB_DICT[sessionID]:
-                   DB = DB_DICT[sessionID][database]
             # Если есть подключение к БД тогда выполняем SQL запрос
             if not DB["SQLconnect"] == '':
                 resObject[dataSetName]["type"] = typeQuery
@@ -751,12 +751,23 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
         query_type = "psql"
         if "query_type" in dataSetXml.attrib:
             query_type = dataSetXml.attrib.get("query_type")
+        DB = {"SQLconnect": ""}
+        _DB_DICT =  DB_DICT[sessionID]
+        if database == "":
+            for nam in DB_DICT[sessionID]:
+                if not DB_DICT[sessionID][nam]["SQLconnect"] == "":
+                    DB = DB_DICT[sessionID][nam]
+                    break
+        else:
+            if database in DB_DICT[sessionID]:
+                DB = DB_DICT[sessionID][database]
+
         if query_type == "server_python":  # выполнить Python скрипт
             code = stripCode(dataSetXml.text)
             dataVarReturn = {}
             localVariableTemp = {}
             try:
-                localVariableTemp = exec_then_eval(argsQuery, code, sessionObj)
+                localVariableTemp = exec_then_eval(_DB_DICT,argsQuery, code, sessionObj)
             except:
                 resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
             for elementDict in localVariableTemp:
@@ -783,15 +794,6 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             resObject[dataSetName]["data"]={}
             resObject[dataSetName]["type"] = typeQuery
             # Если указана БД, тогда выбираем подключение  по имени, или берем первое попавшееся подключение
-            DB={"SQLconnect":""}
-            if database == "":
-                for nam in DB_DICT[sessionID]:
-                    if not DB_DICT[sessionID][nam]["SQLconnect"] == "":
-                        DB = DB_DICT[sessionID][nam]
-                        break
-            else:
-               if database in  DB_DICT[sessionID]:
-                   DB = DB_DICT[sessionID][database]
             if not DB["SQLconnect"] == '':
                 sqlText = dataSetXml.text
                 if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
@@ -836,7 +838,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                     if len(action_sql) > 0:
                         try:
                             # получем первую строку из  простого запроса (необходимо переписать на логику аналогично Oracle Begin End;)
-                            data = query_function(action_sql, args=argsQuery, one=True)
+                            data = query_function(DB,action_sql, args=argsQuery, one=True)
                             resObj={}
                             for key in argsQuery:
                                 if key.lower() in data:

@@ -132,10 +132,10 @@ def all_files(path):
         funName = str(scrArg['WEVENT'])[2:-2]
         args = json.loads(str(scrArg['ARGS'])[2:-2])
         if funName in nameElementHeshMap:
-            return getform.runFormScript(nameElementHeshMap[funName], args, session), 200, {
+            return getform.runFormScript(getform.DB_DICT[session['ID']],nameElementHeshMap[funName], args, session), 200, {
                 'content-type': 'application/json'}
         elif funName in nameElementMap:
-            return getform.runFormScript(nameElementMap[funName], args, session), 200, {
+            return getform.runFormScript(getform.DB_DICT[session['ID']],nameElementMap[funName], args, session), 200, {
                 'content-type': 'application/json'}
         else:
             return f"""{{"error":"код с именем  '{funName}' не определено"}}""", 200, {

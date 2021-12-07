@@ -118,4 +118,3 @@ ConfigOptions = {
 }
 nameElementHeshMap={} # список ХЭШ названий элементов, для пеобразования
 nameElementMap={} # список названий элементов
-GLOBAL_DICT = shelve.open(ConfigOptions['shelve'])
