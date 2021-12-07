@@ -819,6 +819,41 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             s = {dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}}
             return json.dumps(resObject)
     # print(ET.tostring(dataSetXml).decode())
+    if typeQuery == "Module":
+        module = dataSetXml.attrib.get("module")
+        module_class_string = module.replace("/", ".")
+        class_name = "ExecModule"
+        defName = ""
+        if ":" in module_class_string:
+            module, class_name = module.split(":")
+            pathForm = f"{FORM_PATH}{os.sep}{module}.py"
+        else:
+            pathForm = f"{FORM_PATH}{os.sep}{module}.py"
+        if "." in class_name:
+            class_name, defName = class_name.split(".")
+        if os.path.exists(pathForm):
+            module_class_string = module.replace("/", ".")
+            module = importlib.import_module(f"Forms.{module_class_string}")
+            cls = getattr(module, class_name)
+            if len(defName) > 0:
+                obj = cls()
+                methObject = getattr(obj, defName)
+                resultExecMeth = methObject(argsQuery)
+                if not resultExecMeth == None:
+                    resObject[dataSetName]["data"] = resultExecMeth
+                else:
+                    del resObject[dataSetName]["data"]
+            else:
+                cls(argsQuery)
+                del resObject[dataSetName]["data"]
+
+            del resObject[dataSetName]["locals"]
+            del resObject[dataSetName]["position"]
+            del resObject[dataSetName]["rowcount"]
+            resObject[dataSetName]["type"] = typeQuery
+            resObject[dataSetName]["uid"] = uid
+            return json.dumps(resObject)
+        resObject[dataSetName]["data"] = {}
     return json.dumps(resObject)
 
 def connect_db():
