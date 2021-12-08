@@ -1,5 +1,6 @@
 package ru.miacomsoft.flask_d3_client.Lib;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,17 +42,21 @@ public class Android {
     private long lastUpdate;
     private WebView webView;
     private SQLLiteORM sqlLocal;
+    private GPSTracker gPSTracker; // Получение положения GPS сигнала
     List<Sensor> mList;
 //       webView.loadUrl("javascript: Accel="+jsonObject.toString()   );
 
     private MainActivity parentActivity;
 
+    @SuppressLint("NewApi")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public Android(MainActivity activity, WebView webViewPar,SQLLiteORM sqlLocal) {
         webView = webViewPar;
         parentActivity = activity;
         lastUpdate = System.currentTimeMillis();
         this.sqlLocal =sqlLocal;
+        gPSTracker = new GPSTracker(activity,webView);
+
         /**
          * This is an approved way to pass data back to the html page
          */
@@ -264,8 +269,40 @@ public class Android {
     }
 
 /// ===============================================================
-/// ===============================================================
+/// ================Работа с GPS ==================================
 /// ===============================================================
 
+
+    @JavascriptInterface
+    public boolean startLocation(String provider) {
+        if (provider == "net"){
+             return gPSTracker.startNetworkLocation();
+        }
+        if (provider == "gps"){
+            return gPSTracker.startGpsLocation();
+        }
+        return gPSTracker.startGpsLocation();
+    }
+
+    @JavascriptInterface
+    public void setGpsNetSettings(String provider) {
+        gPSTracker.setSettings();
+    }
+
+
+    @JavascriptInterface
+    public String getGPS(String provider) {
+        return gPSTracker.getGPS();
+    }
+
+    @JavascriptInterface
+    public String getNetGPS(String provider) {
+        return gPSTracker.getNetGPS();
+    }
+
+
+/// ===============================================================
+/// ===============================================================
+/// ===============================================================
 
 }
