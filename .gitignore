@@ -18,3 +18,4 @@ __pycache__
 /app/.idea
 /app/db.shelve.dat
 /app/TempDir
+/app/venv
