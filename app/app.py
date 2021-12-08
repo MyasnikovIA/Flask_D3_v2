@@ -53,6 +53,7 @@ def after_request(response):
     header['Access-Control-Allow-Origin'] = '*'
     header['Access-Control-Allow-Headers'] = '*'
     header['Access-Control-Allow-Methods'] = '*'
+    header['Access-Control-Allow-Methods'] = '*'
     header['Server'] = 'D3apiServer'
     return response
 
@@ -100,10 +101,10 @@ def all_files(path):
         return bin, 200, {'content-type': mime}
 
     if "~d3theme" in path:
-        return d3theme_css(request), 200, {'content-type': 'text/css'}
+        return d3theme_css(request), 200, {'content-type': 'text/css; charset=utf-8'}
 
     if "~d3main" in path:
-        return d3main_js(request), 200, {'content-type': 'application/x-javascript'}
+        return d3main_js(request), 200, {'content-type': 'application/x-javascript; charset=utf-8'}
 
     if "getform.php" in path:
         formName = getParam('Form')
@@ -123,7 +124,7 @@ def all_files(path):
             cache = getParam('cache')
             dataSetName = getParam('DataSet', "")
             frm = getform.getParsedForm(formName, cache, dataSetName, session)
-        return frm, 200, {'content-type': 'application/plain'}
+        return frm, 200, {'content-type': 'application/plain; charset=utf-8'}
 
     if "request.php" in path:
         resultTxt = "{}"
@@ -165,14 +166,14 @@ def all_files(path):
         dataSetName = getParam('DataSet', "")
         if ext == "frm":
             frm = getform.getParsedForm(path, cache, dataSetName, session)
-            return frm, 200, {'content-type': 'text/html'}
+            return frm, 200, {'content-type': 'text/html; charset=utf-8'}
         else:
             frm = getform.getParsedForm(path, cache, dataSetName, session)
-            return frm, 200, {'content-type': 'text/html'}
+            return frm, 200, {'content-type': 'text/html; charset=utf-8'}
 
     if path[-3:].lower() in ["tml", "htm"]:
         return redirect("/index.html")
-    return render_template('404.html', **locals()), 404
+    return render_template('404.html; charset=utf-8', **locals()), 404
     # return app.render_template(path)
     # return app.send_static_file(path)
 

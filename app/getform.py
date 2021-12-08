@@ -325,7 +325,7 @@ def getParsedForm(formName, cache, dataSetName="", session={}):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
     """
-    if ("AgentInfo" in session and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0):
+    if ("AgentInfo" in session and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0 and DEBUGGER == 1):
         return getTemp(formName, cache, dataSetName, session)
     else:
         return getSrc(formName, cache, dataSetName, session)
