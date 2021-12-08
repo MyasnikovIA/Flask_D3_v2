@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<HTML>
+<HEAD>
+    <style>
+        .textarea2 {
+          width: 800px;height: 400px;
+        }
+    </style>
+    <script>
+        configObj = {"setupUrl":"file:///android_asset/setup.html","worUrl":""};
+        var init = function() {
+            let id = -1;
+            let tmpConfigObj = Android.getJson('config',1);
+            if (typeof tmpConfigObj['setupUrl'] === "undefined"){
+               configObj = tmpConfigObj;
+               id = Android.insertJson('config', JSON.stringify(tmpConfigObj));
+               document.getElementById('log').value ="------"
+            }
+            document.getElementById('log').value += JSON.stringify(configObj);
+            document.getElementById('log').value +=id;
+        }
+        var onSaveVal = function() {
+            configObj['worUrl']=document.getElementById('wirUrl').value;
+            document.getElementById('log').value = JSON.stringify(configObj);
+            Android.getJson('config',1);
+        }
+    </script>
+</HEAD>
+<BODY onload="init()" style="width: 1200px;" >
+    <input id="wirUrl" />
+    <button onclick="onSaveVal();" >Сохранить URL</button>
+    <br/><textarea id="log" rows="10" style="width: 800px;"  disabled="disabled" ></textarea>
+</BODY>
+</HTML>
