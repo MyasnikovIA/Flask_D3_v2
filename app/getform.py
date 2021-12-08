@@ -30,7 +30,6 @@ USER_FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['UserForm
 TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['TempDir'])      # Директория  хронения временных файлов
 DEBUGGER = int(ConfigOptions['debug'])                                                 # признак возможности включения режима отладки в URL строке
 
-
 nameElementHeshMap={}     # список ХЭШ названий элементов, для пеобразования
 nameElementMap={}         # список названий элементов
 DB_DICT = {}              # Список БД по  сессиям

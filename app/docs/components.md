@@ -56,6 +56,7 @@
 
 * [Action](components/Action.md)
 * [DataSet](components/DataSet.md)
+* [Modules](components/Modules.md)
 
 Прочие
 --------------------
