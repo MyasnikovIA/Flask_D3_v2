@@ -480,6 +480,9 @@ def joinDfrm(formName, rootForm):
 
 
 def readFile(pathForm):
+    """
+    Чтение исходного текстового файла, и добавление Элементов для дальнейшего преобразование в XML
+    """
     if not os.path.exists(pathForm):
         return f'<?xml version="1.0" encoding="UTF-8" ?>\n<error>Fragment "{pathForm}" not found </error>'
     with codecs.open(pathForm, 'r', encoding='utf8') as f:
@@ -508,6 +511,9 @@ def readFile(pathForm):
 
 
 def getXMLObject(formName):
+    """
+    Получение XML объекта из прочитаного файла (или фрагмента XML)
+    """
     global TEMP_XML_PAGE
     # TEMP_DS_PAGE = {}
     blockName = ""
@@ -572,9 +578,8 @@ def query_function(DB,function_name, args=(), one=False):
 
 def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     """
-    Функция обработки запросов DataSet и Action с клиентских форм
+    Функция обработки запросов DataSet, Action и Module с клиентских форм
     """
-
     global DB_DICT
     if 'ID' in sessionObj and not sessionObj['ID'] in DB_DICT:
         sessionID = sessionObj['ID']
@@ -852,18 +857,6 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
         resObject[dataSetName]["data"] = {}
     return json.dumps(resObject)
 
-def connect_db():
-    conn = sqlite3.connect(app.config['DATABASE'])
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def create_db():
-    dbLoc = connect_db()
-    dbLoc.cursor().executescript("");
-    dbLoc.commit()
-    dbLoc.close()
-
-
 ###-----------------------------------------------------------------------------------------------
 ###------ Механизм буфиризации контента, для ускорения продуктового сервета ----------------------
 ###-----------------------------------------------------------------------------------------------
@@ -872,6 +865,11 @@ TMP_PAGE_CAHE = {}
 
 
 def getTempPage(name, defoultValue=''):
+    """
+    Получить текст страницы, к которой уже обращались ранее после перезагрузки
+    необходимо для ускорения работы, страница персится один раз, и сохраняется ,
+    При повтороном обращении  вытаскивается сохраненая копия
+    """
     global TMP_PAGE_CAHE
     if TMP_PAGE_CAHE.get(name) == None:
         return defoultValue, 'application/plain'
@@ -880,6 +878,9 @@ def getTempPage(name, defoultValue=''):
 
 
 def setTempPage(name, html='', mime='application/plain'):
+    """
+    Сохранение  преобразованной страницы во временное хронилище (Словарь)
+    """
     global TMP_PAGE_CAHE
     if TMP_PAGE_CAHE == None:
         TMP_PAGE_CAHE = {}
@@ -887,6 +888,9 @@ def setTempPage(name, html='', mime='application/plain'):
 
 
 def existTempPage(name):
+    """
+    Проверка наличия  сохраненой копии преобразованной страницы
+    """
     global TMP_PAGE_CAHE
     if TMP_PAGE_CAHE == None:
         TMP_PAGE_CAHE = {}
@@ -897,19 +901,35 @@ def existTempPage(name):
 
 
 def getSession(name, defoult):
+    """
+    функция для получения сессии
+    (кандидат на удаление)
+    """
     if not name in session:
         return defoult
     return session[name]
 
+
 def setSession(name, value):
+    """
+    функция добавления значения в сессию
+    (кандидат на удаление)
+    """
     session[name] = value
 
 
 def getSessionObject():
+    """
+    Функция  для получения объекта сессия
+    (кандидат на удаление)
+    """
     return session
 
 
 def getAgentInfo(session,request):
+    """
+    Сохранение в сессии информации об подключаемом клиенте
+    """
     if not "AgentInfo" in session:
         session["AgentInfo"] = {'browser': '', 'version': 94, 'platform': 'externalQuery'}
     if hasattr(request, 'user_agent'):
@@ -943,7 +963,11 @@ def getAgentInfo(session,request):
         session["REMOUTE"] = request.args.get("REMOUTE")
     return session["AgentInfo"]
 
+
 def mimeType(pathFile):
+    """
+    Получение типа HTML контента, по  расширению  запрациваемой страницы
+    """
     extList = {"py": "text/html", "psp": "text/html", "css": "text/css", "js": "application/x-javascript",
                "xml": "text/xml", "dtd": "text/xml", "txt": "text/plain", "inf": "text/plain",
                "nfo": "text/plain",
@@ -989,61 +1013,3 @@ def mimeType(pathFile):
 
 # ====================================================================================================================
 # ====================================================================================================================
-
-
-"""
-
-DataSet
-{
-  "type": "DataSet",
-  "uid": "DS2471634288781925",
-  "data": [
-    {
-      "ID": "556277290",
-      "FULLNAME": "ЛПУ для тренироваки"
-    }
-  ],
-  "position": 0,
-  "rowcount": 914,
-  "page": 0
-}
-
-def parseFrm(root):
-    attrib = root.attrib.copy()
-    if len(root.attrib) > 0:
-        data = " ".join(f'{k}="{v}"' for k, v in root.attrib.items())
-    else:
-        data = ""
-    if not root.text == None and root.tail == None:
-        print(f"<{root.tag}{data}>", end="")
-        print(root.text, end="")
-
-    elif root.text == None and not root.tail == None:
-        # если тэг закрытый
-        print(f"<{root.tag}{data}/>", end="")
-
-    elif not root.text == None and not root.tail == None:
-        print(f"<{root.tag}{data}>", end="")
-        print(root.text, end="")
-    else:
-        pass
-        # print(root.text)
-
-    # =========== Рекурсионый обход дерева ============================
-    if hasattr(root, 'getchildren'):
-        for elem in root.getchildren():
-            parseFrm(elem)
-    elif len(root) > 0:
-        for elem in root:
-            parseFrm(elem)
-    # =================================================================
-    if not root.text == None and root.tail == None:
-        print(f"</{root.tag}>", end="")
-    elif root.text == None and not root.tail == None:
-        print(root.tail, end="")
-    elif not root.text == None and not root.tail == None:
-        # print(root.tail)
-        # print(root.text)
-        print(f"</{root.tag}>", end="")
-        print(root.tail, end="")
-"""
