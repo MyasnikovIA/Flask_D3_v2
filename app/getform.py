@@ -7,11 +7,8 @@ import json
 import sys
 import hashlib
 import cx_Oracle
-import sqlite3
-import app
-
 from app import session
-from pathlib import Path
+from Etc.config import ConfigOptions
 
 try:
     import xml.etree.cElementTree as ET
@@ -20,11 +17,19 @@ except ImportError:
 
 global COMPONENT_PATH
 ROOT_DIR = os.path.dirname(__file__)
+"""
 COMPONENT_PATH = os.path.join(os.path.dirname(__file__), 'Components')  # Директория  где хронятся Компоненты
 FORM_PATH = os.path.join(os.path.dirname(__file__), 'Forms')            # Директория  где хронятся формы
 USER_FORM_PATH = os.path.join(os.path.dirname(__file__), 'UserForms')   # Директория  ЮзерФорм
 TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), 'TempDir')      # Директория  хронения временных файлов
 DEBUGGER = 1                                                            # признак возможности включения режима отладки в URL строке
+"""
+COMPONENT_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['Components'])  # Директория  где хронятся Компоненты
+FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['Forms'])            # Директория  где хронятся формы
+USER_FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['UserForms'])   # Директория  ЮзерФорм
+TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['TempDir'])      # Директория  хронения временных файлов
+DEBUGGER = int(ConfigOptions['debug'])                                                 # признак возможности включения режима отладки в URL строке
+
 
 nameElementHeshMap={}     # список ХЭШ названий элементов, для пеобразования
 nameElementMap={}         # список названий элементов
