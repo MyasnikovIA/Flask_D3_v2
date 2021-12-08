@@ -26,8 +26,10 @@ USER_FORM_PATH = os.path.join(os.path.dirname(__file__), 'UserForms')   # Дир
 TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), 'TempDir')      # Директория  хронения временных файлов
 DEBUGGER = 1                                                            # признак возможности включения режима отладки в URL строке
 
-nameElementHeshMap={} # список ХЭШ названий элементов, для пеобразования
-nameElementMap={} # список названий элементов
+nameElementHeshMap={}     # список ХЭШ названий элементов, для пеобразования
+nameElementMap={}         # список названий элементов
+DB_DICT = {}              # Список БД по  сессиям
+REMOTE_SESSION_DICT = {}  # Словарь содержащий сессии удаленных серверов
 
 def stripCode(srcCode=""):
     """
@@ -262,7 +264,7 @@ def getSrc(formName, cache, dataSetName="", session={}):
     rootForm = getXMLObject(formName)
     sysinfoBlock, text = parseFrm(rootForm, formName, {}, 0, session)  # парсим форму
     resTxt = []
-    if ext=="frm":
+    if ext=="frm" and (not "REMOUTE" in session or not int(session["REMOUTE"]) == 1 ):
         resTxt.append("""
         <html  lang="en"  ><head>
             <meta charset="UTF-8"/>
@@ -567,7 +569,7 @@ def query_function(DB,function_name, args=(), one=False):
     cur.close()
     return (r[0] if r else None) if one else r
 
-DB_DICT = {}
+
 def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     """
     Функция обработки запросов DataSet и Action с клиентских форм
@@ -909,18 +911,23 @@ def getSessionObject():
 
 def getAgentInfo(session,request):
     if not "AgentInfo" in session:
-        session["AgentInfo"] = {}
+        session["AgentInfo"] = {'browser': '', 'version': 94, 'platform': 'externalQuery'}
     if hasattr(request, 'user_agent'):
         session["AgentInfo"] = {}
         session["AgentInfo"]['debug'] = 0
         session["AgentInfo"]['User-Agent'] = request.headers.get('User-Agent')
-        if hasattr(request.user_agent, 'browser'):
+        if hasattr(request.user_agent, 'browser') and not request.user_agent.browser == None:
             session["AgentInfo"]['browser'] = request.user_agent.browser
-        if hasattr(request.user_agent, 'version'):
-            session["AgentInfo"]['version'] = request.user_agent.version and int(
-                request.user_agent.version.split('.')[0])
-        if hasattr(request.user_agent, 'platform'):
+        else:
+            session["AgentInfo"]['browser'] = ""
+        if hasattr(request.user_agent, 'version') and not request.user_agent.version == None:
+            session["AgentInfo"]['version'] = request.user_agent.version and int(request.user_agent.version.split('.')[0])
+        else:
+            session["AgentInfo"]['version'] = 0
+        if hasattr(request.user_agent, 'platform')  and not request.user_agent.platform == None:
             session["AgentInfo"]['platform'] = request.user_agent.platform
+        else:
+            session["AgentInfo"]['platform'] = "externalQuery"
         if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
             session["AgentInfo"]['ip'] = request.environ['REMOTE_ADDR']
         else:
@@ -929,6 +936,11 @@ def getAgentInfo(session,request):
         session["AgentInfo"]['debug'] = int(request.args.get("debug"))
     if not request.args.get("f") == None:
         session["AgentInfo"]['UserForms'] = request.args.get("f")
+    if (not request.args.get("modal") ==None):
+        session["modal"] = request.args.get("modal")
+    # Признак обработки запроса  с удаленного сервера
+    if (not request.args.get("REMOUTE") ==None):
+        session["REMOUTE"] = request.args.get("REMOUTE")
     return session["AgentInfo"]
 
 def mimeType(pathFile):

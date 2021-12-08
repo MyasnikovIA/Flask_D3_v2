@@ -17,3 +17,4 @@ __pycache__
 /app/temp
 /app/.idea
 /app/db.shelve.dat
+/app/TempDir

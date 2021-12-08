@@ -1,12 +1,13 @@
 import datetime
 import os
+import sys
 import shutil
 import json
 import uuid
 from pathlib import Path
 from flask import Flask, redirect, session, render_template, request, g
 import getform
-import requests as req
+import requests as reqExt
 import urllib.parse
 
 from System.d3main import show as d3main_js
@@ -76,6 +77,7 @@ def all_files(path):
         global countQuery
         countQuery += 1
         session["ID"] = f'{str(uuid.uuid1()).replace("-", "")}{countQuery}{datetime.datetime.now().microsecond}'
+        getform.REMOTE_SESSION_DICT[session["ID"]] = {}
     ext = path[path.rfind('.') + 1:].lower()
     getform.getAgentInfo(session,request) # получить информацию о клиенте
     ROOT_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}"
@@ -105,13 +107,17 @@ def all_files(path):
 
     if "getform.php" in path:
         formName = getParam('Form')
+        extSub = formName[formName.rfind('.') + 1:].lower()
         if "http" in formName or  "https" in formName:
-            # Дописать авторизацию на удаленном сервере
-            o = urllib.parse.urlsplit(formName)
-            # o.hostname # адрес сервера
-            # o.path # путь к форме
-            # o.query # параметры ключ=значение  в URL строке
-            htmlResObj = req.get(formName)
+            if not extSub == 'html' and not extSub == 'frm':
+                formName=f"{formName}.frm"
+            urlParstmp = urllib.parse.urlsplit(formName)
+            if urlParstmp.hostname in getform.REMOTE_SESSION_DICT[session["ID"]]:
+                remote_session = getform.REMOTE_SESSION_DICT[session["ID"]][urlParstmp.hostname]
+            else:
+                remote_session = reqExt.Session()
+                getform.REMOTE_SESSION_DICT[session["ID"]][urlParstmp.hostname] = remote_session
+            htmlResObj = remote_session.get(f"{formName}?REMOUTE=1")
             frm = htmlResObj.content
         else:
             cache = getParam('cache')
@@ -123,15 +129,33 @@ def all_files(path):
         resultTxt = "{}"
         formName = getParam('Form')
         cache = getParam('cache')
+        requestPoetText = request.form.get('request')
+        if not requestPoetText:
+            requestPoetText = request.data.decode()
+        dataSet = json.loads(requestPoetText)
         if request.method == 'POST':
-            dataSet = json.loads(request.form.get('request'))
-            for dataSetName in dataSet:
-                typeQuery = dataSet[dataSetName]["type"]
-                paramsQuery = dataSet[dataSetName]["params"]
-                if len(formName) == 0:
-                    formName = urllib.parse.urlsplit(request.referrer).path[1:]
-                resultTxt = getform.dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
-                # getRunAction(formName, cache, name, queryActionObject[name])
+            extSub = formName[formName.rfind('.') + 1:].lower()
+            if "http" in formName or  "https" in formName:
+                    if not extSub == 'html' and not extSub == 'frm':
+                        formName=f"{formName}"
+                    urlParstmp = urllib.parse.urlsplit(formName)
+                    if urlParstmp.hostname in getform.REMOTE_SESSION_DICT[session["ID"]]:
+                        remote_session = getform.REMOTE_SESSION_DICT[session["ID"]][urlParstmp.hostname]
+                    else:
+                        remote_session = reqExt.Session()
+                        getform.REMOTE_SESSION_DICT[session["ID"]][urlParstmp.hostname] = remote_session
+                    remote_headers_query = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+                    url_tmp = f"{urlParstmp.scheme}://{urlParstmp.netloc}/request.php?cache_enabled=0&REMOUTE=1&Form={urlParstmp.path[1:]}"
+                    result_query = remote_session.post(url_tmp, headers=remote_headers_query,json=dataSet)
+                    resultTxt = result_query.text
+            else:
+                for dataSetName in dataSet:
+                    typeQuery = dataSet[dataSetName]["type"]
+                    paramsQuery = dataSet[dataSetName]["params"]
+                    if len(formName) == 0:
+                        formName = urllib.parse.urlsplit(request.referrer).path[1:]
+                    resultTxt = getform.dataSetQuery(f'{formName}:{dataSetName}', typeQuery, paramsQuery, session)
+                    # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
 
     # Поиск запроса в каталоге форм
@@ -163,6 +187,8 @@ if __name__ == '__main__':
     else:
         os.mkdir(getform.TEMP_DIR_PATH)
     port = int(os.environ.get("PORT", 5000))
+    if len(sys.argv)>1:
+        port = int(sys.argv[1])
     app.run(debug=False, host='0.0.0.0', port=port)
 
 

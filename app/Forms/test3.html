@@ -10,6 +10,8 @@
       <cmpButton caption="открыть окно index.html (модально)" onclick = "Form.onBtnTest6();"/>
       <cmpButton caption="открыть окно test6.frm (модально)" onclick = "Form.onBtnTest7();"/>
       <cmpButton caption="открыть окно http://127.0.0.1:5000/index.html (модально)" onclick = "Form.onBtnTest8();"/>
+      <cmpButton caption="открыть окно http://192.168.15.200:5000/System/loginPostgres.frm (модально)" onclick = "Form.onBtnTest9();"/>
+      <cmpButton caption="открыть окно http://192.168.15.200:5000/index.html (модально)" onclick = "Form.onBtnTest10();"/>
 
           <cmpScript>
             <![CDATA[
@@ -26,7 +28,14 @@
                     win = openD3Form('test6.frm', true, {width: 700, height: 300, vars: { test:"11111"}});
                 }
                 Form.onBtnTest8 = function() {
-                    win = openD3Form('http://127.0.0.1:9091/index.html', true, {width: 700, height: 300, vars: { test:"11111"}});
+                    win = openD3Form('http://192.168.15.200:5000/index.html', true, {width: 700, height: 300, vars: { test:"11111"}});
+                }
+               Form.onBtnTest9 = function() {
+                    win = openD3Form('http://192.168.15.200:5000/System/loginPostgres.frm', true, {width: 700, height: 300, vars: { test:"11111"}});
+                    //win = openD3Form('http://192.168.15.200:9091/System/loginPostgres.frm', true, {width: 700, height: 300, vars: { test:"11111"}});
+                }
+               Form.onBtnTest10 = function() {
+                    win = openD3Form('http://192.168.15.200:5000/index.html', true, {width: 700, height: 300, vars: { test:"11111"}});
                 }
             ]]>
         </cmpScript>
