@@ -57,15 +57,14 @@ public class Android {
         this.sqlLocal =sqlLocal;
         gPSTracker = new GPSTracker(activity,webView);
 
-        /**
-         * This is an approved way to pass data back to the html page
-         */
+        /*
         webView.evaluateJavascript("alert('pass here some ...')", new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String s) {
 
             }
         });
+         */
         // webView.loadUrl("javascript: window.RecognizerText = function(text){ console.log('RecognizerText',text); };");
     }
 

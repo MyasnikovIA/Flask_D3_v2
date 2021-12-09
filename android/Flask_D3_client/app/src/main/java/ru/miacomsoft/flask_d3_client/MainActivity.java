@@ -10,6 +10,7 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private Button button;
     SQLLiteORM sqlLiteORM;
     ProgressBar progressBar ;
-
+    TextView progressTv;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint("JavascriptInterface")
@@ -37,16 +38,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.webview_main);
-        webView = new WebView(this);
-        webView.getSettings().setAppCacheEnabled(true);
-        webView.getSettings().setAppCachePath(this.getCacheDir().getPath());
-        // webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
-        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        webView.getSettings().setAppCacheMaxSize(1024*1024*8);
-
-        //webView = (WebView) findViewById(R.id.webView);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-
         setContentView(R.layout.activity_main);
         button = (Button) findViewById(R.id.button);
 
@@ -59,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         }else{
             runWebClient(urlText);
         }
-        // webView.loadUrl("file:///android_asset/mypage.html");
-        // webView.reload();
+        //webView.loadUrl("file:///android_asset/setup.html");
+        //webView.reload();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -73,14 +64,24 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void runWebClient(String urlText) {
-        setContentView(webView);
-        //setContentView(R.layout.webview_main);
+        // setContentView(webView);
+        setContentView(R.layout.webview_main);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressTv= (TextView) findViewById(R.id.progressTv);
+        webView = (WebView) findViewById(R.id.webView);
+        // webView = new WebView(this);
+        webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setAppCachePath(this.getCacheDir().getPath());
+        // webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        webView.getSettings().setAppCacheMaxSize(1024*1024*8);
         webView.setWebViewClient(new WebViewClient());
-        // webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new WebChromeClient());
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);  // Включить обработчик JS
         webView.addJavascriptInterface(new Android(this,webView,sqlLiteORM), "Android");
         webView.loadUrl(urlText);
+        //webView.loadUrl("file:///android_asset/setup.html");
     }
 
     @Override
@@ -125,18 +126,17 @@ public class MainActivity extends AppCompatActivity {
 
     public class WebChromeClient extends android.webkit.WebChromeClient {
         public void onProgressChanged(WebView view, int progress) {
-             /*
             if(progress < 100 && progressBar.getVisibility() == ProgressBar.GONE){
-                progressBar.setVisibility(ProgressBar.VISIBLE);
-                txtview.setVisibility(View.VISIBLE);
+               progressBar.setVisibility(ProgressBar.VISIBLE);
+                progressTv.setVisibility(View.VISIBLE);
             }
-
             progressBar.setProgress(progress);
+            progressTv.setText(String.valueOf(progress)+"%");
             if(progress == 100) {
                 progressBar.setVisibility(ProgressBar.GONE);
-                txtview.setVisibility(View.GONE);
+                progressTv.setVisibility(View.GONE);
             }
-              */
+
         }
     }
 
@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
-            // progressBar.setVisibility(View.GONE);
+            //progressBar.setVisibility(View.GONE);
         }
     }
 
