@@ -38,6 +38,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.webview_main);
         webView = new WebView(this);
+        webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setAppCachePath(this.getCacheDir().getPath());
+        // webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        webView.getSettings().setAppCacheMaxSize(1024*1024*8);
+
         //webView = (WebView) findViewById(R.id.webView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
 

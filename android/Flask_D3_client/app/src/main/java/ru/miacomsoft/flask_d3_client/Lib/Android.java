@@ -285,7 +285,7 @@ public class Android {
     }
 
     @JavascriptInterface
-    public void setGpsNetSettings(String provider) {
+    public void setGpsNetSettings() {
         gPSTracker.setSettings();
     }
 

@@ -5,15 +5,31 @@
         <link rel="stylesheet" type="text/css" href="./~d3theme"/>
         <script src="./~d3main"></script>
     </head>
-    <body name="eeeee">
+    <body name="eeeee" onshow="Form.onShow()">
       <cmpButton caption="Обучение платформе" onclick = "Form.onBtnTest2();"/>
       <cmpScript>
         <![CDATA[
             Form.onBtnTest2 = function() {
                 openD3Form('Tutorial/main',false);
             }
+            Form.onShow = function(){
+               if (Android) {
+                  Android.setGpsNetSettings();
+                  // Android.alert(Android.startLocation('gps'));
+                  setValue('log','fsdfasdfasdfasdf-----');
+               }
+            }
+            Form.saveSqlite = function() {
+                Android.insertJson("tab1",'{"pole1":123456}')
+            }
+            Form.readSqlite = function() {
+                setValue('log',JSON.stringify(Android.getJsonArray("tab1",'')));
+            }
         ]]>
     </cmpScript>
+    <cmpTextArea name="log" height="70%"/>
+    <cmpButton caption="записать" onclick="Form.saveSqlite()"/>
+    <cmpButton caption="Читать" onclick="Form.readSqlite()"/>
     </body>
 </html>
 
