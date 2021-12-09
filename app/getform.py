@@ -956,7 +956,7 @@ def getAgentInfo(session,request):
             session["AgentInfo"]['ip'] = request.environ['REMOTE_ADDR']
         else:
             session["AgentInfo"]['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
-    if (not request.args.get("debug") == None and DEBUGGER==1) or DEBUGGER==2:
+    if (not request.args.get("debug") == None and DEBUGGER==1):
         session["AgentInfo"]['debug'] = int(request.args.get("debug"))
     if not request.args.get("f") == None:
         session["AgentInfo"]['UserForms'] = request.args.get("f")
