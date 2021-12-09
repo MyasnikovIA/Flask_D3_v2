@@ -202,10 +202,9 @@ public class Android {
      * @return - JSON объект
      */
     @JavascriptInterface
-    public JSONObject getJson(String tableName,long id) {
-       return sqlLocal.getJson(tableName, id);
+    public String getJson(String tableName,long id) {
+       return sqlLocal.getJson(tableName, id).toString();
     }
-
     /***
      * Вставить JSON объект в таблицу
      * @param tableName
@@ -214,13 +213,12 @@ public class Android {
      */
     @JavascriptInterface
     public long insertJson(String tableName, String json) {
-        JSONObject jsonOnj = null;
         try {
-            jsonOnj = new JSONObject(json);
+            return sqlLocal.insertJson(tableName,new JSONObject(json));
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return sqlLocal.insertJson(tableName, jsonOnj);
+        return -1;
     }
 
     /***
@@ -230,8 +228,13 @@ public class Android {
      * @return
      */
     @JavascriptInterface
-    public boolean updateJsonSQL(String tableName, JSONObject json) {
-        return sqlLocal.updateJson(tableName, json);
+    public boolean updateJsonSQL(String tableName,  String json) {
+        try {
+            return sqlLocal.updateJson(tableName,new JSONObject(json));
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /***
@@ -244,17 +247,26 @@ public class Android {
     }
 
     /***
+     * Очистить таблицу от всех записей
+     * @param tableName
+     */
+    @JavascriptInterface
+    public void clearRow(String tableName) {
+        sqlLocal.clearRow(tableName);
+    }
+
+    /***
      *  Получить массив объектов  из таблици по условию
      * @param tableName - Имя таблицы
      * @param where - SQL условие
      * @return
      */
     @JavascriptInterface
-    public JSONArray getJsonArray(String tableName , String where) {
+    public String getJsonArray(String tableName , String where) {
         if (where.length()>0) {
             where =" where "+where;
         }
-        return sqlLocal.sql("select * from "+tableName+where,null);
+        return sqlLocal.sql("select * from "+tableName+where,null).toString();
     }
 
     /***
@@ -263,8 +275,8 @@ public class Android {
      * @return
      */
     @JavascriptInterface
-    public JSONArray SQL(String SQLtext) {
-        return sqlLocal.sql(SQLtext,null);
+    public String SQL(String SQLtext) {
+        return sqlLocal.sql(SQLtext,null).toString();
     }
 
 /// ===============================================================

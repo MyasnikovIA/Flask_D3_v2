@@ -22,14 +22,12 @@
      <cmpButton caption="DataSet"  onclick="openD3Form('Tutorial/DataSet/DataSet',true,{width: 1200, height: 900})" />
      <cmpButton caption="Action"  onclick="openD3Form('Tutorial/Action/Action',true,{width: 1200, height: 900})" />
      <hr/>
-     <cmpButton caption="Android D3extClient"  onclick="openD3Form('Tutorial/Android/alert',true,{width: 1200, height: 900})" />
+     <cmpButton caption="Android Flask D3 client Alert"  onclick="openD3Form('Tutorial/Android/alert',true,{width: 1200, height: 900})" />
+     <cmpButton caption="Android Flask D3 client SQLite"  onclick="openD3Form('Tutorial/Android/SqliteAndroid',true,{width: 1200, height: 900})" />
      <hr/>
      <cmpButton caption="FormDesugner"  onclick="openD3Form('FormDesugner/main',true,{width: '100%', height: '100%'})" />
      <div name="MyDfrmBlock">-----------------</div>
-
-
      <cmpButton caption="send" onclick=" Android.speech(' сообщение от системы '); " />
-
      <div>
         фвфывфыв
      </div>

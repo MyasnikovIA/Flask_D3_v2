@@ -10,6 +10,8 @@
         <entry key="..\:/AndroidProject/Flask_D3_client/app/src/main/res/layout/setup.xml" value="0.33" />
         <entry key="..\:/AndroidProject/Flask_D3_client/app/src/main/res/layout/webview_main.xml" value="0.5" />
         <entry key="..\:/AndroidProject/Flask_D3_client/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.22135416666666666" />
+        <entry key="..\:/AppServ/var/www/Flask_D3_v2/android/Flask_D3_client/app/src/main/res/layout/activity_main.xml" value="0.22864583333333333" />
+        <entry key="..\:/AppServ/var/www/Flask_D3_v2/android/Flask_D3_client/app/src/main/res/layout/webview_main.xml" value="0.25" />
       </map>
     </option>
   </component>
