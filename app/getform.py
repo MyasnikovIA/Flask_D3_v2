@@ -329,7 +329,7 @@ def getParsedForm(formName, cache, dataSetName="", session={}):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
     """
-    if ("AgentInfo" in session and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0 and DEBUGGER == 1):
+    if ("AgentInfo" in session and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0 and DEBUGGER == 1)and not DEBUGGER == 2:
         return getTemp(formName, cache, dataSetName, session)
     else:
         return getSrc(formName, cache, dataSetName, session)
@@ -607,7 +607,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     # =============== Вставляем инициализированые переменные =======================
     argsQuery, sessionVar, argsPutQuery = parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj)
     varsDebug = {}
-    if not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1:
+    if (not int(sessionObj["AgentInfo"]['debug']) == 0) or DEBUGGER==2:
         varsDebug = argsQuery.copy()
     # =============================================================================
     argsQuery["DB_DICT"] = DB_DICT
@@ -665,7 +665,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             resObject[dataSetName]["type"] = typeQuery
             resObject[dataSetName]["position"] = 0
             resObject[dataSetName]["page"] = 0
-            if not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1:
+            if (not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1) or DEBUGGER==2:
                 resObject[dataSetName]["var"] = varsDebug
                 resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
             return json.dumps(resObject)
@@ -679,7 +679,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
                     # Дописать обработку вставок
                     pass
-                if not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1:
+                if (not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1) or DEBUGGER==2:
                     resObject[dataSetName]["var"] = varsDebug
                     resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
                 try:
@@ -739,7 +739,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             del resObject[dataSetName]["locals"]
             del resObject[dataSetName]["position"]
             del resObject[dataSetName]["rowcount"]
-            if not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1:
+            if (not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1) or DEBUGGER==2:
                 resObject[dataSetName]["var"] = varsDebug
                 resObject[dataSetName]["sqlArr"] = [line for line in code.split("\n")]
                 resObject[dataSetName]["sql"] = code
@@ -753,7 +753,7 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
                     # Дописать обработку вставок
                     pass
-                if not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1:
+                if (not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1) or DEBUGGER==2:
                     resObject[dataSetName]["var"] = varsDebug
                     resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
                     resObject[dataSetName]["sql"] = sqlText
@@ -956,7 +956,7 @@ def getAgentInfo(session,request):
             session["AgentInfo"]['ip'] = request.environ['REMOTE_ADDR']
         else:
             session["AgentInfo"]['ip'] = request.environ['HTTP_X_FORWARDED_FOR']
-    if not request.args.get("debug") == None and DEBUGGER==1:
+    if (not request.args.get("debug") == None and DEBUGGER==1) or DEBUGGER==2:
         session["AgentInfo"]['debug'] = int(request.args.get("debug"))
     if not request.args.get("f") == None:
         session["AgentInfo"]['UserForms'] = request.args.get("f")

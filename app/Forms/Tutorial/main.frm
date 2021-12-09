@@ -30,6 +30,7 @@
 
      <cmpButton caption="send" onclick=" Android.speech(' сообщение от системы '); " />
 
-
-
+     <div>
+        фвфывфыв
+     </div>
 </div>
