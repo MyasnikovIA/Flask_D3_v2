@@ -23,6 +23,13 @@ import org.json.JSONObject;
 
 public class GPSTracker extends Service implements LocationListener {
 
+    /*
+    Кандидан на удаление
+
+    Необходимо перенести  в GpsTrack логику получения гео данных по сети, или вышкам GPS
+
+     */
+
     private final Context mContext;
 
     // flag for GPS status
@@ -57,6 +64,7 @@ public class GPSTracker extends Service implements LocationListener {
 
         //  getLocation();
     }
+
 
 
     @SuppressLint("MissingPermission")
@@ -123,6 +131,8 @@ public class GPSTracker extends Service implements LocationListener {
     }
 
     public void setSettings(){
+        showSettingsAlert();
+        /*
         // getting GPS status
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         // getting network status
@@ -131,6 +141,7 @@ public class GPSTracker extends Service implements LocationListener {
             // no network provider is enabled
             showSettingsAlert();
         }
+         */
     }
 
 
@@ -229,7 +240,7 @@ public class GPSTracker extends Service implements LocationListener {
 
     public void showSettingsAlert() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
-        // Setting Dialog Title
+        // Setting DialogTitle
         alertDialog.setTitle("GPS is settings");
         // Setting Dialog Message
         alertDialog.setMessage("GPS is not enabled. Do you want to go to settings menu?");

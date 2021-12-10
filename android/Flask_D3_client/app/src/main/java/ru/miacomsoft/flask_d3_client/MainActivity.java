@@ -1,6 +1,8 @@
 package ru.miacomsoft.flask_d3_client;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,8 +14,11 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -32,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
     ProgressBar progressBar ;
     TextView progressTv;
 
+    public static final int REQUEST_PERMISSION_LOCATION = 255; // int should be between 0 and 255
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @SuppressLint("JavascriptInterface")
     @Override
@@ -40,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.webview_main);
         setContentView(R.layout.activity_main);
         button = (Button) findViewById(R.id.button);
-
         sqlLiteORM = new SQLLiteORM(this);
         String urlText = loadConfig();
         if (urlText.length()==0){
@@ -52,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
         }
         //webView.loadUrl("file:///android_asset/setup.html");
         //webView.reload();
+
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -159,5 +167,20 @@ public class MainActivity extends AppCompatActivity {
             //progressBar.setVisibility(View.GONE);
         }
     }
+
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PERMISSION_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Включение доступ к GPS
+                // gps1 = new gps(context);
+            }
+        }
+    }
+
 
 }

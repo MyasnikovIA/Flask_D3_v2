@@ -19,21 +19,22 @@
                   setValue('log','fsdfasdfasdfasdf-----');
                }
             }
-            Form.saveSqlite = function() {
-                Android.insertJson("tab1",'{"pole1":123456}');
+            Form.startGPS = function() {
+               Android.startGPS();
             }
-            Form.readSqlite = function() {
-                setValue('log',Android.getJsonArray("tab1",''));
+            Form.stopGPS = function() {
+                Android.stopGPS();
             }
-            Form.readSqliteOne = function() {
-                setValue('log',Android.getJson("tab1",1));
+            Form.getDeviceInfo = function() {
+                setValue('log',Android.getDeviceInfo());
             }
         ]]>
     </cmpScript>
-    <cmpTextArea name="log" height="50%"/>
-    <cmpButton caption="записать" onclick="Form.saveSqlite()"/>
-    <cmpButton caption="Читать" onclick="Form.readSqlite()"/>
-    <cmpButton caption="Читать 1 запись" onclick="Form.readSqliteOne()"/>
+
+      <cmpTextArea name="log" height="50%"/>
+      <cmpButton caption="Запуск GPS" onclick="Form.startGPS()"/>
+      <cmpButton caption="Остановить GPS" onclick="Form.stopGPS()"/>
+      <cmpButton caption="getDeviceInfo" onclick="Form.getDeviceInfo()"/>
     </body>
 </html>
 

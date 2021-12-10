@@ -1,9 +1,12 @@
 package ru.miacomsoft.flask_d3_client.Lib;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.net.Uri;
 import android.net.wifi.WifiInfo;
@@ -17,6 +20,7 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +46,8 @@ public class Android {
     private long lastUpdate;
     private WebView webView;
     private SQLLiteORM sqlLocal;
-    private GPSTracker gPSTracker; // Получение положения GPS сигнала
+    private GpsTrack gPSTracker; // Получение положения GPS сигнала
+    private IdDevice idDevice;
     List<Sensor> mList;
 //       webView.loadUrl("javascript: Accel="+jsonObject.toString()   );
 
@@ -55,8 +60,8 @@ public class Android {
         parentActivity = activity;
         lastUpdate = System.currentTimeMillis();
         this.sqlLocal =sqlLocal;
-        gPSTracker = new GPSTracker(activity,webView);
-
+        gPSTracker = new GpsTrack(activity,webView,sqlLocal);
+        idDevice = new IdDevice(activity);
         /*
         webView.evaluateJavascript("alert('pass here some ...')", new ValueCallback<String>() {
             @Override
@@ -279,38 +284,45 @@ public class Android {
         return sqlLocal.sql(SQLtext,null).toString();
     }
 
+
+/// ===============================================================
+/// ================Получить информацию о устройстве===============
+/// ===============================================================
+
+    @JavascriptInterface
+    public String getDeviceId() {
+        return idDevice.deviceId;
+    }
+    @JavascriptInterface
+    public String getDeviceInfo() {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("Device",idDevice.Device);
+            obj.put("Serial",idDevice.Serial);
+            obj.put("androidId",idDevice.androidId);
+            obj.put("UUIDId",idDevice.UUIDId);
+            obj.put("deviceId",idDevice.deviceId);
+            obj.put("IMEI",idDevice.IMEI);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return obj.toString();
+    }
+
 /// ===============================================================
 /// ================Работа с GPS ==================================
 /// ===============================================================
 
-
+    @SuppressLint("NewApi")
     @JavascriptInterface
-    public boolean startLocation(String provider) {
-        if (provider == "net"){
-             return gPSTracker.startNetworkLocation();
-        }
-        if (provider == "gps"){
-            return gPSTracker.startGpsLocation();
-        }
-        return gPSTracker.startGpsLocation();
+    public void startGPS() {
+        gPSTracker.startGPS();
     }
 
     @JavascriptInterface
-    public void setGpsNetSettings() {
-        gPSTracker.setSettings();
+    public void stopGPS() {
+        gPSTracker.stopGPS();
     }
-
-
-    @JavascriptInterface
-    public String getGPS(String provider) {
-        return gPSTracker.getGPS();
-    }
-
-    @JavascriptInterface
-    public String getNetGPS(String provider) {
-        return gPSTracker.getNetGPS();
-    }
-
 
 /// ===============================================================
 /// ===============================================================
