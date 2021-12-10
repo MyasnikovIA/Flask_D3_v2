@@ -1,56 +1,83 @@
 package ru.miacomsoft.flask_d3_client.Lib;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.provider.Settings;
+import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.UUID;
 
-/**
- * Created by MyasnikovI on 29.08.13.
+import ru.miacomsoft.flask_d3_client.MainActivity;
 
+/**
+ * Created by MyasnikovI on 10.12.2021.
  *
- *                     // Возможно понадобится добавить
- *                     //  AndroidManifest.xml
- *                     // <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+ *    // Возможно понадобится добавить
+ *    //  AndroidManifest.xml
+ *    // <uses-permission android:name="android.permission.READ_PHONE_STATE" />
  *
- *    -----------------------------------------------
- *                      Применение
- *           IdDevice id = new IdDevice(this);
- *           tv2.setText(id.deviceId);
- *    -----------------------------------------------
  */
 public class IdDevice {
 
-    public String Device="";
-    public String Serial="";
-    public String androidId="";
-    public String UUIDId="";
-    public String deviceId="";
-    public String IMEI="";
+    private MainActivity activity;
+    private Context context;
 
-    public IdDevice(Context context) {
-        final TelephonyManager tm = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
-        Device = "" + tm.getDeviceId();
-        Serial = "" + tm.getSimSerialNumber();
-        androidId = "" + Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+    public IdDevice(MainActivity activity) {
+        this.activity = activity;
+        this.context = activity.getBaseContext();
+    }
 
-        UUID deviceUuid = new UUID(androidId.hashCode(), ((long)Device.hashCode() << 32) | Serial.hashCode());
-        UUIDId = deviceUuid.toString();
-        deviceId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+    @SuppressLint("MissingPermission")
+    public String getDeviceInfo() {
+        if (setTelephoneSetings()){
+            return "";
+        };
+        JSONObject obj = new JSONObject();
+        try {
+            TelephonyManager manager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) { // API Level 26.
+                String imei = manager.getImei();
+                int phoneCount = manager.getPhoneCount();
+                obj.put("PhoneNumber",manager.getLine1Number());
+                obj.put("IMEI",imei);
+                obj.put("PhoneCount",phoneCount);
+                obj.put("Device",manager.getDeviceId());
+                obj.put("AndroidId", Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
+                obj.put("Serial",manager.getSimSerialNumber());
+                // obj.put("UUID",new UUID(androidId.hashCode(), ((long)Device.hashCode() << 32) | Serial.hashCode()).toString());
+                obj.put("UUIDId",Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID));
+            }
+            if(android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) { // API Level 28.
+                SignalStrength signalStrength = manager.getSignalStrength();
+                int level = signalStrength.getLevel();
+                obj.put("StrengthLevel",level);
+            }
 
-        //      public String BluetoothAdress;
-        //  BluetoothAdapter m_BluetoothAdapter = null; // Local Bluetooth adapter
-        //  m_BluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        //  BluetoothAdress = m_BluetoothAdapter.getAddress();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return obj.toString();
+    }
 
-        //     public String WiFiMac;
-        //      WifiManager wm = (WifiManager)context.getSystemService(Context.WIFI_SERVICE);
-        //      WiFiMac = wm.getConnectionInfo().getMacAddress();
-
-        TelephonyManager TelephonyMgr = (TelephonyManager) context.getSystemService(context.TELEPHONY_SERVICE);
-        IMEI = TelephonyMgr.getDeviceId(); // Requires READ_PHONE_STATE
-
+    public boolean setTelephoneSetings() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { // 23
+            int readPhoneStatePermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE);
+            if ( readPhoneStatePermission != PackageManager.PERMISSION_GRANTED) {
+                activity.requestPermissions( new String[]{Manifest.permission.READ_PHONE_STATE}, MainActivity.MY_PERMISSION_REQUEST_CODE_PHONE_STATE);
+                return true;
+            }
+        }
+        return false;
     }
 
 }

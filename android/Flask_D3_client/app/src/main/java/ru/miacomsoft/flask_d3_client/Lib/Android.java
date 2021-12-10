@@ -290,23 +290,12 @@ public class Android {
 /// ===============================================================
 
     @JavascriptInterface
-    public String getDeviceId() {
-        return idDevice.deviceId;
+    public String getDeviceInfo() {
+        return idDevice.getDeviceInfo();
     }
     @JavascriptInterface
-    public String getDeviceInfo() {
-        JSONObject obj = new JSONObject();
-        try {
-            obj.put("Device",idDevice.Device);
-            obj.put("Serial",idDevice.Serial);
-            obj.put("androidId",idDevice.androidId);
-            obj.put("UUIDId",idDevice.UUIDId);
-            obj.put("deviceId",idDevice.deviceId);
-            obj.put("IMEI",idDevice.IMEI);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return obj.toString();
+    public void setTelephoneSetings() {
+        idDevice.setTelephoneSetings();
     }
 
 /// ===============================================================

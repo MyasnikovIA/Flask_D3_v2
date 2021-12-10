@@ -40,12 +40,11 @@
     <!--uses-permission android:name="android.permission.WRITE_SETTINGS"/-->
     <!-- Чтение настроек телефона -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-
     <!-- GPS -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
-
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
 
 </manifest>

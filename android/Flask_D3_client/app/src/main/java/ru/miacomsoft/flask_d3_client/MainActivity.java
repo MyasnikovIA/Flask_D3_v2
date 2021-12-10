@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -31,12 +33,13 @@ import ru.miacomsoft.flask_d3_client.Lib.SQLLiteORM;
 
 
 public class MainActivity extends AppCompatActivity {
-    public static WebView webView ;
+    public static WebView webView;
     private Button button;
     SQLLiteORM sqlLiteORM;
-    ProgressBar progressBar ;
+    ProgressBar progressBar;
     TextView progressTv;
 
+    public static final int MY_PERMISSION_REQUEST_CODE_PHONE_STATE = 1;
     public static final int REQUEST_PERMISSION_LOCATION = 255; // int should be between 0 and 255
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -49,17 +52,15 @@ public class MainActivity extends AppCompatActivity {
         button = (Button) findViewById(R.id.button);
         sqlLiteORM = new SQLLiteORM(this);
         String urlText = loadConfig();
-        if (urlText.length()==0){
+        if (urlText.length() == 0) {
             setContentView(R.layout.activity_main);
-            urlText ="http://128.0.24.172:9091";
+            urlText = "http://128.0.24.172:9091";
             saveConfig(urlText);
-        }else{
+        } else {
             runWebClient(urlText);
         }
         //webView.loadUrl("file:///android_asset/setup.html");
         //webView.reload();
-
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -75,19 +76,19 @@ public class MainActivity extends AppCompatActivity {
         // setContentView(webView);
         setContentView(R.layout.webview_main);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressTv= (TextView) findViewById(R.id.progressTv);
+        progressTv = (TextView) findViewById(R.id.progressTv);
         webView = (WebView) findViewById(R.id.webView);
         // webView = new WebView(this);
         webView.getSettings().setAppCacheEnabled(true);
         webView.getSettings().setAppCachePath(this.getCacheDir().getPath());
         // webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        webView.getSettings().setAppCacheMaxSize(1024*1024*8);
+        webView.getSettings().setAppCacheMaxSize(1024 * 1024 * 8);
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);  // Включить обработчик JS
-        webView.addJavascriptInterface(new Android(this,webView,sqlLiteORM), "Android");
+        webView.addJavascriptInterface(new Android(this, webView, sqlLiteORM), "Android");
         webView.loadUrl(urlText);
         //webView.loadUrl("file:///android_asset/setup.html");
     }
@@ -115,9 +116,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public String loadConfig() {
-        StringBuffer res= new StringBuffer();
+        StringBuffer res = new StringBuffer();
         try {
-            BufferedReader br = new BufferedReader(new InputStreamReader( openFileInput("config.ini")));
+            BufferedReader br = new BufferedReader(new InputStreamReader(openFileInput("config.ini")));
             String str = "";
             while ((str = br.readLine()) != null) {
                 res.append(str);
@@ -131,16 +132,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     public class WebChromeClient extends android.webkit.WebChromeClient {
         public void onProgressChanged(WebView view, int progress) {
-            if(progress < 100 && progressBar.getVisibility() == ProgressBar.GONE){
-               progressBar.setVisibility(ProgressBar.VISIBLE);
+            if (progress < 100 && progressBar.getVisibility() == ProgressBar.GONE) {
+                progressBar.setVisibility(ProgressBar.VISIBLE);
                 progressTv.setVisibility(View.VISIBLE);
             }
             progressBar.setProgress(progress);
-            progressTv.setText(String.valueOf(progress)+"%");
-            if(progress == 100) {
+            progressTv.setText(String.valueOf(progress) + "%");
+            if (progress == 100) {
                 progressBar.setVisibility(ProgressBar.GONE);
                 progressTv.setVisibility(View.GONE);
             }
@@ -169,17 +169,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_PERMISSION_LOCATION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Включение доступ к GPS
-                // gps1 = new gps(context);
+        switch (requestCode) {
+            case REQUEST_PERMISSION_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Включение доступ к GPS
+                }
+                break;
+            }
+            case MY_PERMISSION_REQUEST_CODE_PHONE_STATE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Toast.makeText(this, "Permission granted!", Toast.LENGTH_LONG).show();
+                    // this.getPhoneNumbers();
+                } else {
+                    // Toast.makeText(this, "Permission denied!", Toast.LENGTH_LONG).show();
+                }
+                break;
             }
         }
+
+
     }
 
 

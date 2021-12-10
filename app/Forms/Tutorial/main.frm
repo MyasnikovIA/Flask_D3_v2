@@ -24,6 +24,7 @@
      <hr/>
      <cmpButton caption="Android Flask D3 client Alert"  onclick="openD3Form('Tutorial/Android/alert',true,{width: 1200, height: 900})" />
      <cmpButton caption="Android Flask D3 client SQLite"  onclick="openD3Form('Tutorial/Android/SqliteAndroid',true,{width: 1200, height: 900})" />
+     <cmpButton caption="Android Flask D3 client TelephoneInfo"  onclick="openD3Form('Tutorial/Android/TelephoneInfo',true,{width: 1200, height: 900})" />
      <hr/>
      <cmpButton caption="FormDesugner"  onclick="openD3Form('FormDesugner/main',true,{width: '100%', height: '100%'})" />
      <div name="MyDfrmBlock">-----------------</div>
