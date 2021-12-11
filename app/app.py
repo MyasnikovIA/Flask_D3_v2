@@ -171,7 +171,7 @@ def all_files(path):
             frm = getform.getParsedForm(path, cache, dataSetName, session)
             return frm, 200, {'content-type': 'text/html; charset=utf-8'}
 
-    if path[-3:].lower() in ["tml", "htm"]:
+    if ext in ["html"]:
         return redirect("/index.html")
     return render_template('404.html; charset=utf-8', **locals()), 404
     # return app.render_template(path)

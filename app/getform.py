@@ -202,14 +202,14 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
     # =========== Рекурсионый обход дерева ============================
     if hasattr(root, 'getchildren'):
         for elem in root.getchildren():
-            loc_SetSysInfo, text = parseFrm(elem, formName, root, 0)
+            loc_SetSysInfo, text = parseFrm(elem, formName, root, 0, session)
             sysinfoBlock.extend(loc_SetSysInfo)
             htmlContent.append(text)
     elif len(root) > 0:
         num_element = 0
         for elem in root:
             num_element += 1
-            loc_SetSysInfo, text = parseFrm(elem, formName, root, num_element)
+            loc_SetSysInfo, text = parseFrm(elem, formName, root, num_element, session)
             sysinfoBlock.extend(loc_SetSysInfo)
             htmlContent.append(text)
     # =================================================================

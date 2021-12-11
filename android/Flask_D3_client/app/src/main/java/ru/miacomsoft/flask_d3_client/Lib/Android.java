@@ -12,6 +12,8 @@ import android.net.Uri;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
@@ -55,12 +57,12 @@ public class Android {
 
     @SuppressLint("NewApi")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public Android(MainActivity activity, WebView webViewPar,SQLLiteORM sqlLocal) {
-        webView = webViewPar;
+    public Android(MainActivity activity, WebView webView, SQLLiteORM sqlLocal) {
+        this.webView = webView;
         parentActivity = activity;
         lastUpdate = System.currentTimeMillis();
-        this.sqlLocal =sqlLocal;
-        gPSTracker = new GpsTrack(activity,webView,sqlLocal);
+        this.sqlLocal = sqlLocal;
+        gPSTracker = new GpsTrack(activity, webView, sqlLocal);
         idDevice = new IdDevice(activity);
         /*
         webView.evaluateJavascript("alert('pass here some ...')", new ValueCallback<String>() {
@@ -74,54 +76,59 @@ public class Android {
     }
 
 
-    /** Show a toast from the web page */
+    /**
+     * Show a toast from the web page
+     */
     @JavascriptInterface
     public void showToast(String toast) {
         Toast.makeText(parentActivity.getBaseContext(), toast, Toast.LENGTH_SHORT).show();
     }
 
     /**
-     *  Вывод консоли
+     * Вывод консоли
+     *
      * @param msg
      */
     @JavascriptInterface
-    public void console_log(String msg){
+    public void console_log(String msg) {
         Log.d("console.log", msg);
     }
 
     /**
-     *  Вывод консоли
+     * Вывод консоли
+     *
      * @param msg
      */
     @JavascriptInterface
-    public void log(String msg){
+    public void log(String msg) {
         Log.d("console.log", msg);
     }
 
     /**
      * Переход в браузер
+     *
      * @param UrlStr - строка запроса
      */
     @JavascriptInterface
-    public void getBrouser(String UrlStr){
-        if( (UrlStr.toLowerCase().indexOf("http://") == -1) &&(UrlStr.toLowerCase().indexOf("https://") == -1))
-        {
-            UrlStr+="http://";
+    public void getBrouser(String UrlStr) {
+        if ((UrlStr.toLowerCase().indexOf("http://") == -1) && (UrlStr.toLowerCase().indexOf("https://") == -1)) {
+            UrlStr += "http://";
         }
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlStr)) ;
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(UrlStr));
         parentActivity.startActivity(browserIntent);
     }
 
     /**
      * Запись текста в файл
+     *
      * @param Str
      * @param FileName
      */
     @JavascriptInterface
-    public void writeFile(String Str,String FileName){
+    public void writeFile(String Str, String FileName) {
         try {
             // отрываем поток для записи
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter( parentActivity.openFileOutput(FileName,  parentActivity.MODE_PRIVATE)));
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(parentActivity.openFileOutput(FileName, parentActivity.MODE_PRIVATE)));
             // пишем данные
             bw.write(Str);
             // закрываем поток
@@ -136,11 +143,12 @@ public class Android {
 
     /**
      * Чтение текстового файла
+     *
      * @param FileName
      * @return
      */
     @JavascriptInterface
-    public String readFile(String FileName){
+    public String readFile(String FileName) {
         StringBuffer sb = new StringBuffer();
         try {
             // открываем поток для чтения
@@ -155,15 +163,16 @@ public class Android {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return   sb.toString();
+        return sb.toString();
     }
 
     /**
-     *  JS функция вывода сообщения во вст\плывающем окне
+     * JS функция вывода сообщения во вст\плывающем окне
+     *
      * @param msg
      */
     @JavascriptInterface
-    public void alert(String msg){
+    public void alert(String msg) {
         //  Toast.makeText(parentActivity, msg, Toast.LENGTH_LONG).show();
         new AlertDialog.Builder(parentActivity)
                 .setMessage(msg)
@@ -180,8 +189,8 @@ public class Android {
     }
 
     @JavascriptInterface
-    public String getIP(){
-        WifiManager wifiMgr1 = (WifiManager) parentActivity.getApplicationContext() .getSystemService(parentActivity .WIFI_SERVICE);
+    public String getIP() {
+        WifiManager wifiMgr1 = (WifiManager) parentActivity.getApplicationContext().getSystemService(parentActivity.WIFI_SERVICE);
         WifiInfo wifiInfo1 = wifiMgr1.getConnectionInfo();
         int ip = wifiInfo1.getIpAddress();
         String ipAddress = Formatter.formatIpAddress(ip);
@@ -190,6 +199,7 @@ public class Android {
 /// ===============================================================
 /// ----------------------------SQL lite --------------------------
 /// ===============================================================
+
     /***
      * Провенрка наличия таблицы в локальной SQLlite БД
      * @param tableName
@@ -201,15 +211,17 @@ public class Android {
     }
 
     /**
-     *  Получить запись с указанным ID номером из Таблицы
+     * Получить запись с указанным ID номером из Таблицы
+     *
      * @param tableName - имя таблицы
-     * @param id - идентификатор записи
+     * @param id        - идентификатор записи
      * @return - JSON объект
      */
     @JavascriptInterface
-    public String getJson(String tableName,long id) {
-       return sqlLocal.getJson(tableName, id).toString();
+    public String getJson(String tableName, long id) {
+        return sqlLocal.getJson(tableName, id).toString();
     }
+
     /***
      * Вставить JSON объект в таблицу
      * @param tableName
@@ -219,7 +231,7 @@ public class Android {
     @JavascriptInterface
     public long insertJson(String tableName, String json) {
         try {
-            return sqlLocal.insertJson(tableName,new JSONObject(json));
+            return sqlLocal.insertJson(tableName, new JSONObject(json));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -233,9 +245,9 @@ public class Android {
      * @return
      */
     @JavascriptInterface
-    public boolean updateJsonSQL(String tableName,  String json) {
+    public boolean updateJsonSQL(String tableName, String json) {
         try {
-            return sqlLocal.updateJson(tableName,new JSONObject(json));
+            return sqlLocal.updateJson(tableName, new JSONObject(json));
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
@@ -267,11 +279,11 @@ public class Android {
      * @return
      */
     @JavascriptInterface
-    public String getJsonArray(String tableName , String where) {
-        if (where.length()>0) {
-            where =" where "+where;
+    public String getJsonArray(String tableName, String where) {
+        if (where.length() > 0) {
+            where = " where " + where;
         }
-        return sqlLocal.sql("select * from "+tableName+where,null).toString();
+        return sqlLocal.sql("select * from " + tableName + where, null).toString();
     }
 
     /***
@@ -281,14 +293,13 @@ public class Android {
      */
     @JavascriptInterface
     public String SQL(String SQLtext) {
-        return sqlLocal.sql(SQLtext,null).toString();
+        return sqlLocal.sql(SQLtext, null).toString();
     }
 
 
 /// ===============================================================
 /// ================Получить информацию о устройстве===============
 /// ===============================================================
-
     @JavascriptInterface
     public String getDeviceInfo() {
         return idDevice.getDeviceInfo();
@@ -301,17 +312,70 @@ public class Android {
 /// ===============================================================
 /// ================Работа с GPS ==================================
 /// ===============================================================
-
+/*
     @SuppressLint("NewApi")
     @JavascriptInterface
     public void startGPS() {
-        gPSTracker.startGPS();
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                gPSTracker.startGPS();
+            }
+        });
     }
 
     @JavascriptInterface
     public void stopGPS() {
-        gPSTracker.stopGPS();
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                gPSTracker.stopGPS();
+            }
+        });
     }
+
+    @JavascriptInterface
+    public String getLocation() {
+        return gPSTracker.getLocation();
+    }
+
+    @JavascriptInterface
+    public Boolean setGpsSetings() {
+        return gPSTracker.setGpsSetings();
+    }
+
+    @JavascriptInterface
+    public void setGpsCallback(final String text) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                webView.loadUrl("javascript: "+text+"('zzz');");
+                gPSTracker.setGpsCallback(text);
+            }
+        });
+    }
+
+ */
+
+
+/*
+
+    public void setGpsCallback(String functionText) {
+        String script = functionText; //"javascript:JsUseEvaluateJavascript()";
+        webView.evaluateJavascript(script, new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String value) {
+                // значение является возвращаемым значением после того, как JavaScript выполняет метод JsUseEvaluateJavascript ()
+                // т.е. "Android вызывает саму веб-страницу Js UseEvaluateJavascript"
+                Log.e("MainActivity",value);
+            }
+        });
+        // webView.loadUrl("javascript: "+functionText+"('ddddd'); "   );
+        // gPSTracker.setGpsCallback(functionText);
+    }
+
+ */
+
 
 /// ===============================================================
 /// ===============================================================

@@ -1,40 +1,29 @@
 <html lang="en">
-    <head>
-        <meta charset="UTF-8"/>
-        <title>Title</title>
-        <link rel="stylesheet" type="text/css" href="./~d3theme"/>
-        <script src="./~d3main"></script>
-    </head>
-    <body name="eeeee" onshow="Form.onShow()">
-      <cmpButton caption="Обучение платформе" onclick = "Form.onBtnTest2();"/>
-      <cmpScript>
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="./~d3theme"/>
+    <script src="./~d3main"></script>
+</head>
+<body name="eeeee" onshow="Form.onShow()">
+<div>
+    <cmpButton caption="Обучение платформе" onclick="Form.onBtnTest2();"/>
+    <cmpScript>
         <![CDATA[
-            Form.onBtnTest2 = function() {
-                openD3Form('Tutorial/main',false);
+        Form.onBtnTest2 = function() {
+            openD3Form('Tutorial/main');
+        }
+        Form.onShow = function(){
+            if (Android) {
+                // Android.setGpsNetSettings();
+                // Android.alert(Android.startLocation('gps'));
+                setValue('log','fsdfasdfasdfasdf-----');
             }
-            Form.onShow = function(){
-               if (Android) {
-                  Android.setGpsNetSettings();
-                  // Android.alert(Android.startLocation('gps'));
-                  setValue('log','fsdfasdfasdfasdf-----');
-               }
-            }
-            Form.startGPS = function() {
-               Android.startGPS();
-            }
-            Form.stopGPS = function() {
-                Android.stopGPS();
-            }
-            Form.getDeviceInfo = function() {
-                setValue('log',Android.getDeviceInfo());
-            }
+        }
         ]]>
     </cmpScript>
-
-      <cmpTextArea name="log" height="50%"/>
-      <cmpButton caption="Запуск GPS" onclick="Form.startGPS()"/>
-      <cmpButton caption="Остановить GPS" onclick="Form.stopGPS()"/>
-      <cmpButton caption="getDeviceInfo" onclick="Form.getDeviceInfo()"/>
-    </body>
+    <cmpTextArea name="log" height="50%"/>
+</div>
+</body>
 </html>
 

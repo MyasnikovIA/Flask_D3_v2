@@ -2,8 +2,10 @@ package ru.miacomsoft.flask_d3_client;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Set;
 
 import ru.miacomsoft.flask_d3_client.Lib.Android;
 import ru.miacomsoft.flask_d3_client.Lib.SQLLiteORM;
@@ -79,19 +83,22 @@ public class MainActivity extends AppCompatActivity {
         progressTv = (TextView) findViewById(R.id.progressTv);
         webView = (WebView) findViewById(R.id.webView);
         // webView = new WebView(this);
-        webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setAppCacheEnabled(false);
         webView.getSettings().setAppCachePath(this.getCacheDir().getPath());
-        // webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
+        webView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+        webView.getSettings().setJavaScriptEnabled(true); // Включить обработчик JS
+        webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         webView.getSettings().setAppCacheMaxSize(1024 * 1024 * 8);
         webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
-        WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(true);  // Включить обработчик JS
         webView.addJavascriptInterface(new Android(this, webView, sqlLiteORM), "Android");
         webView.loadUrl(urlText);
-        //webView.loadUrl("file:///android_asset/setup.html");
+        // webView.loadUrl("file:///android_asset/javascript.html");
+        // webView.loadUrl("file:///android_asset/setup.html");
     }
+
 
     @Override
     public void onBackPressed() {
@@ -157,8 +164,26 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            view.loadUrl(url);
-            return true;
+            // https://russianblogs.com/article/8848276449/
+            //view.loadUrl(url);
+            Uri uri = Uri.parse(url);
+            // Если протокол URL = предварительно согласованный протокол JS
+            // Разобрать, чтобы разобрать параметры
+            if (uri.getScheme().equals("js")) {
+                // Если орган = предварительно согласовал веб-просмотр в соглашении, это означает, что все они соответствуют согласованному соглашению
+                // Итак, перехватите URL, следующий JS начинает вызывать метод, необходимый для Android
+                if (uri.getAuthority().equals("webview")) {
+                    // Шаг 3:
+                    // Логика, необходимая для выполнения JS
+                    System.out.println ("js называется методом Android");
+                    // Может принимать параметры по протоколу и передавать их в Android
+                    HashMap<String, String> params = new HashMap<>();
+                    Set<String> collection = uri.getQueryParameterNames();
+                    Log.i("MainActivity", "collection:\n" + collection.toString());
+                }
+                return true;
+            }
+            return super.shouldOverrideUrlLoading(view, url);
         }
 
         @Override
@@ -169,28 +194,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case REQUEST_PERMISSION_LOCATION: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Включение доступ к GPS
-                }
-                break;
+        if (requestCode == REQUEST_PERMISSION_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Включение доступ к GPS
+                // gps1 = new gps(context);
             }
-            case MY_PERMISSION_REQUEST_CODE_PHONE_STATE: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Toast.makeText(this, "Permission granted!", Toast.LENGTH_LONG).show();
-                    // this.getPhoneNumbers();
-                } else {
-                    // Toast.makeText(this, "Permission denied!", Toast.LENGTH_LONG).show();
-                }
-                break;
-            }
+            return;
         }
+        if (requestCode == MY_PERMISSION_REQUEST_CODE_PHONE_STATE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Toast.makeText(this, "Permission granted!", Toast.LENGTH_LONG).show();
+                // this.getPhoneNumbers();
+            } else {
+                // Toast.makeText(this, "Permission denied!", Toast.LENGTH_LONG).show();
+            }
 
-
+        }
     }
 
 

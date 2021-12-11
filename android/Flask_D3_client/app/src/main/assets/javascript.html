@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Carson</title>
+    <script>
+
+                         <! - Метод второй старт->
+            function callAndroidTwo() {
+                Android.alert('sdfsadfasd');
+                // document.location = "js://webview?arg1=111&arg2=222";
+            }
+
+           startGPS = function() {
+              Android.startGPS();
+           }
+
+           setGpsCallback = function() {
+              Android.setGpsCallback("getLocationColl");
+           }
+
+           stopGPS = function() {
+              Android.stopGPS();
+           }
+
+           setGpsCallback = function() {
+              Android.setGpsCallback("getLocationColl");
+           }
+
+           var getLocationColl = function(obj) {
+             document.getElementById('log').value = JSON.stringify(obj);
+           }
+
+
+    </script>
+</head>
+<body>
+<! - Нажмите кнопку, чтобы вызвать функцию callAndroidTwo->
+<br><br><br><br>
+<!--
+<button type="button" onclick=" Android.setGpsCallback('Android.alert') ">Js вызывает код Android </button>
+-->
+<textarea id="log"></textarea>
+<button type="button" onclick="startGPS() ">startGPS</button>
+<button type="button" onclick="stopGPS() ">stopGPS</button>
+<button type="button" onclick="setGpsCallback() ">setGpsCallback</button>
+
+</body>
+</html>
