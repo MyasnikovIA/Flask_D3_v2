@@ -519,6 +519,8 @@ def getXMLObject(formName):
     Получение XML объекта из прочитаного файла (или фрагмента XML)
     """
     global TEMP_XML_PAGE
+    if formName[0] == "/":
+        formName[1:]
     # TEMP_DS_PAGE = {}
     blockName = ""
     if ":" in formName:
