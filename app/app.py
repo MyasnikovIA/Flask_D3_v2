@@ -31,22 +31,16 @@ def before_request():
 def after_request(response):
     # CORS in flask
     header = response.headers
-    header['Access-Control-Allow-Origin'] = '*'
-    header['Access-Control-Allow-Headers'] = '*'
-    header['Access-Control-Allow-Methods'] = '*'
+    header['Access-Control-Allow-Origin'] = '*'  # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+    header['Access-Control-Allow-Headers'] = '*' # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Headers
+    header['Access-Control-Allow-Methods'] = '*' # https://developer.mozilla.org/ru/docs/Web/HTTP/Headers/Access-Control-Allow-Methods
     header['Server'] = 'D3apiServer'
     return response
 
-# @app.errorhandler(404)
-# def not_found(error):
-#   return app.send_static_file('/templates/404.html'), 404
-#   return render_template('404.html', **locals()), 404
-
 @app.route('/')
 def example():
-    # user_agent = request.headers.get('User-Agent')
-    # return app.send_static_file('index.html')
     return redirect("/index.html")
+
 
 def getParam(name, defoultValue=''):
     return request.args.get(name, default=defoultValue)
@@ -54,6 +48,8 @@ def getParam(name, defoultValue=''):
 countQuery = 0
 @app.route('/<path:path>', methods=['GET', 'POST'])
 def all_files(path):
+
+    # инициализируем
     if session.get("ID") == None:
         global countQuery
         countQuery += 1
@@ -62,7 +58,7 @@ def all_files(path):
     ext = path[path.rfind('.') + 1:].lower()
     getform.getAgentInfo(session,request) # получить информацию о клиенте
     ROOT_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}"
-    ROOT_FORM_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}Forms{os.sep}"
+    #ROOT_FORM_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}Forms{os.sep}"
 
     # Получение контента с использованием в пути псевдонима  /~Cmp (наследие из PHP)
     if '/~Cmp' in path and 'Components/' in path:
@@ -150,7 +146,7 @@ def all_files(path):
 
 
     # Поиск запроса в каталоге форм
-    pathHtmlFromForm = f"{ROOT_FORM_DIR}{path}"
+    pathHtmlFromForm = f"{getform.FORM_PATH}{os.sep}{path}"
     if os.path.isfile(pathHtmlFromForm):
         cache = getParam('cache')
         dataSetName = getParam('DataSet', "")
@@ -183,29 +179,3 @@ if __name__ == '__main__':
     if len(sys.argv)>1:
         port = int(sys.argv[1])
     app.run(debug=False, host='0.0.0.0', port=port)
-
-
-"""
-заметки
->>> import urllib.parse
->>> o = urllib.parse.urlsplit('https://user:pass@www.example.com:8080/dir/page.html?q1=test&q2=a2#anchor1')
->>> o.scheme
-'https'
->>> o.netloc
-'user:pass@www.example.com:8080'
->>> o.hostname
-'www.example.com'
->>> o.port
-8080
->>> o.path
-'/dir/page.html'
->>> o.query
-'q1=test&q2=a2'
->>> o.fragment
-'anchor1'
->>> o.username
-'user'
->>> o.password
-'pass'
-
-"""
