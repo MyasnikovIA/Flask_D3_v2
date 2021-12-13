@@ -18,25 +18,6 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.permanent_session_lifetime = datetime.timedelta(days=10)  # период хронений сессии составляет 10 дней
 
 
-
-def sendCostumBin(pathFile):
-    # костыль для docker
-    txt = ""
-    if getform.existTempPage(pathFile):
-        txt, mime = getform.getTempPage(pathFile, '')
-    if txt == "":
-        if os.path.isfile(pathFile):
-            with open(pathFile, "rb") as f:
-                return f.read(), getform.mimeType(pathFile)
-        else:
-            # fpath = Path(__file__).absolute()
-            fpath = os.path.dirname(Path(__file__).absolute())
-            return f"File {pathFile} not found {os.path.dirname(Path(__file__).absolute())}{os.sep}  --{fpath}---", getform.mimeType(
-                ".txt")
-    else:
-        return txt, mime
-
-
 @app.before_request
 def before_request():
     """
@@ -82,31 +63,39 @@ def all_files(path):
     getform.getAgentInfo(session,request) # получить информацию о клиенте
     ROOT_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}"
     ROOT_FORM_DIR = f"{os.path.dirname(Path(__file__).absolute())}{os.sep}Forms{os.sep}"
+
+    # Получение контента с использованием в пути псевдонима  /~Cmp (наследие из PHP)
     if '/~Cmp' in path and 'Components/' in path:
         cmp = path[path.find('Components/') + len('Components/'): path.find('/~Cmp') - len('/~Cmp') + 1]
         img = path[path.rfind("/"):]
         pathImg = f"{ROOT_DIR}Components/{cmp}/images/default{img}.png"
-        bin, mime = sendCostumBin(pathImg)
+        bin, mime = getform.sendCostumBin(pathImg)
         return bin, 200, {'content-type': mime}
 
+    #  Получение контента для компонентов
     if 'Components/' in path:
         pathImg = f"{ROOT_DIR}{path[path.find('Components/'):]}"
-        bin, mime = sendCostumBin(pathImg)
+        bin, mime = getform.sendCostumBin(pathImg)
         return bin, 200, {'content-type': mime}
 
+    # Получение иконки страницы
     if 'favicon.ico' in path:
         pathImg = f"{ROOT_DIR}{path}"
-        bin, mime = sendCostumBin(pathImg)
+        bin, mime = getform.sendCostumBin(pathImg)
         return bin, 200, {'content-type': mime}
 
+    # Получение CSS библиотеки платформы D3Ext
     if "~d3theme" in path:
         return d3theme_css(request), 200, {'content-type': 'text/css; charset=utf-8'}
 
+    # Получение JS библиотеки платформы D3Ext
     if "~d3main" in path:
         return d3main_js(request), 200, {'content-type': 'application/x-javascript; charset=utf-8'}
 
+    # Получение пользовательских форм описанных в формате XML
     if "getform.php" in path:
         formName = getParam('Form')
+        external = getParam('external','');
         extSub = formName[formName.rfind('.') + 1:].lower()
         if "http" in formName or  "https" in formName:
             if not extSub == 'html' and not extSub == 'frm':
@@ -125,6 +114,7 @@ def all_files(path):
             frm = getform.getParsedForm(formName, cache, dataSetName, session)
         return frm, 200, {'content-type': 'application/plain; charset=utf-8'}
 
+    # Обработка запросов DataSet Action
     if "request.php" in path:
         resultTxt = "{}"
         formName = getParam('Form')
@@ -158,6 +148,7 @@ def all_files(path):
                     # getRunAction(formName, cache, name, queryActionObject[name])
         return resultTxt, 200, {'Content-Type': 'text/xml; charset=utf-8'}
 
+
     # Поиск запроса в каталоге форм
     pathHtmlFromForm = f"{ROOT_FORM_DIR}{path}"
     if os.path.isfile(pathHtmlFromForm):
@@ -170,8 +161,10 @@ def all_files(path):
             frm = getform.getParsedForm(path, cache, dataSetName, session)
             return frm, 200, {'content-type': 'text/html; charset=utf-8'}
 
+    # Если запрос HTML к не существующей страницы, тогда перебрасываем на  стартовую страницу
     if ext in ["html"]:
         return redirect("/index.html")
+
     return render_template('404.html; charset=utf-8', **locals()), 404
     # return app.render_template(path)
     # return app.send_static_file(path)

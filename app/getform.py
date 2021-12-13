@@ -8,6 +8,7 @@ import sys
 import hashlib
 import cx_Oracle
 from app import session
+from pathlib import Path
 from Etc.config import ConfigOptions
 
 try:
@@ -968,6 +969,25 @@ def getAgentInfo(session,request):
     if (not request.args.get("REMOUTE") ==None):
         session["REMOUTE"] = request.args.get("REMOUTE")
     return session["AgentInfo"]
+
+
+
+def sendCostumBin(pathFile):
+    # костыль для docker
+    txt = ""
+    if existTempPage(pathFile):
+        txt, mime = getTempPage(pathFile, '')
+    if txt == "":
+        if os.path.isfile(pathFile):
+            with open(pathFile, "rb") as f:
+                return f.read(), mimeType(pathFile)
+        else:
+            # fpath = Path(__file__).absolute()
+            fpath = os.path.dirname(Path(__file__).absolute())
+            return f"File {pathFile} not found {os.path.dirname(Path(__file__).absolute())}{os.sep}  --{fpath}---", getform.mimeType(
+                ".txt")
+    else:
+        return txt, mime
 
 
 def mimeType(pathFile):

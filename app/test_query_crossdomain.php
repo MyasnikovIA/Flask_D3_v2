@@ -77,7 +77,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, "");
 $answer = curl_exec($ch);
 if (curl_error($ch)) {
     echo curl_error($ch);
-}else{
+} else{
 	print($answer);
 }
 			 
