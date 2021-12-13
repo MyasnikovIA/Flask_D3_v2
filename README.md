@@ -7,6 +7,7 @@
 <br/>в каталоке "app\Components"
 <br/>При использовании компонентов название начинается со слова "cmp"
 <br/>На пример, необходимо подключить компонент в HTML странице, описанный в каталоге "app\Components\Button"
+<br/> тэг будет выглядить так ```<cmpButton caption="push my" onclick="alert('click')"/>```
 <br/>__Html страница будет такой:__
 ```html
 <html lang="en">
