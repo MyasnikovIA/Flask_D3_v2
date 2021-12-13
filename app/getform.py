@@ -25,11 +25,13 @@ USER_FORM_PATH = os.path.join(os.path.dirname(__file__), 'UserForms')   # Дир
 TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), 'TempDir')      # Директория  хронения временных файлов
 DEBUGGER = 1                                                            # признак возможности включения режима отладки в URL строке
 """
+
 COMPONENT_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['Components'])  # Директория  где хронятся Компоненты
 FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['Forms'])            # Директория  где хронятся формы
 USER_FORM_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['UserForms'])   # Директория  ЮзерФорм
 TEMP_DIR_PATH = os.path.join(os.path.dirname(__file__), ConfigOptions['TempDir'])      # Директория  хронения временных файлов
 DEBUGGER = int(ConfigOptions['debug'])                                                 # признак возможности включения режима отладки в URL строке
+ROOT_DIR = os.path.join(os.path.dirname(__file__))                                     # Корневая папка
 
 nameElementHeshMap={}     # список ХЭШ названий элементов, для пеобразования
 nameElementMap={}         # список названий элементов
