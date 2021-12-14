@@ -110,7 +110,7 @@ docker commit d02a9d321c4b python3.8_flask:flask_001
 
 
 <br>Развертывание  платформы в Docker:  https://youtu.be/IsNmCKiFTuY
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/IsNmCKiFTuY/0.jpg)](https://www.youtube.com/watch?v=IsNmCKiFTuY)
+<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/IsNmCKiFTuY/0.jpg)](https://www.youtube.com/watch?v=IsNmCKiFTuY)
 <br>Запуск платформы локально:  https://youtu.be/LV5cnsGonZU
 <br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/LV5cnsGonZU/0.jpg)](https://www.youtube.com/watch?v=LV5cnsGonZU)
 
