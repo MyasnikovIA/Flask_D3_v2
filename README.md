@@ -28,7 +28,7 @@
 
 **Запуск платформы в Docker контейнере**
 ```
-1) Скачать репазиторий локально;
+1) Скачать репозиторий локально;
 2) Запустить Docker (авторизоватся);
 3) Запустить скрипт для сборки Docker контейнера "build.bat"(подождать окончания сборки);
 4) Запустите контейнер через скрипт "run.bat". Полсе запуска через 10 секунд откроется браузер 
@@ -37,13 +37,13 @@
 
 **Запуск платформы локально**
 ```
-1) Скачать репазиторий локально;
-2) Перейти в виректорию платформы "\Flask_D3_v2\app"
+1) Скачать репозиторий локально;
+2) Перейти в директорию платформы "\Flask_D3_v2\app"
 3) В командной строке установить виртуальное окружение cmd:virtualenv env
 4) Активировать виртуальное окружение cmd:env\Scripts\activate.bat
 5) Установить зависимости проекта cmd:pip3 install -r requirements.txt
 6) Запустить сервер cmd:python app.py 5001
-    5001 - порт на котором запустился сенрвер
+    5001 - порт на котором запустился сервер
 	Запустить браузер и перейти по адресу http://127.0.0.1:5001/
 ``` 
 
@@ -111,8 +111,8 @@ docker commit d02a9d321c4b python3.8_flask:flask_001
 
 <br>Развертывание  платформы в Docker:  https://youtu.be/SnS24nFNFzU
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/SnS24nFNFzU/0.jpg)](https://www.youtube.com/watch?v=SnS24nFNFzU)
-<br>Запуск платформы локально:  https://youtu.be/Fifx-BXfM7g
-<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/Fifx-BXfM7g/0.jpg)](https://www.youtube.com/watch?v=Fifx-BXfM7g)
+<br>Запуск платформы локально:  https://youtu.be/LV5cnsGonZU
+<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/LV5cnsGonZU/0.jpg)](https://www.youtube.com/watch?v=LV5cnsGonZU)
 
 
 
