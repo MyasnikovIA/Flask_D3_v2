@@ -34,7 +34,7 @@
 4) Запустите контейнер через скрипт "run.bat". Полсе запуска через 10 секунд откроется браузер 
    или перейти по адресу   http://127.0.0.1:9091/
 ```
-<br>Развертывание  платформы в Docker:  https://youtu.be/IsNmCKiFTuY
+Развертывание  платформы в Docker:  https://youtu.be/IsNmCKiFTuY
 <br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/IsNmCKiFTuY/0.jpg)](https://www.youtube.com/watch?v=IsNmCKiFTuY)
 <br>
 <br>
@@ -50,7 +50,7 @@
     5001 - порт на котором запустился сервер
 	Запустить браузер и перейти по адресу http://127.0.0.1:5001/
 ``` 
-<br>Запуск платформы локально:  https://youtu.be/LV5cnsGonZU
+Запуск платформы локально:  https://youtu.be/LV5cnsGonZU
 <br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/LV5cnsGonZU/0.jpg)](https://www.youtube.com/watch?v=LV5cnsGonZU)
 <br>
 <br>
