@@ -34,6 +34,10 @@
 4) Запустите контейнер через скрипт "run.bat". Полсе запуска через 10 секунд откроется браузер 
    или перейти по адресу   http://127.0.0.1:9091/
 ```
+<br>Развертывание  платформы в Docker:  https://youtu.be/IsNmCKiFTuY
+<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/IsNmCKiFTuY/0.jpg)](https://www.youtube.com/watch?v=IsNmCKiFTuY)
+<br>
+<br>
 
 **Запуск платформы локально**
 ```
@@ -46,6 +50,11 @@
     5001 - порт на котором запустился сервер
 	Запустить браузер и перейти по адресу http://127.0.0.1:5001/
 ``` 
+<br>Запуск платформы локально:  https://youtu.be/LV5cnsGonZU
+<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/LV5cnsGonZU/0.jpg)](https://www.youtube.com/watch?v=LV5cnsGonZU)
+<br>
+<br>
+
 
 **Назначение файлов и директорий в проекте**
 ```
@@ -107,13 +116,3 @@ docker images
 docker commit d02a9d321c4b python3.8_flask:flask_001
 -------------------------------------------------------------
 ```
-
-
-<br>Развертывание  платформы в Docker:  https://youtu.be/IsNmCKiFTuY
-<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/IsNmCKiFTuY/0.jpg)](https://www.youtube.com/watch?v=IsNmCKiFTuY)
-<br>Запуск платформы локально:  https://youtu.be/LV5cnsGonZU
-<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/LV5cnsGonZU/0.jpg)](https://www.youtube.com/watch?v=LV5cnsGonZU)
-
-
-
-
