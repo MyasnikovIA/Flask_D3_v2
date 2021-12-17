@@ -1,5 +1,9 @@
 # Flask_D3Ext_v2
 Трансляция фреймворка D3 от компании Bars-груп с PHP на Python3.8(вариант2)
+<br> **Установка**r:  https://youtu.be/eUePsfeHuwg
+<br>[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/eUePsfeHuwg/0.jpg)](https://www.youtube.com/watch?v=eUePsfeHuwg)
+
+
 
 **Для чего эта разработка**
 Разработка была сделана для расширения стандартной HTML компонентной базы.
@@ -44,8 +48,9 @@
 1) Скачать репозиторий локально;
 2) Перейти в директорию платформы "\Flask_D3_v2\app"
 3) В командной строке установить виртуальное окружение cmd:virtualenv env
+                                                       cmd:python -m venv env
 4) Активировать виртуальное окружение cmd:env\Scripts\activate.bat
-5) Установить зависимости проекта cmd:pip3 install -r requirements.txt
+5) Установить зависимости проекта cmd:pip install -r requirements.txt
 6) Запустить сервер cmd:python app.py 5001
     5001 - порт на котором запустился сервер
 	Запустить браузер и перейти по адресу http://127.0.0.1:5001/
