@@ -5,7 +5,11 @@ import shutil
 import json
 import uuid
 from pathlib import Path
-from flask import Flask, redirect, session, render_template, request, g
+from flask import Flask
+from flask import redirect
+from flask import session
+from flask import render_template
+from flask import request
 import getform
 import requests as reqExt
 import urllib.parse
