@@ -17,7 +17,7 @@
                    column_name,
                    data_type
               FROM information_schema.columns
-             WHERE column_name = %(form_params)s
+             WHERE column_name = :form_params
         ]]>
        <cmpDataSetVar name="form_params" src="form_params" srctype="var"/>
     </cmpDataSet>

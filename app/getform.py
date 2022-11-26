@@ -7,6 +7,7 @@ import json
 import sys
 import hashlib
 import cx_Oracle
+import psycopg2
 from app import session
 from pathlib import Path
 from Etc.config import ConfigOptions
@@ -60,8 +61,15 @@ def stripCode(srcCode=""):
     code = '\n'.join(codeRes)
     return code
 
+def connectPostgres(session,host, port,database, user, password ):
+    try:
+        DB_DICT[session['ID']] = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
+    except  Exception as inst:
+        return False, f"error connect:{inst}"
+    return True, "ok"
 
-def exec_then_eval(DB_DICT,vars, code, sessionObj):
+
+def exec_then_eval(DB,vars, code, sessionObj):
     """
     Запуск многострочного текста кода  с кэшированием
     :param vars:  переменные для входных рагументов скрипта (инициализация) {"var1":111,"var2":333}
@@ -78,9 +86,11 @@ def exec_then_eval(DB_DICT,vars, code, sessionObj):
             # and not str(type(globals()[ind])) == "<class 'module'>"
             vars[ind] = globals()[ind]
     vars["session"] = sessionObj
-    vars["getSession"] = getSession
-    vars["setSession"] = setSession
-    vars["SQL"] = DB_DICT
+    # vars["getSession"] = getSession
+    # vars["setSession"] = setSession
+    vars["connectPostgres"] = connectPostgres
+    vars["SQL"] = DB
+    vars["ConfigOptions"] = ConfigOptions
     _globals, _locals = vars, {}
     exec(compile(block, '<string>', mode='exec'), _globals, _locals)
     return eval(compile(last, '<string>', mode='eval'), _globals, _locals)
@@ -564,11 +574,11 @@ def query_db(DB,query, args=(), one=False):
     """
     if "DB_DICT" in args:
         del args["DB_DICT"]
-    cur = DB["SQLconnect"].cursor()
+    cur = DB.cursor()
     cur.execute(query, args)
     r = [dict((cur.description[i][0], value) for i, value in enumerate(row)) for row in cur.fetchall()]
     #cur.connection.close()
-    DB["SQLconnect"].commit()
+    DB.commit()
     cur.close()
     return (r[0] if r else None) if one else r
 
@@ -593,11 +603,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     if 'ID' in sessionObj and not sessionObj['ID'] in DB_DICT:
         sessionID = sessionObj['ID']
         DB_DICT[sessionID] = {}
-        DB_DICT[sessionID]["oracle"] = {'SQL': '', 'SQLconnect': ''}
-        DB_DICT[sessionID]["postgre"] = {'SQL': '', 'SQLconnect': ''}
-        DB_DICT[sessionID]["sqlite"] = {'SQL': '', 'SQLconnect': ''}
     else:
         sessionID = sessionObj['ID']
+    DB = DB_DICT[sessionID]
     dataSetName = ""
     if ":" in formName:
         dataSetName = formName.split(":")[1]
@@ -615,118 +623,16 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
     if (not int(sessionObj["AgentInfo"]['debug']) == 0) or DEBUGGER==2:
         varsDebug = argsQuery.copy()
     # =============================================================================
-    argsQuery["DB_DICT"] = DB_DICT
-    action_sql=""
-    if "action" in dataSetXml.attrib:
-        action_sql = dataSetXml.attrib.get("action")
-    database = ""  # имя базы данных к которой должен обратится запрос
-    if "database" in dataSetXml.attrib:
-        database = dataSetXml.attrib.get("database")
-    if typeQuery == "DataSet":
-        query_type = "sql"
-        if "query_type" in dataSetXml.attrib:
-            query_type = dataSetXml.attrib.get("query_type")
-        # Если указана БД, тогда выбираем подключение  по имени, или берем первое попавшееся подключение
-        DB = {"SQLconnect": ""}
-        _DB_DICT = DB_DICT[sessionID]
-        if database == "":
-            for nam in DB_DICT[sessionID]:
-                if not DB_DICT[sessionID][nam]["SQLconnect"] == "":
-                    DB = DB_DICT[sessionID][nam]
-                    break
-        else:
-            if database in DB_DICT[sessionID]:
-                DB = DB_DICT[sessionID][database]
-        if query_type == "server_python":  # выполнить Python скрипт
-            code = stripCode(dataSetXml.text)
-            dataVarReturn = {}
-            localVariableTemp = {}
-            try:
-                localVariableTemp = exec_then_eval(_DB_DICT,argsQuery, code, sessionObj)
-            except:
-                resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
-            for elementDict in localVariableTemp:
-                if elementDict[:2] == '__' or elementDict == 'elementDict' \
-                        or elementDict == 'localVariableTemp' or elementDict == 'sys':
-                    continue
-                if elementDict in sessionVar:  # запоменаем переменные сессии
-                    sessionObj[elementDict] = localVariableTemp[elementDict]
-                else:
-                    dataVarReturn[elementDict] = localVariableTemp[elementDict]
-            del localVariableTemp
-            if "data" in dataVarReturn:
-                resObject[dataSetName]["data"] = dataVarReturn["data"]
-                resObject[dataSetName]["rowcount"] = len(dataVarReturn["data"])
-                del dataVarReturn["data"]
-            resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
-            if "position" in dataVarReturn:
-                resObject[dataSetName]["rowcount"] = dataVarReturn['position']
-                del dataVarReturn['position']
-            if "rowcount" in dataVarReturn:
-                resObject[dataSetName]["rowcount"] = dataVarReturn['rowcount']
-                del dataVarReturn['rowcount']
-            resObject[dataSetName]["locals"] = dataVarReturn
-            resObject[dataSetName]["uid"] = uid
-            resObject[dataSetName]["type"] = typeQuery
-            resObject[dataSetName]["position"] = 0
-            resObject[dataSetName]["page"] = 0
-            if (not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1) or DEBUGGER==2:
-                resObject[dataSetName]["var"] = varsDebug
-                resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
-            return json.dumps(resObject)
-        else:
-            # Если есть подключение к БД тогда выполняем SQL запрос
-            if not DB["SQLconnect"] == '':
-                resObject[dataSetName]["type"] = typeQuery
-                ext = argsQuery["_ext_"]
-                del argsQuery["_ext_"] # странная переменная
-                sqlText = dataSetXml.text
-                if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
-                    # Дописать обработку вставок
-                    pass
-                if (not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1) or DEBUGGER==2:
-                    resObject[dataSetName]["var"] = varsDebug
-                    resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
-                try:
-                    resObject[dataSetName]["data"] = query_db(DB, sqlText, argsQuery)
-                    resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
-                    resObject[dataSetName]["position"] = 0
-                except Exception as e:
-                    resObject[dataSetName]["rowcount"] = 0
-                    resObject[dataSetName]["position"] = 0
-                    resObject[dataSetName]["locals"] = {}
-                    resObject[dataSetName]["data"] = []
-                    resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
-                return json.dumps(resObject)
-        # дописать обработку SQL запроса
-        if DB["SQLconnect"] == '':
-            s = {dataSetName: {"type": typeQuery, "data": [{'console': "необходимо подключится к БД"}], "locals": {},
-                               "position": 0, "rowcount": 0}}
-        else:
-            s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {},
-                           "position": 0, "rowcount": 0}}
-        return json.dumps(s)
     if typeQuery == "Action":
         query_type = "psql"
         if "query_type" in dataSetXml.attrib:
             query_type = dataSetXml.attrib.get("query_type")
-        DB = {"SQLconnect": ""}
-        _DB_DICT =  DB_DICT[sessionID]
-        if database == "":
-            for nam in DB_DICT[sessionID]:
-                if not DB_DICT[sessionID][nam]["SQLconnect"] == "":
-                    DB = DB_DICT[sessionID][nam]
-                    break
-        else:
-            if database in DB_DICT[sessionID]:
-                DB = DB_DICT[sessionID][database]
-
         if query_type == "server_python":  # выполнить Python скрипт
             code = stripCode(dataSetXml.text)
             dataVarReturn = {}
             localVariableTemp = {}
             try:
-                localVariableTemp = exec_then_eval(_DB_DICT,argsQuery, code, sessionObj)
+                localVariableTemp = exec_then_eval(DB, argsQuery, code, sessionObj)
             except:
                 resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
             for elementDict in localVariableTemp:
@@ -749,6 +655,52 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 resObject[dataSetName]["sqlArr"] = [line for line in code.split("\n")]
                 resObject[dataSetName]["sql"] = code
             return json.dumps(resObject)
+        else:
+            if DB == {} or DB.closed == 1:
+                s = {dataSetName: {"type": typeQuery, 'eval': ConfigOptions['DatabaseLoginName'], "data": {}, "locals": {}, "position": 0, "rowcount": 0}}
+                return json.dumps(s)
+            sqlText = dataSetXml.text
+            if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
+                # Дописать обработку вставок
+                pass
+            if (not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER==1) or DEBUGGER==2:
+                resObject[dataSetName]["var"] = varsDebug
+                resObject[dataSetName]["sqlArr"] = [line for line in sqlText.split("\n")]
+                resObject[dataSetName]["sql"] = sqlText
+            # Если подключение к Oracle
+            if str(type(DB))=="<class 'cx_Oracle.Connection'>":
+                cur = DB.cursor()
+                argsQuerySrc = argsQuery.copy()
+                for nam in argsPutQuery:
+                    argsQuerySrc[nam] = cur.var(cx_Oracle.STRING)
+                try:
+                    cur.execute(sqlText, argsQuerySrc)
+                    outVar = {}
+                    for nam in argsPutQuery:
+                        outVar[nam] = argsQuerySrc[nam].getvalue()
+                    resObject[dataSetName]["data"] = outVar
+                    res = json.dumps(resObject)
+                except Exception as e:
+                    resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
+                    res = json.dumps({dataSetName: {"type": typeQuery, "data": {}, "locals": {} }})
+                DB.commit()
+                cur.close()
+                return res
+
+            # Если подключение к Sqlote
+            if str(type(DB)) == "<class 'sqlite3.Connection'>":
+                # дописать поведение для SQL lite
+                # https://stackoverflow.com/questions/3286525/return-sql-table-as-json-in-python
+                try:
+                    # получем первую строку из  простого запроса (необходимо переписать на логику аналогично Oracle Begin End;)
+                    resObject[dataSetName]["data"] = query_db(DB, sqlText, args=argsQuery, one=True)
+                except Exception as e:
+                    resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
+                return json.dumps(resObject)
+            if str(type(DB['SQLconnect'])) == "<class 'psycopg2.extensions.connection'>":
+                pass
+        """
+        Дописать получение однострочно
         else:
             resObject[dataSetName]["data"]={}
             resObject[dataSetName]["type"] = typeQuery
@@ -826,6 +778,92 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
 
             s = {dataSetName: {"type": typeQuery, "data": {}, "locals": {}, "position": 0, "rowcount": 0}}
             return json.dumps(resObject)
+        """
+
+    if typeQuery == "DataSet":
+        query_type = "sql"
+        if "query_type" in dataSetXml.attrib:
+            query_type = dataSetXml.attrib.get("query_type")
+        if query_type == "server_python":  # выполнить Python скрипт
+            code = stripCode(dataSetXml.text)
+            dataVarReturn = {}
+            localVariableTemp = {}
+            try:
+                localVariableTemp = exec_then_eval(DB, argsQuery, code, sessionObj)
+            except:
+                resObject["error"] = f"{formName} : {dataSetName} :{sys.exc_info()}"
+            for elementDict in localVariableTemp:
+                if elementDict[:2] == '__' or elementDict == 'elementDict' \
+                        or elementDict == 'localVariableTemp' or elementDict == 'sys':
+                    continue
+                if elementDict in sessionVar:  # запоменаем переменные сессии
+                    sessionObj[elementDict] = localVariableTemp[elementDict]
+                else:
+                    dataVarReturn[elementDict] = localVariableTemp[elementDict]
+            del localVariableTemp
+            if "data" in dataVarReturn:
+                resObject[dataSetName]["data"] = dataVarReturn["data"]
+                resObject[dataSetName]["rowcount"] = len(dataVarReturn["data"])
+                del dataVarReturn["data"]
+            resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
+            if "position" in dataVarReturn:
+                resObject[dataSetName]["rowcount"] = dataVarReturn['position']
+                del dataVarReturn['position']
+            if "rowcount" in dataVarReturn:
+                resObject[dataSetName]["rowcount"] = dataVarReturn['rowcount']
+                del dataVarReturn['rowcount']
+            resObject[dataSetName]["locals"] = dataVarReturn
+            resObject[dataSetName]["uid"] = uid
+            resObject[dataSetName]["type"] = typeQuery
+            resObject[dataSetName]["position"] = 0
+            resObject[dataSetName]["page"] = 0
+            if (not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER == 1) or DEBUGGER == 2:
+                resObject[dataSetName]["var"] = varsDebug
+                resObject[dataSetName]["sql"] = [line for line in code.split("\n")]
+            return json.dumps(resObject)
+        else:
+            # Если есть подключение к БД тогда выполняем SQL запрос
+            resObject[dataSetName]["type"] = typeQuery
+            if DB == {} or DB.closed == 1:
+                s = {dataSetName: {"type": typeQuery, 'eval': ConfigOptions['DatabaseLoginName'], "data": [{}], "locals": {},"position": 0, "rowcount": 0}}
+                return json.dumps(s)
+            resObject[dataSetName]["type"] = typeQuery
+            ext = argsQuery["_ext_"]
+            del argsQuery["_ext_"]  # странная переменная
+            sqlText = dataSetXml.text
+
+            for argName in argsQuery:
+                print("type(argsQuery[argName]", sqlText.find(f":{argName}")>0 );
+                if sqlText.find(f":{argName}") > 0:
+                    if type(argsQuery[argName]).__name__ == 'str':
+                        sqlText = sqlText.replace(f":{argName} ",f"%({argName})s ")\
+                                         .replace(f":{argName},",f"%({argName})s,") \
+                                         .replace(f":{argName}\n", f"%({argName})s\n")
+                    else:
+                        sqlText = sqlText.replace(f":{argName} ",f"{argsQuery[argName]} ")\
+                                         .replace(f":{argName},",f"{argsQuery[argName]},") \
+                                         .replace(f":{argName}\n", f"{argsQuery[argName]}\n")
+            if "compile" in dataSetXml.attrib and dataSetXml.attrib['compile'] == str("true"):
+                # Дописать обработку вставок
+                pass
+            if (not int(sessionObj["AgentInfo"]['debug']) == 0 and DEBUGGER == 1) or DEBUGGER == 2:
+                resObject[dataSetName]["var"] = varsDebug
+                resObject[dataSetName]["sql"] = [line for line in sqlText.split("\n")]
+            try:
+                resObject[dataSetName]["data"] = query_db(DB, sqlText, argsQuery)
+                resObject[dataSetName]["rowcount"] = len(resObject[dataSetName]["data"])
+                resObject[dataSetName]["position"] = 0
+            except Exception as e:
+                resObject[dataSetName]["rowcount"] = 0
+                resObject[dataSetName]["position"] = 0
+                resObject[dataSetName]["locals"] = {}
+                resObject[dataSetName]["data"] = []
+                resObject[dataSetName]["error"] = f"An error occurred. Error number {e.args}.".split("\\n")
+            return json.dumps(resObject)
+        # дописать обработку SQL запроса
+        s = {dataSetName: {"type": typeQuery, "data": [{'console': "Необходимо допилить метод"}], "locals": {}, "position": 0, "rowcount": 0}}
+        return json.dumps(s)
+
     # print(ET.tostring(dataSetXml).decode())
     if typeQuery == "Module":
         module = dataSetXml.attrib.get("module")

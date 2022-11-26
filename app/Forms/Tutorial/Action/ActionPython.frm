@@ -1,5 +1,3 @@
-
-
 <div cmptype="Form"  caption="Выполнение SQL запросов" width="60%" height="60%" >
 
    <cmpScript name="main_script">

@@ -708,7 +708,6 @@ D3Api = new function () {
         var requestData = '';
         var postData = '';
         var _param = ''
-
         if('cache_enabled' in D3Api){
             _param += 'cache_enabled='+D3Api.cache_enabled;
         }
@@ -770,6 +769,15 @@ D3Api = new function () {
                 if (reqObj.status == 200) {
                     if (checkErrorRequest(reqObj, params) && params.onSuccess instanceof Function)
                         params.onSuccess.call(params.contextObj, ((params.responseXml) ? reqObj.responseXML : reqObj.responseText),reqObj);
+                    if (reqObj.responseText[0] === '{') {
+                        var reqObjJson = JSON.parse(reqObj.responseText);
+                        for (var keySub in reqObjJson) {
+                            if (typeof(reqObjJson[keySub]['eval']) === 'string' ){
+                                eval(reqObjJson[keySub]['eval']);
+                                break;
+                            }
+                        }
+                    }
                 } else if (params.onError instanceof Function) {
                     checkErrorRequest(reqObj, params);
                     params.onError.call(params.contextObj, (params.responseXml) ? reqObj.responseXML : reqObj.responseText, reqObj);
