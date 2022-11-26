@@ -72,30 +72,7 @@ def getSrc(request):
     # ============================================
 
     # Добавил функцию отладки (для Android)
-    res.append("""
-    /* Функция отладки ghbvty*/
-    var console_log = function(message){
-       if ((AGENT_INFO_PLATFORM == "android") && (Android)) {
-         msg="";
-         for (let args of arguments) {
-            if (typeof args === 'string') {
-               msg+="|"+args;
-            }
-            if (typeof args === 'object') {
-               try {
-                 msg+="|"+JSON.stringify(args);
-               } catch {
-                 msg+="|"+args;
-               }
-            }
-         }
-         Android.console_log(msg);
-       } else {
-         console.log(arguments);
-       }
-    }
-    var log = console_log; 
-    """)
+    res.append(""" """)
 
 
     res.append(readfile('System/js/main.js'))
@@ -166,6 +143,9 @@ def getSrc(request):
       }}
  }},true);
     """)
+
+    cmpDirSrc = f'System{os.sep}js{os.sep}mobile_touchpad_event_processing.js'
+    res.append(readfile(cmpDirSrc))
     # res.append(f'\rD3Api.agent_info = { json.dumps(agent_info)};')
     return "".join(res)
 

@@ -388,13 +388,13 @@ D3Api = new function () {
      */
     function parseForm(xml,_peq) {
         if (this.name.indexOf('.') != -1) {
-             let fragArr = this.name.split('.');
+             var fragArr = this.name.split('.');
              // Модифицируем HTML в формат FRM
              // Выредзаем содержимое <body> и вставляем в блоки <div>
              // Необходимо написать полнноценный конвертор на  регулярных вырожениях
              if ((fragArr[fragArr.length-1]).toLowerCase() == 'html') {
-                let sysinfo = xml.split("</html>")[1];
-                let bodyText = "<div"+xml.split("<body")[1];
+                var sysinfo = xml.split("</html>")[1];
+                var bodyText = "<div"+xml.split("<body")[1];
                 bodyText = bodyText.split("</body>")[0]+"</div>"
                 xml = bodyText+sysinfo;
              }
