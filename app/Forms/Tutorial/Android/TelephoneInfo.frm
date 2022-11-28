@@ -2,15 +2,19 @@
 <cmpScript>
   <![CDATA[
       Form.onShow = function(){
-          if (Android) {
+          if (typeof(Android) !== 'undefined') {
              setValue('log','--------');
           }
       }
       Form.setTelephoneSetings = function() {
-          Android.setTelephoneSetings();
+          if (typeof(Android) !== 'undefined') {
+             Android.setTelephoneSetings();
+          }
       }
       Form.getDeviceInfo = function() {
-          setValue('log',Android.getDeviceInfo());
+          if (typeof(Android) !== 'undefined') {
+              setValue('log',Android.getDeviceInfo());
+          }
       }
 
   ]]>

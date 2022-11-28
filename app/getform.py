@@ -11,6 +11,7 @@ import psycopg2
 from app import session
 from pathlib import Path
 from Etc.config import ConfigOptions
+import shelve
 
 try:
     import xml.etree.cElementTree as ET
@@ -38,6 +39,9 @@ nameElementHeshMap={}     # список ХЭШ названий элемент�
 nameElementMap={}         # список названий элементов
 DB_DICT = {}              # Список БД по  сессиям
 REMOTE_SESSION_DICT = {}  # Словарь содержащий сессии удаленных серверов
+
+TEMP_FILE_NAME = ConfigOptions['TempPageFile'] # Словарь содержащий обработанные формы (после перезагрузки сервера файл удаляется)
+
 
 def stripCode(srcCode=""):
     """
@@ -316,13 +320,16 @@ def getTemp(formName, cache, dataSetName, session):
        cmpFiletmp = os.path.join(cmpDirSrc, session["AgentInfo"]['platform'], f"{formName[:-5].replace(os.sep, '_')}{blockName}."+ext)
     else:
        cmpFiletmp = os.path.join(cmpDirSrc, session["AgentInfo"]['platform'], f"{formName.replace(os.sep, '_')}{blockName}.frm")
+    """
     if not os.path.exists(cmpDirSrc):
         os.makedirs(cmpDirSrc)
+    """
     txt = ""
     if existTempPage(cmpFiletmp):
         txt, mime = getTempPage(cmpFiletmp, '')
     if not txt == "":
         return txt
+    """
     if not os.path.exists(cmpFiletmp):
         if not os.path.exists(os.path.dirname(cmpFiletmp)):
             os.makedirs(os.path.dirname(cmpFiletmp))
@@ -336,16 +343,25 @@ def getTemp(formName, cache, dataSetName, session):
             txt = infile.read()
             setTempPage(cmpFiletmp, txt)
             return txt
+    """
+    txt = getSrc(formName, cache, dataSetName, session)
+    setTempPage(cmpFiletmp, txt)
+    return txt
 
 
 def getParsedForm(formName, cache, dataSetName="", session={}):
     """
       Функция предназаначенна дла  чтения исходного файла формы и замены его фрагментов на компоненты
     """
+    """
     if ("AgentInfo" in session and 'debug' in session["AgentInfo"] and int(session["AgentInfo"]['debug']) == 0 and DEBUGGER == 1)and not DEBUGGER == 2:
+        print("DEBUGGER", DEBUGGER)
         return getTemp(formName, cache, dataSetName, session)
     else:
+        print("DEBUGGER222", DEBUGGER)
         return getSrc(formName, cache, dataSetName, session)
+    """
+    return getTemp(formName, cache, dataSetName, session)
 
 
 def parseVar(paramsQuery, dataSetXml, typeQuery, sessionObj):
@@ -833,7 +849,6 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
             sqlText = dataSetXml.text
 
             for argName in argsQuery:
-                print("type(argsQuery[argName]", sqlText.find(f":{argName}")>0 );
                 if sqlText.find(f":{argName}") > 0:
                     if type(argsQuery[argName]).__name__ == 'str':
                         sqlText = sqlText.replace(f":{argName} ",f"%({argName})s ")\
@@ -908,7 +923,8 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
 ###------ Механизм буфиризации контента, для ускорения продуктового сервета ----------------------
 ###-----------------------------------------------------------------------------------------------
 global TMP_PAGE_CAHE
-TMP_PAGE_CAHE = {}
+TMP_PAGE_CAHE = shelve.open(TEMP_FILE_NAME)
+#TMP_PAGE_CAHE = {}
 
 
 def getTempPage(name, defoultValue=''):
@@ -932,6 +948,7 @@ def setTempPage(name, html='', mime='application/plain'):
     if TMP_PAGE_CAHE == None:
         TMP_PAGE_CAHE = {}
     TMP_PAGE_CAHE[f"{name}"] = {"txt": html, "mime": mime}
+    TMP_PAGE_CAHE.sync()
 
 
 def existTempPage(name):
@@ -1024,8 +1041,7 @@ def sendCostumBin(pathFile):
         else:
             # fpath = Path(__file__).absolute()
             fpath = os.path.dirname(Path(__file__).absolute())
-            return f"File {pathFile} not found {os.path.dirname(Path(__file__).absolute())}{os.sep}  --{fpath}---", getform.mimeType(
-                ".txt")
+            return f"File {pathFile} not found {os.path.dirname(Path(__file__).absolute())}{os.sep}  --{fpath}---", mimeType(".txt")
     else:
         return txt, mime
 

@@ -1,7 +1,6 @@
 import datetime
 import os
 import sys
-import shutil
 import json
 import uuid
 from pathlib import Path
@@ -171,14 +170,10 @@ def all_files(path):
 
 
 if __name__ == '__main__':
-    if os.path.exists(getform.TEMP_DIR_PATH):
-        for root, dirs, files in os.walk(getform.TEMP_DIR_PATH):
-            for f in files:
-                os.unlink(os.path.join(root, f))
-            for d in dirs:
-                shutil.rmtree(os.path.join(root, d))
-    else:
-        os.mkdir(getform.TEMP_DIR_PATH)
+    #if os.path.exists(f"{getform.TEMP_FILE_NAME}.dat"):
+    #    os.remove(f"{getform.TEMP_FILE_NAME}.bak")
+    #    os.remove(f"{getform.TEMP_FILE_NAME}.dat")
+    #    os.remove(f"{getform.TEMP_FILE_NAME}.dir")
     port = int(os.environ.get("PORT", 5000))
     if len(sys.argv)>1:
         port = int(sys.argv[1])

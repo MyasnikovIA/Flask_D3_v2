@@ -55,6 +55,6 @@ class OpenStreetMap(Base):
 
         # self.SetSysInfo.append("<scriptfile>/Components/OpenStreetMap/js/OpenLayers.js</scriptfile>")
         self.SetSysInfo.append("<scriptfile>Components/OpenStreetMap/js/OpenLayers.js</scriptfile>") # в локальной версии исправлена ошибка при  увеличении масштаба
-        self.SetSysInfo.append("<cssfile>Components/OpenStreetMap/css/OpenStreetMap.css</cssfile>")
+        self.SetSysInfo.append("<cssfile>Components/OpenStreetMap/css/OpenStreetMap</cssfile>")
         # подключаем библиотеку из интернета
         # self.SetSysInfo.append("<scriptfile>https://openlayers.org/api/2.13.1/OpenLayers.js</scriptfile>")

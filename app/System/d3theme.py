@@ -41,7 +41,21 @@ def getSrc(request):
     res.append(readfile('Components/Layout/css/Layout.css'))
     return "".join(res)
 
+
 def getTemp(request):
+    cmpDirSrc = getform.TEMP_DIR_PATH
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{request.user_agent.platform}_d3theme.css"
+    txt = ""
+    if getform.existTempPage(cmpFiletmp):
+       txt,mime = getform.getTempPage(cmpFiletmp,'')
+    if txt == "":
+        txt = getSrc(request)
+        getform.setTempPage(cmpFiletmp, txt)
+        return txt
+    else:
+        return txt
+
+def getTempOld(request):
     cmpDirSrc = getform.TEMP_DIR_PATH
     cmpFiletmp = f"{cmpDirSrc}{os.sep}{request.user_agent.platform}_d3theme.css"
     if not os.path.exists(cmpDirSrc):
@@ -63,7 +77,6 @@ def getTemp(request):
                 return txt
     else:
         return txt
-
 def show(request):
     # request.user_agent.platform
     return getTemp(request)

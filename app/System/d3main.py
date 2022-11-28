@@ -33,7 +33,7 @@ def genCacheUid():
     hesh = random + hashlib.md5(f'{getIdClient()}'.encode('utf-8')).hexdigest()
     return hesh
 
-def getTemp(request):
+def getTempOld(request):
     cmpDirSrc = getform.TEMP_DIR_PATH
     cmpFiletmp = f"{cmpDirSrc}{os.sep}{request.user_agent.platform}_d3main.js"
     if not os.path.exists(cmpDirSrc):
@@ -54,6 +54,19 @@ def getTemp(request):
             txt = infile.read()
             getform.setTempPage(cmpFiletmp, txt)
             return txt
+
+
+def getTemp(request):
+    cmpDirSrc = getform.TEMP_DIR_PATH
+    cmpFiletmp = f"{cmpDirSrc}{os.sep}{request.user_agent.platform}_d3main.js"
+    txt = ""
+    if getform.existTempPage(cmpFiletmp):
+        txt,mime = getform.getTempPage(cmpFiletmp,'')
+    if not txt == "":
+        return txt
+    txt = getSrc(request)
+    getform.setTempPage(cmpFiletmp, txt)
+    return txt
 
 
 def getSrc(request):
