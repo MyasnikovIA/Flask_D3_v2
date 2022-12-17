@@ -217,12 +217,13 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
             if hasattr(obj, 'text') and not obj.text == None:
                 htmlContent.append(obj.text)
     # =========== Рекурсионый обход дерева ============================
-    if hasattr(root, 'getchildren'):
-        for elem in root.getchildren():
+    if root.__len__() > 0:  # ---- дочерние элементы
+        numbeSubLavel += 1
+        for elem in range(root.__len__()):
             loc_SetSysInfo, text = parseFrm(elem, formName, root, 0, session)
             sysinfoBlock.extend(loc_SetSysInfo)
             htmlContent.append(text)
-    elif len(root) > 0:
+    elif len(root) > 0:  # ---- рядом стоящий элемент
         num_element = 0
         for elem in root:
             num_element += 1
