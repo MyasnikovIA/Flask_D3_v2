@@ -219,7 +219,8 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
     # =========== Рекурсионый обход дерева ============================
     if root.__len__() > 0:  # ---- дочерние элементы
         numbeSubLavel += 1
-        for elem in range(root.__len__()):
+        for indElem in range(root.__len__()):
+            elem = root[indElem]
             loc_SetSysInfo, text = parseFrm(elem, formName, root, 0, session)
             sysinfoBlock.extend(loc_SetSysInfo)
             htmlContent.append(text)
