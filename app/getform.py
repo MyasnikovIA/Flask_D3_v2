@@ -6,7 +6,7 @@ import ast
 import json
 import sys
 import hashlib
-import cx_Oracle
+#import cx_Oracle
 import psycopg2
 from app import session
 from pathlib import Path
@@ -218,7 +218,7 @@ def parseFrm(root, formName, parentRoot={}, num_element=0, session={}):
                 htmlContent.append(obj.text)
     # =========== Рекурсионый обход дерева ============================
     if root.__len__() > 0:  # ---- дочерние элементы
-        numbeSubLavel += 1
+        # numbeSubLavel += 1
         for indElem in range(root.__len__()):
             elem = root[indElem]
             loc_SetSysInfo, text = parseFrm(elem, formName, root, 0, session)
@@ -690,7 +690,9 @@ def dataSetQuery(formName, typeQuery, paramsQuery, sessionObj):
                 cur = DB.cursor()
                 argsQuerySrc = argsQuery.copy()
                 for nam in argsPutQuery:
-                    argsQuerySrc[nam] = cur.var(cx_Oracle.STRING)
+                   pass
+                   # Библиотека Oracle не загружается через PIP ПЕРЕПИСАТЬ!!!
+                   # argsQuerySrc[nam] = cur.var(cx_Oracle.STRING)
                 try:
                     cur.execute(sqlText, argsQuerySrc)
                     outVar = {}
